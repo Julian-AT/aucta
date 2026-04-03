@@ -14,6 +14,7 @@
     "format": "biome format --write .",
     "check": "biome check --fix ."
   },
+  "packageManager": "bun@1.3.8",
   "devDependencies": {
     "turbo": "^2.9.0",
     "typescript": "^6.0.0",
