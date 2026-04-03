@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **UI hint**: yes
 
 Plans:
-- [ ] 01-01-PLAN.md — Monorepo foundation: Turborepo + Bun workspaces + packages/shared + packages/config
+- [x] 01-01-PLAN.md — Monorepo foundation: Turborepo + Bun workspaces + packages/shared + packages/config
 - [ ] 01-02-PLAN.md — Database + auth: Drizzle ORM with Neon Postgres, Better Auth with org plugin and RBAC
 - [ ] 01-03-PLAN.md — API layer: tRPC middleware (auth, org-scope, rate-limit, error-converter) + org and invite routers
 - [ ] 01-04-PLAN.md — CI + test infrastructure: Vitest workspace config, packages/shared tests, GitHub Actions workflow
