@@ -12,7 +12,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **INFRA-01**: Turborepo monorepo with Bun, TypeScript 6 strict, Biome linting/formatting
 - [x] **INFRA-02**: Shared packages structure: ai, api, db, auth, shared, config with correct import boundaries
 - [ ] **INFRA-03**: EAS development builds configured for physical device testing (audio/camera require dev builds, not Expo Go)
-- [ ] **INFRA-04**: CI pipeline: Biome lint, TypeScript typecheck, Vitest tests, Turborepo build with remote caching
+- [x] **INFRA-04**: CI pipeline: Biome lint, TypeScript typecheck, Vitest tests, Turborepo build with remote caching
 - [x] **INFRA-05**: Neon Postgres (EU Frankfurt) with Drizzle ORM schema, migrations, and repository pattern
 - [ ] **INFRA-06**: Upstash Redis (EU) configured for rate limiting and ephemeral token caching
 - [ ] **INFRA-07**: Qdrant vector DB (EU) configured for knowledge base embeddings and hybrid search
@@ -152,7 +152,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-01 | Phase 1 | Complete |
 | INFRA-02 | Phase 1 | Complete |
 | INFRA-03 | Phase 1 | Pending |
-| INFRA-04 | Phase 1 | Pending |
+| INFRA-04 | Phase 1 | Complete |
 | INFRA-05 | Phase 1 | Complete |
 | INFRA-06 | Phase 1 | Pending |
 | INFRA-07 | Phase 5 | Pending |
