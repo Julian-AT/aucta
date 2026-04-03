@@ -30,13 +30,16 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Technician can join an organization by entering an invite code or scanning a QR code
   4. tRPC middleware enforces org-scoped access on every endpoint and rate limiting is active on auth and API routes
   5. CI pipeline runs Biome lint, TypeScript typecheck, and Vitest tests; EAS development builds work on physical devices
-**Plans**: TBD
+**Plans**: 6 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md — Monorepo foundation: Turborepo + Bun workspaces + packages/shared + packages/config
+- [ ] 01-02-PLAN.md — Database + auth: Drizzle ORM with Neon Postgres, Better Auth with org plugin and RBAC
+- [ ] 01-03-PLAN.md — API layer: tRPC middleware (auth, org-scope, rate-limit, error-converter) + org and invite routers
+- [ ] 01-04-PLAN.md — CI + test infrastructure: Vitest workspace config, packages/shared tests, GitHub Actions workflow
+- [ ] 01-05-PLAN.md — Mobile app foundation: Expo SDK 55, NativeWind v4, theme system, providers, Expo Router layouts
+- [ ] 01-06-PLAN.md — Mobile screens + EAS: Auth/onboarding screens, home, settings, InviteCodeInput, QRScanner, EAS config
 
 ### Phase 2: AI Pipeline and Tool System
 **Goal**: The API can issue ephemeral Gemini tokens with locked system prompts and tool declarations, and tools can be dispatched and tested individually
@@ -110,11 +113,11 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and Auth | 0/0 | Not started | - |
+| 1. Foundation and Auth | 0/6 | Planning complete | - |
 | 2. AI Pipeline and Tool System | 0/0 | Not started | - |
 | 3. Live Streaming Session | 0/0 | Not started | - |
 | 4. Session Lifecycle | 0/0 | Not started | - |
