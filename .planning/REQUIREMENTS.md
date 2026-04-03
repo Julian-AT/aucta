@@ -13,19 +13,19 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **INFRA-02**: Shared packages structure: ai, api, db, auth, shared, config with correct import boundaries
 - [ ] **INFRA-03**: EAS development builds configured for physical device testing (audio/camera require dev builds, not Expo Go)
 - [ ] **INFRA-04**: CI pipeline: Biome lint, TypeScript typecheck, Vitest tests, Turborepo build with remote caching
-- [ ] **INFRA-05**: Neon Postgres (EU Frankfurt) with Drizzle ORM schema, migrations, and repository pattern
+- [x] **INFRA-05**: Neon Postgres (EU Frankfurt) with Drizzle ORM schema, migrations, and repository pattern
 - [ ] **INFRA-06**: Upstash Redis (EU) configured for rate limiting and ephemeral token caching
 - [ ] **INFRA-07**: Qdrant vector DB (EU) configured for knowledge base embeddings and hybrid search
 - [ ] **INFRA-08**: Inngest background job handler on Next.js API route
 
 ### Authentication & Organization
 
-- [ ] **AUTH-01**: User can create account with email and password via Better Auth
+- [x] **AUTH-01**: User can create account with email and password via Better Auth
 - [ ] **AUTH-02**: User can log in and session persists across app restarts (expo-secure-store on mobile)
 - [ ] **AUTH-03**: User can create an organization and become its owner
 - [ ] **AUTH-04**: Owner can generate invite codes with role assignment (technician/manager) and expiry
 - [ ] **AUTH-05**: Technician can join an organization by entering invite code or scanning QR
-- [ ] **AUTH-06**: Role-based access control enforced: owner, manager, technician with distinct permissions
+- [x] **AUTH-06**: Role-based access control enforced: owner, manager, technician with distinct permissions
 - [ ] **AUTH-07**: Org-scoped tRPC middleware enforces org_id on every query — no cross-org data access possible
 - [ ] **AUTH-08**: Rate limiting on auth endpoints (10/min), token creation (5/min), and general API (100/min)
 
@@ -153,16 +153,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-02 | Phase 1 | Complete |
 | INFRA-03 | Phase 1 | Pending |
 | INFRA-04 | Phase 1 | Pending |
-| INFRA-05 | Phase 1 | Pending |
+| INFRA-05 | Phase 1 | Complete |
 | INFRA-06 | Phase 1 | Pending |
 | INFRA-07 | Phase 5 | Pending |
 | INFRA-08 | Phase 4 | Pending |
-| AUTH-01 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Pending |
 | AUTH-03 | Phase 1 | Pending |
 | AUTH-04 | Phase 1 | Pending |
 | AUTH-05 | Phase 1 | Pending |
-| AUTH-06 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Complete |
 | AUTH-07 | Phase 1 | Pending |
 | AUTH-08 | Phase 1 | Pending |
 | TOOL-01 | Phase 2 | Pending |
