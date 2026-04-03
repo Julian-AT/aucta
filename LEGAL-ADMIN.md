@@ -1,6 +1,8 @@
-# Legal, Regulatory & Business Strategy
+# Aucta
 
-## HVAC AI Copilot — Business Case, Compliance & Investor Readiness
+## Legal, Regulatory & Business Strategy — Business Case, Compliance & Investor Readiness
+
+**Product:** Aucta — HVAC AI Copilot for technicians and field teams.
 
 **Version:** 3.0
 **Date:** April 3, 2026
@@ -11,7 +13,7 @@
 
 ## 1. Executive Summary
 
-An AI copilot for HVAC technicians that provides real-time visual and voice guidance through a smartphone camera. The AI watches what the technician sees, listens to their questions in any language, and speaks back expert-level guidance — like having a master HVAC technician looking over their shoulder on every job.
+**Aucta** is an AI copilot for HVAC technicians that provides real-time visual and voice guidance through a smartphone camera. The AI watches what the technician sees, listens to their questions in any language, and speaks back expert-level guidance — like having a master HVAC technician looking over their shoulder on every job.
 
 This is a new category: **AI-powered skill augmentation for physical work** — or, in investor terminology, **Physical AI**. It complements existing field service management tools by making every technician — regardless of experience level or native language — perform like a 10-year veteran. A self-learning knowledge base compounds organizational expertise with every session: the AI extracts learnings, compiles them into a verifiable wiki, and becomes smarter over time. Gemini function calling enables mid-conversation tool use — error code lookup, equipment identification, knowledge base search — without interrupting the audio stream.
 
@@ -175,7 +177,7 @@ As an Austria-based SaaS processing personal data of EU residents, GDPR complian
 
 ### 5.2 EU AI Act — Transparency Obligations (August 2, 2026)
 
-The HVAC AI Copilot is a **deployer** of a general-purpose AI model (Gemini), not a provider of an AI system.
+Aucta is a **deployer** of a general-purpose AI model (Gemini), not a provider of an AI system.
 
 **Risk classification:** **Limited risk (transparency obligations)**. The product does not involve biometric identification, critical infrastructure control, employment decisions, or any Annex III category. It provides guidance and recommendations; it does not make autonomous decisions affecting individuals' rights.
 
@@ -507,4 +509,4 @@ These are the numbers we need to demonstrate or exceed during validation:
 
 ---
 
-*This document covers business strategy, regulatory compliance, and investor readiness. For the complete technical specification, see [TECH-SPEC.md](./TECH-SPEC.md).*
+*This document covers business strategy, regulatory compliance, and investor readiness for **Aucta**. For the complete technical specification, see [TECH-SPEC.md](./TECH-SPEC.md).*

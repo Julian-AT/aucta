@@ -717,7 +717,7 @@ mkdir -p docs
 
 # 4. Dashboard (Next.js 16)
 
-cd apps/dashboard
+cd apps/web
 bunx create-next-app@latest . --typescript --tailwind --app --src-dir=false --turbopack
 cd ../..
 
@@ -733,10 +733,10 @@ bun add -d turbo typescript@6 @biomejs/biome vitest @playwright/test
 
 # 7. Dashboard dependencies
 
-bun add next@16 react@19 react-dom@19 --filter apps/dashboard
-bun add @trpc/server @trpc/client @trpc/next @tanstack/react-query zod drizzle-orm @neondatabase/serverless better-auth @upstash/redis @upstash/ratelimit inngest posthog-js @sentry/nextjs stripe --filter apps/dashboard
-bun add -d drizzle-kit --filter apps/dashboard
-bunx --cwd apps/dashboard shadcn@latest init
+bun add next@16 react@19 react-dom@19 --filter apps/web
+bun add @trpc/server @trpc/client @trpc/next @tanstack/react-query zod drizzle-orm @neondatabase/serverless better-auth @upstash/redis @upstash/ratelimit inngest posthog-js @sentry/nextjs stripe --filter apps/web
+bun add -d drizzle-kit --filter apps/web
+bunx --cwd apps/web shadcn@latest init
 
 # 8. Mobile dependencies
 
@@ -927,7 +927,7 @@ packages/config/
 ├── tailwind-mobile.config.ts # NativeWind v5 specific overrides
 └── design-tokens.ts # Shared design tokens (colors, spacing, typography)
 
-Both apps/dashboard and apps/mobile import from packages/config. NativeWind v5 uses Tailwind v4's CSS-first config, enabling true design token sharing between web and mobile for the first time.
+Both apps/web and apps/mobile import from packages/config. NativeWind v5 uses Tailwind v4's CSS-first config, enabling true design token sharing between web and mobile for the first time.
 
 10. Testing Strategy (Updated Tools)
 

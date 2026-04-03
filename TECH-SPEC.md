@@ -1,6 +1,8 @@
-# Technical Specification
+# Aucta
 
-## HVAC AI Copilot — Engineering Baseline
+## Technical Specification — Engineering Baseline
+
+**Product:** Aucta — HVAC AI Copilot for technicians and field teams.
 
 **Version:** 3.0
 **Date:** April 3, 2026
@@ -11,7 +13,7 @@
 
 ## 1. Product Overview
 
-A real-time AI copilot for HVAC technicians. The mobile app streams camera video (1 FPS JPEG) and microphone audio (PCM 16kHz) directly to Google's Gemini 2.5 Flash Live API via WebSocket. Gemini reasons over the multimodal input, calls domain-specific tools (error code lookup, knowledge base search, equipment identification), and streams spoken guidance back in the technician's language. No audio or video touches our servers — the app connects directly to Gemini using short-lived ephemeral tokens issued by our API. A Next.js dashboard gives business owners visibility into team activity, session analytics, and a self-learning knowledge base that compounds organizational expertise over time.
+**Aucta** is a real-time AI copilot for HVAC technicians. The mobile app streams camera video (1 FPS JPEG) and microphone audio (PCM 16kHz) directly to Google's Gemini 2.5 Flash Live API via WebSocket. Gemini reasons over the multimodal input, calls domain-specific tools (error code lookup, knowledge base search, equipment identification), and streams spoken guidance back in the technician's language. No audio or video touches our servers — the app connects directly to Gemini using short-lived ephemeral tokens issued by our API. A Next.js dashboard gives business owners visibility into team activity, session analytics, and a self-learning knowledge base that compounds organizational expertise over time.
 
 **Core loop:** Camera + Voice → Gemini Live (with tool calling) → Spoken guidance + structured session data → Knowledge base ingestion → Smarter AI next session.
 
@@ -35,6 +37,7 @@ A real-time AI copilot for HVAC technicians. The mobile app streams camera video
 7. **Between sessions:** View past session summaries → see personal stats → browse cached knowledge articles offline → update language preference → check for app updates
 
 **Critical UX Requirements:**
+
 - Maximum two taps to start a session from app launch
 - Large, glove-friendly touch targets (minimum 48x48dp, recommended 56x56dp)
 - High-contrast UI readable in direct sunlight (WCAG AAA contrast ratios)
@@ -51,6 +54,7 @@ A real-time AI copilot for HVAC technicians. The mobile app streams camera video
 **Dashboard Sections:**
 
 **Overview (Home):**
+
 - Live activity: active sessions right now (count + technician names) — updated in real time via tRPC subscriptions (SSE)
 - Today's key numbers: sessions completed, total AI time, estimated cost
 - Week/month trends: session volume, avg duration, language distribution
@@ -58,6 +62,7 @@ A real-time AI copilot for HVAC technicians. The mobile app streams camera video
 - Revenue opportunities: aggregated replacement/upsell suggestions from session summaries
 
 **Team Management:**
+
 - Technician roster with status (online/offline/in-session)
 - Invite flow: generate code/link → set role (technician/manager) → set expiry
 - Individual technician profiles: session history, performance trend, language, specialties
@@ -65,6 +70,7 @@ A real-time AI copilot for HVAC technicians. The mobile app streams camera video
 - Skill matrix: which technicians have handled which equipment types (derived from session metadata)
 
 **Session Explorer:**
+
 - Searchable/filterable session history across entire organization
 - Session detail view: timeline of events, duration, language, token usage, cost, feedback, tools used
 - Transcript viewer (when available): AI responses with timestamps
@@ -73,6 +79,7 @@ A real-time AI copilot for HVAC technicians. The mobile app streams camera video
 - Export: CSV/PDF for compliance documentation
 
 **Analytics:**
+
 - Usage trends: sessions per day/week/month, peak usage hours
 - Cost analysis: total AI cost, cost per session, cost per technician, projected monthly spend
 - Quality metrics: average feedback rating, reconnection rate, error rate
@@ -83,6 +90,7 @@ A real-time AI copilot for HVAC technicians. The mobile app streams camera video
 - Knowledge base analytics: most retrieved articles, correlation with positive feedback, coverage gaps
 
 **Knowledge Base Management:**
+
 - Article browser: search, filter by category/equipment brand/model/confidence level
 - Verification queue: pending articles awaiting review, approve/reject/request revision workflow
 - Manual upload: drag-and-drop PDF manuals for RAG ingestion (ColPali multimodal processing)
@@ -91,6 +99,7 @@ A real-time AI copilot for HVAC technicians. The mobile app streams camera video
 - Article detail view: full content, version history, verification trail, retrieval statistics, source attribution
 
 **Organization Settings:**
+
 - Company profile, billing, subscription management
 - AI configuration: custom system prompt additions (company-specific procedures, safety protocols, preferred brands)
 - Expert escalation: designate senior technicians as escalation targets
@@ -155,18 +164,18 @@ packages/ai/tools/
 
 **10 HVAC-specific tools (Gemini function declarations):**
 
-| # | Tool | Input | Output | Data Source |
-|---|------|-------|--------|-------------|
-| 1 | `lookupErrorCode` | manufacturer, code | meaning, repair steps, severity | Knowledge base + manufacturer DB |
-| 2 | `getEquipmentSpecs` | model_number | specs, installation date, warranty status | Equipment library (per-org) |
-| 3 | `getWiringDiagram` | model_number | relevant manual section/diagram reference | Knowledge base (ColPali RAG) |
-| 4 | `calculateRefrigerantCharge` | model, line_length_m | target charge in kg, refrigerant type | Manufacturer tables |
-| 5 | `checkSafetyRecall` | model_number | active recalls, safety notices | Manufacturer API / web scrape |
-| 6 | `getOrgProcedure` | procedure_type | org-specific custom procedure text | org_settings.custom_system_prompt |
-| 7 | `logFinding` | category, description, severity | confirmation, finding_id | ai_sessions.metadata |
-| 8 | `identifyPart` | description, visual_context | part_number, supplier, estimated_cost | Parts database (Phase 2) |
-| 9 | `searchKnowledgeBase` | query, equipment_context | retrieved articles with confidence tags | Qdrant + Postgres |
-| 10 | `escalateToExpert` | context_summary, urgency | notification_sent, expert_name | Push notification system |
+| #   | Tool                         | Input                           | Output                                    | Data Source                       |
+| --- | ---------------------------- | ------------------------------- | ----------------------------------------- | --------------------------------- |
+| 1   | `lookupErrorCode`            | manufacturer, code              | meaning, repair steps, severity           | Knowledge base + manufacturer DB  |
+| 2   | `getEquipmentSpecs`          | model_number                    | specs, installation date, warranty status | Equipment library (per-org)       |
+| 3   | `getWiringDiagram`           | model_number                    | relevant manual section/diagram reference | Knowledge base (ColPali RAG)      |
+| 4   | `calculateRefrigerantCharge` | model, line_length_m            | target charge in kg, refrigerant type     | Manufacturer tables               |
+| 5   | `checkSafetyRecall`          | model_number                    | active recalls, safety notices            | Manufacturer API / web scrape     |
+| 6   | `getOrgProcedure`            | procedure_type                  | org-specific custom procedure text        | org_settings.custom_system_prompt |
+| 7   | `logFinding`                 | category, description, severity | confirmation, finding_id                  | ai_sessions.metadata              |
+| 8   | `identifyPart`               | description, visual_context     | part_number, supplier, estimated_cost     | Parts database (Phase 2)          |
+| 9   | `searchKnowledgeBase`        | query, equipment_context        | retrieved articles with confidence tags   | Qdrant + Postgres                 |
+| 10  | `escalateToExpert`           | context_summary, urgency        | notification_sent, expert_name            | Push notification system          |
 
 **Gemini function calling integration:**
 
@@ -212,14 +221,14 @@ packages/ai/session/
 
 ```typescript
 const systemPrompt = buildEffectiveSystemPrompt([
-  coreRolePrompt,            // "You are an expert HVAC technician copilot..."
-  hvacExpertisePrompt,       // Domain knowledge, procedures, troubleshooting frameworks
-  safetyRulesPrompt,         // Always-on safety warnings, F-Gas EU 2024/573
-  orgOverlayPrompt,          // Per-org custom instructions from dashboard settings
-  knowledgeBasePrompt,       // Retrieved context from org knowledge base (index + key articles)
-  sessionHistoryPrompt,      // "This technician has handled 47 Daikin VRV installations"
-  jobContextPrompt,          // FSM job context (Phase 2)
-  aiActTransparencyPrompt,   // "You are an AI system, not a human expert"
+  coreRolePrompt, // "You are an expert HVAC technician copilot..."
+  hvacExpertisePrompt, // Domain knowledge, procedures, troubleshooting frameworks
+  safetyRulesPrompt, // Always-on safety warnings, F-Gas EU 2024/573
+  orgOverlayPrompt, // Per-org custom instructions from dashboard settings
+  knowledgeBasePrompt, // Retrieved context from org knowledge base (index + key articles)
+  sessionHistoryPrompt, // "This technician has handled 47 Daikin VRV installations"
+  jobContextPrompt, // FSM job context (Phase 2)
+  aiActTransparencyPrompt, // "You are an AI system, not a human expert"
 ]);
 ```
 
@@ -275,12 +284,14 @@ INGEST ──→ COMPILE ──→ VERIFY ──→ RETRIEVE ──→ HEALTH
 ```
 
 **Phase 1 — INGEST:**
+
 - Session data: equipment identified, procedures discussed, errors encountered, tool calls made
 - Technician feedback: "AI was wrong about X, the correct approach is Y"
 - Manual uploads: PDF manuals → ColPali multimodal embeddings (captures text + diagrams as images)
 - External sources: manufacturer recall notices, regulatory updates (scheduled web scrape)
 
 **Phase 2 — COMPILE (LLM-driven, humans verify):**
+
 - Raw session learnings → LLM generates/updates wiki articles (markdown + frontmatter metadata)
 - Articles organized by: equipment brand → model → procedure type
 - Auto-generated backlinks and cross-references between related articles
@@ -289,12 +300,12 @@ INGEST ──→ COMPILE ──→ VERIFY ──→ RETRIEVE ──→ HEALTH
 
 **Phase 3 — VERIFY (critical differentiator):**
 
-| Confidence Level | Source | Dashboard Badge | AI Attribution |
-|---|---|---|---|
-| `unverified` | AI-extracted from session | Yellow | "Based on unverified observation..." |
-| `technician_reviewed` | Experienced tech confirmed | Blue | "Based on technician-confirmed procedure..." |
-| `expert_approved` | Manager/senior tech signed off | Green | "Based on verified procedure..." |
-| `manufacturer_sourced` | From uploaded manual/API | Purple | "Per manufacturer documentation..." |
+| Confidence Level       | Source                         | Dashboard Badge | AI Attribution                               |
+| ---------------------- | ------------------------------ | --------------- | -------------------------------------------- |
+| `unverified`           | AI-extracted from session      | Yellow          | "Based on unverified observation..."         |
+| `technician_reviewed`  | Experienced tech confirmed     | Blue            | "Based on technician-confirmed procedure..." |
+| `expert_approved`      | Manager/senior tech signed off | Green           | "Based on verified procedure..."             |
+| `manufacturer_sourced` | From uploaded manual/API       | Purple          | "Per manufacturer documentation..."          |
 
 - Verification queue in dashboard: managers/senior techs review AI-generated knowledge
 - Digital signatures on verified articles (audit trail)
@@ -302,6 +313,7 @@ INGEST ──→ COMPILE ──→ VERIFY ──→ RETRIEVE ──→ HEALTH
 - Stale detection: articles not referenced in N months marked for review
 
 **Phase 4 — RETRIEVE (during live sessions):**
+
 - Gemini calls `searchKnowledgeBase()` tool mid-conversation
 - Hybrid search: keyword (BM25) + semantic (vector via Qdrant) + metadata filters (equipment model)
 - Cross-encoder reranking on top-K results for precision
@@ -309,6 +321,7 @@ INGEST ──→ COMPILE ──→ VERIFY ──→ RETRIEVE ──→ HEALTH
 - Source attribution: "Based on verified procedure for Daikin VRV IV..."
 
 **Phase 5 — HEALTH (continuous improvement):**
+
 - LLM audits wiki for inconsistencies, imputes missing data
 - Identifies coverage gaps: "No articles for Mitsubishi PUMY series"
 - Suggests new article candidates from cross-referencing session patterns
@@ -316,6 +329,7 @@ INGEST ──→ COMPILE ──→ VERIFY ──→ RETRIEVE ──→ HEALTH
 - Output: health report visible in dashboard analytics section
 
 **Key architectural decisions (from Claude Code's `extractMemories`):**
+
 - Knowledge extraction runs **asynchronously after each session** (Inngest job), not during — avoids impacting session latency
 - The LLM writes and maintains all wiki data; humans verify, rarely edit directly
 - At small scale (<500 articles / ~400K words): LLM reads index files directly without full RAG
@@ -337,15 +351,15 @@ Modeled on Claude Code's `coordinator/` and `AgentTool` — specialized sub-agen
 
 ### 4.1 Context Layers (Injected into Gemini System Prompt)
 
-| Layer | Source | Scope | Example |
-|-------|--------|-------|---------|
-| **Base HVAC knowledge** | Curated system prompt | All organizations | General HVAC principles, safety procedures, common equipment |
-| **Organization context** | Org settings in dashboard | Per-org | "We are Klimatechnik GmbH, we primarily service Daikin and Mitsubishi units, our safety protocol requires XYZ" |
-| **Knowledge base** | Retrieved articles via `searchKnowledgeBase` tool | Per-org + global | Verified procedures, error code meanings, equipment-specific instructions |
-| **Equipment library** | ColPali RAG over uploaded manuals | Per-org | Specific model numbers, wiring diagrams, error code lookups |
-| **Verified tribal knowledge** | Technician-confirmed corrections | Per-org | "For Daikin VRV IV U4 error, always check the thermistor at the outdoor unit first" |
-| **Session history** | Aggregated from past sessions | Per-technician | "This technician has handled 47 Daikin VRV installations" |
-| **Job context** | FSM integration (future) | Per-session | "This is a maintenance call for a 2019 Daikin FTXM, customer reported error code U4" |
+| Layer                         | Source                                            | Scope             | Example                                                                                                        |
+| ----------------------------- | ------------------------------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Base HVAC knowledge**       | Curated system prompt                             | All organizations | General HVAC principles, safety procedures, common equipment                                                   |
+| **Organization context**      | Org settings in dashboard                         | Per-org           | "We are Klimatechnik GmbH, we primarily service Daikin and Mitsubishi units, our safety protocol requires XYZ" |
+| **Knowledge base**            | Retrieved articles via `searchKnowledgeBase` tool | Per-org + global  | Verified procedures, error code meanings, equipment-specific instructions                                      |
+| **Equipment library**         | ColPali RAG over uploaded manuals                 | Per-org           | Specific model numbers, wiring diagrams, error code lookups                                                    |
+| **Verified tribal knowledge** | Technician-confirmed corrections                  | Per-org           | "For Daikin VRV IV U4 error, always check the thermistor at the outdoor unit first"                            |
+| **Session history**           | Aggregated from past sessions                     | Per-technician    | "This technician has handled 47 Daikin VRV installations"                                                      |
+| **Job context**               | FSM integration (future)                          | Per-session       | "This is a maintenance call for a 2019 Daikin FTXM, customer reported error code U4"                           |
 
 ### 4.2 System Prompt Architecture
 
@@ -373,18 +387,19 @@ The dashboard allows owners/managers to add organization-specific instructions t
 
 ### 5.1 Data Security
 
-| Layer | Measure |
-|-------|---------|
-| **Data in transit** | TLS 1.3 for all HTTP/WSS connections |
-| **Data at rest** | Neon Postgres AES-256 encryption at rest; Upstash Redis encryption at rest |
-| **API key security** | Gemini API key never reaches the client; ephemeral tokens with constrained permissions |
-| **Authentication** | Better Auth with session tokens stored in `expo-secure-store` (iOS Keychain / Android Keystore) |
-| **Authorization** | Role-based access control via Better Auth organization plugin; permissions checked in tRPC middleware |
-| **Input validation** | Zod schemas on every tRPC procedure; server-side validation only (never trust client) |
+| Layer                | Measure                                                                                               |
+| -------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Data in transit**  | TLS 1.3 for all HTTP/WSS connections                                                                  |
+| **Data at rest**     | Neon Postgres AES-256 encryption at rest; Upstash Redis encryption at rest                            |
+| **API key security** | Gemini API key never reaches the client; ephemeral tokens with constrained permissions                |
+| **Authentication**   | Better Auth with session tokens stored in `expo-secure-store` (iOS Keychain / Android Keystore)       |
+| **Authorization**    | Role-based access control via Better Auth organization plugin; permissions checked in tRPC middleware |
+| **Input validation** | Zod schemas on every tRPC procedure; server-side validation only (never trust client)                 |
 
 ### 5.2 Audit Trail
 
 Every significant action is logged to an `audit_log` table:
+
 - User authentication events (login, logout, failed attempts)
 - Organization changes (member added/removed, role changed, settings modified)
 - Session lifecycle events (started, ended, failed)
@@ -397,6 +412,7 @@ Each audit entry includes: timestamp, actor (user ID), action type, target entit
 ### 5.3 Organizational Data Isolation
 
 Multi-tenant architecture with strict data isolation:
+
 - Every database query includes `org_id` filtering — enforced at the tRPC middleware level, not left to individual router implementations
 - Technicians can only see their own sessions; managers can see sessions within their org; owners can see everything in their org
 - No cross-org data access is possible through the API
@@ -405,13 +421,13 @@ Multi-tenant architecture with strict data isolation:
 
 Implemented as tRPC middleware using `@upstash/ratelimit`:
 
-| Endpoint | Strategy | Limit |
-|----------|----------|-------|
-| Auth endpoints (login, signup) | Fixed window per IP | 10/minute |
-| `session.createToken` | Sliding window per user | 5/minute |
-| tRPC general | Token bucket per user | 100/minute |
-| Invite code generation | Fixed window per org | 20/hour |
-| Data export | Fixed window per org | 2/hour |
+| Endpoint                       | Strategy                | Limit      |
+| ------------------------------ | ----------------------- | ---------- |
+| Auth endpoints (login, signup) | Fixed window per IP     | 10/minute  |
+| `session.createToken`          | Sliding window per user | 5/minute   |
+| tRPC general                   | Token bucket per user   | 100/minute |
+| Invite code generation         | Fixed window per org    | 20/hour    |
+| Data export                    | Fixed window per org    | 2/hour     |
 
 ### 5.5 Knowledge Base Access Control
 
@@ -428,113 +444,113 @@ Every tool at its latest stable version as of April 2026. Open-source chosen ove
 
 ### 6.1 Monorepo Foundation
 
-| Decision | Tool | Version | Why |
-|----------|------|---------|-----|
-| Build orchestrator | **Turborepo** | 2.9.x | Vercel-native, auto-detects workspace structure |
-| Package manager + runtime | **Bun** | 1.3.x | 25-30x faster installs; transparent `node_modules` for Metro compatibility |
-| Language | **TypeScript (strict)** | 6.0.x | End-to-end type safety from DB schema to mobile UI |
+| Decision                  | Tool                    | Version | Why                                                                        |
+| ------------------------- | ----------------------- | ------- | -------------------------------------------------------------------------- |
+| Build orchestrator        | **Turborepo**           | 2.9.x   | Vercel-native, auto-detects workspace structure                            |
+| Package manager + runtime | **Bun**                 | 1.3.x   | 25-30x faster installs; transparent `node_modules` for Metro compatibility |
+| Language                  | **TypeScript (strict)** | 6.0.x   | End-to-end type safety from DB schema to mobile UI                         |
 
 ### 6.2 Frontend
 
-| Decision | Tool | Version | Why |
-|----------|------|---------|-----|
-| Mobile framework | **Expo SDK** | 55 | New Architecture default, managed workflow, EAS Build/Update |
-| Mobile navigation | **Expo Router** | 55.x | File-based routing, typed routes, deep linking |
-| Dashboard framework | **Next.js** | 16.2.x | Cache Components (`"use cache"`), Turbopack stable, React Compiler |
-| Dashboard styling | **Tailwind CSS v4** | 4.2.x | CSS-first config, shared design tokens with mobile |
-| Mobile styling | **NativeWind v5 + Tailwind v4** | NW 5.0.0-preview.3 + TW 4.2.x | Unified Tailwind v4 across web + mobile |
-| Dashboard components | **shadcn/ui** | CLI v4 | Copy-paste ownership, Radix primitives, accessible |
-| Mobile components | **React Native Reusables** | Latest | shadcn philosophy for React Native, NativeWind-based |
-| Client state (live sessions) | **Zustand** | 5.0.x | `getState()`/`setState()` outside React — required for WebSocket + native audio callbacks |
-| Server state | **TanStack Query** | 5.96.x | Request/response caching for tRPC |
-| i18n | **react-i18next + expo-localization** | Latest | Cross-platform, TypeScript key autocomplete |
+| Decision                     | Tool                                  | Version                       | Why                                                                                       |
+| ---------------------------- | ------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------- |
+| Mobile framework             | **Expo SDK**                          | 55                            | New Architecture default, managed workflow, EAS Build/Update                              |
+| Mobile navigation            | **Expo Router**                       | 55.x                          | File-based routing, typed routes, deep linking                                            |
+| Dashboard framework          | **Next.js**                           | 16.2.x                        | Cache Components (`"use cache"`), Turbopack stable, React Compiler                        |
+| Dashboard styling            | **Tailwind CSS v4**                   | 4.2.x                         | CSS-first config, shared design tokens with mobile                                        |
+| Mobile styling               | **NativeWind v5 + Tailwind v4**       | NW 5.0.0-preview.3 + TW 4.2.x | Unified Tailwind v4 across web + mobile                                                   |
+| Dashboard components         | **shadcn/ui**                         | CLI v4                        | Copy-paste ownership, Radix primitives, accessible                                        |
+| Mobile components            | **React Native Reusables**            | Latest                        | shadcn philosophy for React Native, NativeWind-based                                      |
+| Client state (live sessions) | **Zustand**                           | 5.0.x                         | `getState()`/`setState()` outside React — required for WebSocket + native audio callbacks |
+| Server state                 | **TanStack Query**                    | 5.96.x                        | Request/response caching for tRPC                                                         |
+| i18n                         | **react-i18next + expo-localization** | Latest                        | Cross-platform, TypeScript key autocomplete                                               |
 
 **NativeWind v5 compatibility:** Requires React Native 0.83.x+ (Expo SDK 55), Reanimated v4+ (4.3.x), New Architecture (Fabric) enabled by default in Expo SDK 55.
 
 ### 6.3 API & Data
 
-| Decision | Tool | Version | Why |
-|----------|------|---------|-----|
-| Internal API | **tRPC** | 11.16.x | End-to-end type safety |
-| Real-time dashboard | **tRPC subscriptions (SSE)** | (built-in) | Live session monitoring without polling |
-| Validation | **Zod** | 4.3.x | Single schema validates tRPC input, forms, and DB inserts |
-| ORM | **Drizzle ORM** | 0.45.x | 7.4KB footprint, sub-500ms serverless cold starts, SQL-like API |
-| Database | **Neon Postgres (EU Frankfurt)** | Latest | Serverless, branching for previews, EU data residency |
-| Cache | **Upstash Redis (EU)** | Latest | HTTP-based, rate limiting, ephemeral token caching |
-| Vector DB | **Qdrant (EU)** | 1.17.x | Knowledge base vector search, hybrid retrieval |
-| Background jobs | **Inngest** | 4.1.x | Serverless-native, step functions with independent retries |
-| OpenAPI generation | **zod-to-openapi** | Latest | Phase 2 public API prep at zero cost from existing Zod schemas |
+| Decision            | Tool                             | Version    | Why                                                             |
+| ------------------- | -------------------------------- | ---------- | --------------------------------------------------------------- |
+| Internal API        | **tRPC**                         | 11.16.x    | End-to-end type safety                                          |
+| Real-time dashboard | **tRPC subscriptions (SSE)**     | (built-in) | Live session monitoring without polling                         |
+| Validation          | **Zod**                          | 4.3.x      | Single schema validates tRPC input, forms, and DB inserts       |
+| ORM                 | **Drizzle ORM**                  | 0.45.x     | 7.4KB footprint, sub-500ms serverless cold starts, SQL-like API |
+| Database            | **Neon Postgres (EU Frankfurt)** | Latest     | Serverless, branching for previews, EU data residency           |
+| Cache               | **Upstash Redis (EU)**           | Latest     | HTTP-based, rate limiting, ephemeral token caching              |
+| Vector DB           | **Qdrant (EU)**                  | 1.17.x     | Knowledge base vector search, hybrid retrieval                  |
+| Background jobs     | **Inngest**                      | 4.1.x      | Serverless-native, step functions with independent retries      |
+| OpenAPI generation  | **zod-to-openapi**               | Latest     | Phase 2 public API prep at zero cost from existing Zod schemas  |
 
 ### 6.4 Authentication
 
-| Decision | Tool | Version | Why |
-|----------|------|---------|-----|
-| Auth framework | **Better Auth** | 1.5.x | Open-source, self-hosted, org plugin with RBAC, Expo plugin, data in your Postgres — zero vendor lock-in |
+| Decision       | Tool            | Version | Why                                                                                                      |
+| -------------- | --------------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| Auth framework | **Better Auth** | 1.5.x   | Open-source, self-hosted, org plugin with RBAC, Expo plugin, data in your Postgres — zero vendor lock-in |
 
 **Organization model:** `organization()` plugin with roles: `owner`, `manager`, `technician`. Permissions: `org:sessions:view`, `org:sessions:manage`, `org:team:invite`, `org:team:manage`, `org:settings:edit`, `org:billing:manage`, `org:analytics:view`, `org:analytics:export`, `org:knowledge:verify`.
 
 ### 6.5 AI / Real-Time
 
-| Decision | Tool | Version | Why |
-|----------|------|---------|-----|
-| AI model | **Gemini 2.5 Flash Live** | Latest | Real-time multimodal (video + audio) via WebSocket; auto language detection |
-| Gemini SDK | **@google/genai** | 1.48.x | Unified SDK (replaces legacy `@google/generative-ai`) |
-| API key security | **Ephemeral tokens** | N/A | Short-lived, constrained to system prompt + tools; eliminates need for WebSocket proxy |
-| Audio recording | **expo-av / custom PCM** | Latest | PCM 16kHz/16-bit/mono matching Gemini input |
-| Audio playback | **react-native-audio-api** | Latest | `AudioBufferQueueSourceNode` for streaming PCM at 24kHz |
-| Video capture | **expo-camera** | 55.x | 1 FPS JPEG capture at 768x768 |
-| Tool calling | **Gemini function calling** | (built-in) | 10 HVAC-specific tools called mid-conversation |
-| Knowledge retrieval | **ColPali + Qdrant** | Latest | Multimodal RAG for equipment manuals (text + diagrams) |
-| On-device fallback | **Gemma 4 E2B via LiteRT** | (Phase 2) | 2.3B parameter offline AI for connectivity loss |
+| Decision            | Tool                        | Version    | Why                                                                                    |
+| ------------------- | --------------------------- | ---------- | -------------------------------------------------------------------------------------- |
+| AI model            | **Gemini 2.5 Flash Live**   | Latest     | Real-time multimodal (video + audio) via WebSocket; auto language detection            |
+| Gemini SDK          | **@google/genai**           | 1.48.x     | Unified SDK (replaces legacy `@google/generative-ai`)                                  |
+| API key security    | **Ephemeral tokens**        | N/A        | Short-lived, constrained to system prompt + tools; eliminates need for WebSocket proxy |
+| Audio recording     | **expo-av / custom PCM**    | Latest     | PCM 16kHz/16-bit/mono matching Gemini input                                            |
+| Audio playback      | **react-native-audio-api**  | Latest     | `AudioBufferQueueSourceNode` for streaming PCM at 24kHz                                |
+| Video capture       | **expo-camera**             | 55.x       | 1 FPS JPEG capture at 768x768                                                          |
+| Tool calling        | **Gemini function calling** | (built-in) | 10 HVAC-specific tools called mid-conversation                                         |
+| Knowledge retrieval | **ColPali + Qdrant**        | Latest     | Multimodal RAG for equipment manuals (text + diagrams)                                 |
+| On-device fallback  | **Gemma 4 E2B via LiteRT**  | (Phase 2)  | 2.3B parameter offline AI for connectivity loss                                        |
 
 ### 6.6 Infrastructure & Deployment
 
-| Decision | Tool | Version | Why |
-|----------|------|---------|-----|
-| Dashboard hosting | **Vercel** | Latest | Native Turborepo support, preview deploys, edge functions |
-| Mobile CI/CD | **EAS Build + EAS Workflows** | Latest | M4 Pro builds, OTA updates, GitHub Actions integration |
-| CI pipeline | **GitHub Actions** | Latest | Turborepo remote caching |
-| Background job hosting | **Inngest on Vercel** | 4.1.x | Serverless-native, no separate infrastructure |
-| Vector DB hosting | **Qdrant Cloud (EU)** | 1.17.x | Managed, EU data residency; or self-hosted for cost |
+| Decision               | Tool                          | Version | Why                                                       |
+| ---------------------- | ----------------------------- | ------- | --------------------------------------------------------- |
+| Dashboard hosting      | **Vercel**                    | Latest  | Native Turborepo support, preview deploys, edge functions |
+| Mobile CI/CD           | **EAS Build + EAS Workflows** | Latest  | M4 Pro builds, OTA updates, GitHub Actions integration    |
+| CI pipeline            | **GitHub Actions**            | Latest  | Turborepo remote caching                                  |
+| Background job hosting | **Inngest on Vercel**         | 4.1.x   | Serverless-native, no separate infrastructure             |
+| Vector DB hosting      | **Qdrant Cloud (EU)**         | 1.17.x  | Managed, EU data residency; or self-hosted for cost       |
 
 ### 6.7 Observability & Quality
 
-| Decision | Tool | Version | Why |
-|----------|------|---------|-----|
-| Analytics + feature flags | **PostHog** (self-hostable) | Web 1.364.x / RN 4.39.x | Replaces 3 paid services; unlimited flags on free tier |
-| Error tracking | **Sentry** | Next.js 10.47.x / RN 8.7.x | First-class Expo + Next.js SDKs; free tier |
-| Linting + formatting | **Biome** | 2.4.x | Single tool, 35x faster than ESLint + Prettier |
-| Unit/integration tests | **Vitest** | 4.1.x | Vite-native, shared config |
-| Web E2E | **Playwright** | 1.59.x | WebSocket mocking support |
-| Mobile E2E | **Maestro** | 2.4.x | Expo-recommended, YAML-based |
-| API/WS mocking | **MSW v2** | 2.12.x | `ws.link()` for WebSocket interception |
-| Distributed tracing (Phase 2) | **@vercel/otel** | Latest | OpenTelemetry for billing/latency debugging |
+| Decision                      | Tool                        | Version                    | Why                                                    |
+| ----------------------------- | --------------------------- | -------------------------- | ------------------------------------------------------ |
+| Analytics + feature flags     | **PostHog** (self-hostable) | Web 1.364.x / RN 4.39.x    | Replaces 3 paid services; unlimited flags on free tier |
+| Error tracking                | **Sentry**                  | Next.js 10.47.x / RN 8.7.x | First-class Expo + Next.js SDKs; free tier             |
+| Linting + formatting          | **Biome**                   | 2.4.x                      | Single tool, 35x faster than ESLint + Prettier         |
+| Unit/integration tests        | **Vitest**                  | 4.1.x                      | Vite-native, shared config                             |
+| Web E2E                       | **Playwright**              | 1.59.x                     | WebSocket mocking support                              |
+| Mobile E2E                    | **Maestro**                 | 2.4.x                      | Expo-recommended, YAML-based                           |
+| API/WS mocking                | **MSW v2**                  | 2.12.x                     | `ws.link()` for WebSocket interception                 |
+| Distributed tracing (Phase 2) | **@vercel/otel**            | Latest                     | OpenTelemetry for billing/latency debugging            |
 
 ### 6.8 Payments & Email
 
-| Decision | Tool | Version | Why |
-|----------|------|---------|-----|
-| Web payments | **Stripe** | 21.x | Dashboard checkout, billing portal |
-| Mobile subscriptions | **RevenueCat** | 9.15.x | App Store/Play Store receipts, free under $2,500/month |
-| Transactional email | **React Email + Resend** | RE 5.2.x / Resend 6.10.x | React templates, 3,000 free emails/month |
+| Decision             | Tool                     | Version                  | Why                                                    |
+| -------------------- | ------------------------ | ------------------------ | ------------------------------------------------------ |
+| Web payments         | **Stripe**               | 21.x                     | Dashboard checkout, billing portal                     |
+| Mobile subscriptions | **RevenueCat**           | 9.15.x                   | App Store/Play Store receipts, free under $2,500/month |
+| Transactional email  | **React Email + Resend** | RE 5.2.x / Resend 6.10.x | React templates, 3,000 free emails/month               |
 
 ### 6.9 Mobile-Specific
 
-| Decision | Tool | Why |
-|----------|------|-----|
-| Screen wake lock | **expo-keep-awake** | Prevents dimming during sessions |
-| Android background audio | **@notifee/react-native** | Foreground service for sustained audio |
-| Push notifications | **expo-notifications** | Job alerts, session summaries, expert escalation |
-| OTA updates | **expo-updates** | Field-deployed B2B app; can't always update via store |
-| Local storage | **MMKV** (4.3.x) | 30x faster than AsyncStorage, synchronous |
-| Connectivity | **@react-native-community/netinfo** | Offline detection + reconnection |
+| Decision                 | Tool                                | Why                                                   |
+| ------------------------ | ----------------------------------- | ----------------------------------------------------- |
+| Screen wake lock         | **expo-keep-awake**                 | Prevents dimming during sessions                      |
+| Android background audio | **@notifee/react-native**           | Foreground service for sustained audio                |
+| Push notifications       | **expo-notifications**              | Job alerts, session summaries, expert escalation      |
+| OTA updates              | **expo-updates**                    | Field-deployed B2B app; can't always update via store |
+| Local storage            | **MMKV** (4.3.x)                    | 30x faster than AsyncStorage, synchronous             |
+| Connectivity             | **@react-native-community/netinfo** | Offline detection + reconnection                      |
 
 ---
 
 ## 7. Monorepo Directory Structure
 
 ```
-hvac-copilot/
+aucta/
 ├── apps/
 │   ├── mobile/                              # Expo SDK 55 (technician-facing)
 │   │   ├── app/                             # Expo Router file-based routes
@@ -556,7 +572,7 @@ hvac-copilot/
 │   │   │   └── gemini/                      # Connection, protocol, audio, constants
 │   │   └── package.json
 │   │
-│   └── dashboard/                           # Next.js 16 (owner/manager-facing)
+│   └── web/                                 # Next.js 16 (owner/manager-facing)
 │       ├── app/
 │       │   ├── (auth)/                      # Auth pages
 │       │   ├── (dashboard)/
@@ -571,6 +587,13 @@ hvac-copilot/
 │       │       ├── auth/[...all]/           # Better Auth handler
 │       │       ├── inngest/                 # Inngest handler
 │       │       └── token/                   # Ephemeral token issuer
+│       ├── modules/                         # Web-specific tRPC hooks + components
+│       │   ├── sessions/
+│       │   │   └── hooks/useSessionList.ts  # tRPC queries — MUST live here
+│       │   ├── knowledge/
+│       │   │   └── hooks/useVerificationQueue.ts
+│       │   └── analytics/
+│       │       └── hooks/useAnalytics.ts
 │       ├── components/
 │       │   ├── dashboard/                   # Charts, metrics, data tables
 │       │   ├── sessions/                    # Session list, detail, transcript
@@ -639,13 +662,19 @@ hvac-copilot/
 │   │           ├── gdprDelete.ts
 │   │           └── inviteExpire.ts
 │   │
-│   ├── db/                                  # Drizzle ORM schema + client
+│   ├── db/                                  # Drizzle ORM schema + repositories
 │   │   └── src/
 │   │       ├── client.ts
 │   │       ├── schema/                      # users, orgs, members, sessions, events,
 │   │       │                                # invites, profiles, audit-log, org-settings,
 │   │       │                                # knowledge-articles, knowledge-verifications,
 │   │       │                                # knowledge-links
+│   │       ├── repositories/                # Data access layer (Drizzle stays here)
+│   │       │   ├── sessionRepository.ts
+│   │       │   ├── knowledgeRepository.ts
+│   │       │   ├── technicianRepository.ts
+│   │       │   ├── orgRepository.ts
+│   │       │   └── auditRepository.ts
 │   │       ├── relations.ts
 │   │       └── types.ts                     # Inferred types from schema
 │   │
@@ -655,9 +684,11 @@ hvac-copilot/
 │   ├── shared/                              # Cross-app types, schemas, constants, utils
 │   │   └── src/
 │   │       ├── schemas/                     # Zod schemas (SINGLE SOURCE OF TRUTH)
+│   │       ├── dto/                         # DTOs at every boundary (Zod-validated)
 │   │       ├── types/                       # Inferred TypeScript types
 │   │       ├── constants/                   # roles, session-status, languages, limits
 │   │       └── utils/                       # format, validate, errors, id generation
+│   │           └── errors.ts                # ErrorWithCode class
 │   │
 │   ├── ui/                                  # Web-only shadcn/ui components
 │   ├── email/                               # React Email templates + Resend wrapper
@@ -671,6 +702,15 @@ hvac-copilot/
 │   ├── scripts/                             # setup.sh, db-reset.sh, generate-types.ts
 │   └── docker/                              # Local Postgres + Redis + Qdrant for offline dev
 │
+├── agents/                                  # AI agent rules & knowledge (single source of truth)
+│   ├── rules/                               # Modular engineering rules with impact ratings
+│   ├── skills/                              # Reusable prompts
+│   ├── commands.md                          # Full CLI command reference
+│   └── knowledge-base.md                    # Domain knowledge & business rules
+│
+├── specs/                                   # Spec-driven development (opt-in)
+│   └── _templates/                          # Template for new feature specs
+│
 ├── docs/
 │   ├── TECH-SPEC.md                         # This document
 │   ├── LEGAL-ADMIN.md                       # Legal/administrative companion
@@ -678,7 +718,9 @@ hvac-copilot/
 │   ├── API.md
 │   └── DEPLOYMENT.md
 │
-├── CLAUDE.md                                # LLM project context (auto-loaded by Claude Code)
+├── AGENTS.md                                # Main agent guide — Do/Don't, Boundaries, PR checklist
+├── CLAUDE.md                                # Pointer to AGENTS.md (auto-loaded by Claude Code)
+├── SPEC-WORKFLOW.md                         # Spec-driven development workflow (opt-in)
 ├── turbo.json
 ├── package.json                             # packageManager: "bun@1.3.x", workspaces
 └── bun.lock
@@ -691,7 +733,7 @@ Zod schema (packages/shared)
     → tRPC input validation (packages/api)
     → Drizzle table definition (packages/db)
     → Inferred row types (packages/db/types)
-    → TanStack Query hooks (apps/mobile, apps/dashboard)
+    → TanStack Query hooks (apps/mobile, apps/web)
     → UI rendering (type-checked props)
 ```
 
@@ -701,7 +743,10 @@ A schema change in `packages/shared` propagates TypeScript errors to every consu
 
 This project will be primarily built with AI coding agents. Patterns that maximize LLM productivity:
 
-- **CLAUDE.md at root:** Auto-loaded every session. Contains stack, commands, conventions, forbidden patterns.
+- **AGENTS.md at root:** Main agent guide loaded by all AI tools (Claude Code, Cursor, etc.). Do/Don't, Boundaries, PR checklist.
+- **CLAUDE.md:** Thin pointer to AGENTS.md (auto-loaded by Claude Code).
+- **agents/ directory:** Modular engineering rules with impact ratings, domain knowledge base, and command reference. Symlinked into `.claude/` and `.cursor/` for tool-agnostic sharing.
+- **specs/ directory:** Opt-in spec-driven development for complex features. Each spec has its own CLAUDE.md for feature-specific agent context.
 - **Co-located files:** Each feature is a directory (component + hook + types + constants), not scattered across global folders.
 - **Descriptive file names:** `session.router.ts` not `router.ts`; `useAudioRecorder.ts` not `useRecorder.ts`.
 - **No barrel files:** LLMs handle direct imports better than re-export chains.
@@ -709,6 +754,103 @@ This project will be primarily built with AI coding agents. Patterns that maximi
 - **Test co-location:** `session.router.test.ts` lives next to `session.router.ts`.
 - **Prefixed IDs:** `ses_`, `org_`, `usr_`, `evt_`, `inv_`, `art_`, `ver_` — self-documenting in logs and debuggers.
 - **Composition over inheritance:** Following Claude Code's architecture — 40+ tools, each a self-contained module registered in a pool.
+
+### 7.3 Architectural Patterns
+
+These patterns are adapted from Cal.com's 16,000+ commit monorepo and are enforced via Biome lint rules and code review.
+
+#### Repository Pattern (CRITICAL)
+
+All database access goes through Repository classes. Drizzle ORM calls never appear in services, tRPC routers, or UI code.
+
+```typescript
+// packages/db/src/repositories/sessionRepository.ts
+export class SessionRepository {
+  constructor(private db: DrizzleClient) {}
+
+  async findById(id: string, orgId: string): Promise<SessionDTO | null> {
+    const rows = await this.db
+      .select({
+        id: aiSessions.id,
+        orgId: aiSessions.orgId,
+        status: aiSessions.status,
+        startedAt: aiSessions.startedAt,
+      })
+      .from(aiSessions)
+      .where(and(eq(aiSessions.id, id), eq(aiSessions.orgId, orgId)));
+    return rows[0] ?? null;
+  }
+}
+```
+
+Benefits: technology changes (e.g., migrating from Drizzle to another ORM) only affect repository implementations. Nothing else in the codebase changes.
+
+#### DTO Boundaries (CRITICAL)
+
+Drizzle row types never leak to the frontend. Explicit Zod-validated DTOs at every architectural boundary:
+
+```
+Repository (Drizzle types) → DTO → Service → DTO → tRPC Router → Client
+```
+
+DTOs live in `packages/shared/src/dto/` and are validated with Zod. Use string literal unions instead of Drizzle enums to stay ORM-agnostic.
+
+#### Constructor Injection (HIGH)
+
+Services receive dependencies through constructor injection for testability:
+
+```typescript
+// packages/ai/src/session/sessionService.ts
+interface SessionServiceDeps {
+  sessionRepo: SessionRepository;
+  tokenService: TokenService;
+  eventLogger: EventLogger;
+}
+
+export class SessionService {
+  constructor(private deps: SessionServiceDeps) {}
+
+  async startSession(input: StartSessionInput) {
+    const token = await this.deps.tokenService.createEphemeral(input);
+    const session = await this.deps.sessionRepo.create({ ...input, token });
+    return session;
+  }
+}
+```
+
+In tests, dependencies are easily mocked. In production, they are wired via a factory or DI container.
+
+#### Error Handling Pattern (HIGH)
+
+- `ErrorWithCode` in services, repositories, and AI tools (never imports tRPC)
+- `TRPCError` only in tRPC router files
+- tRPC middleware auto-converts `ErrorWithCode` to the appropriate `TRPCError`
+
+```typescript
+// In a service — no tRPC import
+throw ErrorWithCode.NotFound(`Session ${id} not found for org ${orgId}`);
+
+// In a tRPC router — TRPCError is allowed here
+throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+```
+
+#### Feature Boundaries (HIGH)
+
+- `packages/ai/`, `packages/db/`, `packages/shared/` — framework-agnostic, no tRPC client imports
+- `apps/web/modules/` — Next.js-specific code, tRPC hooks, web-only components
+- `apps/mobile/modules/` — Expo-specific code, tRPC hooks, native components
+- Import direction is one-way: packages → apps, never the reverse
+- Enforced via Biome `noRestrictedImports` rules
+
+#### PR Size Guidelines (HIGH)
+
+- Under 500 lines of code changes per PR
+- Under 10 files changed per PR
+- Conventional commit titles (`feat:`, `fix:`, `refactor:`)
+- Draft PRs by default
+- Split by layer (schema → backend → frontend), by feature component, or by refactor vs feature
+
+See `AGENTS.md` for the full PR checklist and boundary rules.
 
 ---
 
@@ -792,26 +934,27 @@ All tables managed via Drizzle ORM. Better Auth manages its own tables (`user`, 
 
 ### 9.1 Application Tables
 
-| Table | Purpose | Key Fields |
-|-------|---------|------------|
-| `ai_sessions` | One row per AI guidance session | id, org_id, user_id, status (active/completed/failed/timeout), started_at, ended_at, duration_ms, model_version, language_detected, token_count_input, token_count_output, cost_usd, feedback_rating, feedback_note, summary, equipment_identified (jsonb), revenue_opportunities (jsonb), tools_used (jsonb), metadata (jsonb) |
-| `session_events` | Granular event log per session | id, session_id, event_type (connect/disconnect/reconnect/audio_start/video_start/model_response/error/tool_use/tool_response/feedback), timestamp, latency_ms, data (jsonb) |
-| `technician_profiles` | Extended technician data | id, user_id, org_id, preferred_language, specialties (jsonb), total_sessions, total_duration_ms, average_rating, last_active_at |
-| `invite_codes` | Org invitation system | id, org_id, code (6-char), created_by, role (technician/manager), max_uses, used_count, expires_at |
-| `audit_log` | Immutable action trail | id, org_id, actor_id, action_type, target_entity, target_id, ip_address, metadata (jsonb), created_at |
-| `org_settings` | Per-org AI + app configuration | id, org_id, custom_system_prompt, data_retention_days, escalation_contacts (jsonb), notification_prefs (jsonb), billing_config (jsonb) |
+| Table                 | Purpose                         | Key Fields                                                                                                                                                                                                                                                                                                                      |
+| --------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ai_sessions`         | One row per AI guidance session | id, org_id, user_id, status (active/completed/failed/timeout), started_at, ended_at, duration_ms, model_version, language_detected, token_count_input, token_count_output, cost_usd, feedback_rating, feedback_note, summary, equipment_identified (jsonb), revenue_opportunities (jsonb), tools_used (jsonb), metadata (jsonb) |
+| `session_events`      | Granular event log per session  | id, session_id, event_type (connect/disconnect/reconnect/audio_start/video_start/model_response/error/tool_use/tool_response/feedback), timestamp, latency_ms, data (jsonb)                                                                                                                                                     |
+| `technician_profiles` | Extended technician data        | id, user_id, org_id, preferred_language, specialties (jsonb), total_sessions, total_duration_ms, average_rating, last_active_at                                                                                                                                                                                                 |
+| `invite_codes`        | Org invitation system           | id, org_id, code (6-char), created_by, role (technician/manager), max_uses, used_count, expires_at                                                                                                                                                                                                                              |
+| `audit_log`           | Immutable action trail          | id, org_id, actor_id, action_type, target_entity, target_id, ip_address, metadata (jsonb), created_at                                                                                                                                                                                                                           |
+| `org_settings`        | Per-org AI + app configuration  | id, org_id, custom_system_prompt, data_retention_days, escalation_contacts (jsonb), notification_prefs (jsonb), billing_config (jsonb)                                                                                                                                                                                          |
 
 ### 9.2 Knowledge Base Tables
 
-| Table | Purpose | Key Fields |
-|-------|---------|------------|
-| `knowledge_articles` | The wiki — AI-maintained, human-verified | id, org_id (nullable), slug, title, category, content_md, summary, equipment_brand, equipment_model, confidence_level, source_type, source_session_id, version, previous_version_id, embedding_id, word_count, retrieval_count, last_retrieved_at, created_by, verified_by, verified_at, created_at, updated_at |
-| `knowledge_verifications` | Verification queue entries | id, article_id, org_id, reviewer_id, status (pending/approved/rejected/needs_revision), reviewer_notes, reviewed_at, created_at |
-| `knowledge_links` | Article backlinks (auto-maintained) | id, source_article_id, target_article_id, link_type (reference/prerequisite/related), created_at |
+| Table                     | Purpose                                  | Key Fields                                                                                                                                                                                                                                                                                                      |
+| ------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `knowledge_articles`      | The wiki — AI-maintained, human-verified | id, org_id (nullable), slug, title, category, content_md, summary, equipment_brand, equipment_model, confidence_level, source_type, source_session_id, version, previous_version_id, embedding_id, word_count, retrieval_count, last_retrieved_at, created_by, verified_by, verified_at, created_at, updated_at |
+| `knowledge_verifications` | Verification queue entries               | id, article_id, org_id, reviewer_id, status (pending/approved/rejected/needs_revision), reviewer_notes, reviewed_at, created_at                                                                                                                                                                                 |
+| `knowledge_links`         | Article backlinks (auto-maintained)      | id, source_article_id, target_article_id, link_type (reference/prerequisite/related), created_at                                                                                                                                                                                                                |
 
 ### 9.3 Scaling Considerations
 
 At early stage, Postgres handles everything. When `session_events` exceeds tens of millions of rows:
+
 - Add **TimescaleDB** as a Postgres extension for time-based partitioning and 90-95% compression
 - No separate database needed; no migration; `CREATE EXTENSION timescaledb` and convert the table
 
@@ -819,20 +962,20 @@ At early stage, Postgres handles everything. When `session_events` exceeds tens 
 
 ## 10. Background Job System (Inngest)
 
-Inngest runs on existing Vercel infrastructure (serverless-native). Handler at `apps/dashboard/app/api/inngest/route.ts`. Free tier: 25K-50K runs/month.
+Inngest runs on existing Vercel infrastructure (serverless-native). Handler at `apps/web/app/api/inngest/route.ts`. Free tier: 25K-50K runs/month.
 
-| # | Job | Trigger | Steps |
-|---|-----|---------|-------|
-| 1 | `session.summarize` | `session/ended` event | Fetch session → fetch events → generate AI summary → save → extract knowledge → notify manager |
-| 2 | `knowledge.ingest` | `knowledge/session-completed` | Extract learnings → compile articles → update index → check health |
-| 3 | `knowledge.compile` | `knowledge/manual-uploaded` | Process PDF (ColPali) → generate embeddings → create articles → link related |
-| 4 | `analytics.aggregate` | Cron: daily at 02:00 UTC | Roll up session_events into daily stats per org |
-| 5 | `billing.meter` | Cron: hourly | Count sessions per org for usage tracking |
-| 6 | `gdpr.export` | `gdpr/export-requested` | Package all org data as JSON/CSV → upload to Vercel Blob → email download link |
-| 7 | `gdpr.delete` | `gdpr/deletion-requested` | Cascade delete personal data → anonymize session metadata → purge from Qdrant |
-| 8 | `email.sessionSummary` | `session/summary-ready` | Send formatted session summary to manager (if configured) |
-| 9 | `invite.expire` | Cron: daily at 00:00 UTC | Mark expired invite codes |
-| 10 | `audit.archive` | Cron: monthly | Archive audit logs older than retention period |
+| #   | Job                    | Trigger                       | Steps                                                                                          |
+| --- | ---------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | `session.summarize`    | `session/ended` event         | Fetch session → fetch events → generate AI summary → save → extract knowledge → notify manager |
+| 2   | `knowledge.ingest`     | `knowledge/session-completed` | Extract learnings → compile articles → update index → check health                             |
+| 3   | `knowledge.compile`    | `knowledge/manual-uploaded`   | Process PDF (ColPali) → generate embeddings → create articles → link related                   |
+| 4   | `analytics.aggregate`  | Cron: daily at 02:00 UTC      | Roll up session_events into daily stats per org                                                |
+| 5   | `billing.meter`        | Cron: hourly                  | Count sessions per org for usage tracking                                                      |
+| 6   | `gdpr.export`          | `gdpr/export-requested`       | Package all org data as JSON/CSV → upload to Vercel Blob → email download link                 |
+| 7   | `gdpr.delete`          | `gdpr/deletion-requested`     | Cascade delete personal data → anonymize session metadata → purge from Qdrant                  |
+| 8   | `email.sessionSummary` | `session/summary-ready`       | Send formatted session summary to manager (if configured)                                      |
+| 9   | `invite.expire`        | Cron: daily at 00:00 UTC      | Mark expired invite codes                                                                      |
+| 10  | `audit.archive`        | Cron: monthly                 | Archive audit logs older than retention period                                                 |
 
 ```typescript
 // Example: packages/api/src/jobs/sessionSummarize.ts
@@ -841,24 +984,22 @@ inngest.createFunction(
   { event: "session/ended" },
   async ({ event, step }) => {
     const session = await step.run("fetch-session", () =>
-      getSession(event.data.sessionId)
+      getSession(event.data.sessionId),
     );
     const events = await step.run("fetch-events", () =>
-      getSessionEvents(session.id)
+      getSessionEvents(session.id),
     );
     const summary = await step.run("generate-summary", () =>
-      generateSummary(session, events)
+      generateSummary(session, events),
     );
     await step.run("save-summary", () =>
-      updateSession(session.id, { summary })
+      updateSession(session.id, { summary }),
     );
     await step.run("ingest-knowledge", () =>
-      extractKnowledge(session, events, summary)
+      extractKnowledge(session, events, summary),
     );
-    await step.run("notify-manager", () =>
-      sendSummaryEmail(session, summary)
-    );
-  }
+    await step.run("notify-manager", () => sendSummaryEmail(session, summary));
+  },
 );
 ```
 
@@ -866,35 +1007,36 @@ inngest.createFunction(
 
 ## 11. Deployment & DNS
 
-| Domain | Points To | Managed By |
-|--------|-----------|------------|
-| `domain.com` | Framer | Framer DNS |
-| `app.domain.com` | Vercel | CNAME → `cname.vercel-dns.com` |
-| Mobile app | App Store / Google Play | EAS Build |
+| Domain           | Points To               | Managed By                     |
+| ---------------- | ----------------------- | ------------------------------ |
+| `domain.com`     | Framer                  | Framer DNS                     |
+| `app.domain.com` | Vercel                  | CNAME → `cname.vercel-dns.com` |
+| Mobile app       | App Store / Google Play | EAS Build                      |
 
 ### 11.1 Estimated Monthly Costs (Early Stage)
 
-| Service | Cost |
-|---------|------|
-| Vercel Pro | EUR 20 |
-| Neon Postgres (EU, Launch) | EUR 19 |
-| Upstash Redis (EU) | EUR 0-5 |
-| Qdrant Cloud (EU, free tier) | EUR 0 |
-| EAS Build (free tier) | EUR 0 |
-| Framer Basic | EUR 5-15 |
-| PostHog (free / self-hosted) | EUR 0 |
-| Sentry (free tier) | EUR 0 |
-| Resend (free tier) | EUR 0 |
-| Better Auth | EUR 0 (open-source) |
-| Inngest (free tier, 25K runs) | EUR 0 |
-| Gemini API | ~EUR 10-50 (usage) |
-| **Total** | **~EUR 55-110/month** |
+| Service                       | Cost                  |
+| ----------------------------- | --------------------- |
+| Vercel Pro                    | EUR 20                |
+| Neon Postgres (EU, Launch)    | EUR 19                |
+| Upstash Redis (EU)            | EUR 0-5               |
+| Qdrant Cloud (EU, free tier)  | EUR 0                 |
+| EAS Build (free tier)         | EUR 0                 |
+| Framer Basic                  | EUR 5-15              |
+| PostHog (free / self-hosted)  | EUR 0                 |
+| Sentry (free tier)            | EUR 0                 |
+| Resend (free tier)            | EUR 0                 |
+| Better Auth                   | EUR 0 (open-source)   |
+| Inngest (free tier, 25K runs) | EUR 0                 |
+| Gemini API                    | ~EUR 10-50 (usage)    |
+| **Total**                     | **~EUR 55-110/month** |
 
 ---
 
 ## 12. CI/CD Pipeline
 
 **On every push:**
+
 - Biome lint + format check
 - TypeScript type-check (`turbo run typecheck`)
 - Vitest unit tests (`turbo run test`)
@@ -902,11 +1044,13 @@ inngest.createFunction(
 - Inngest function type verification
 
 **On push to main:**
+
 - Vercel auto-deploys dashboard (preview → production)
 - Neon database branch created per PR (copy-on-write, isolated test data)
 - If `apps/mobile/**` or `packages/**` changed: trigger EAS Build (preview profile)
 
 **On release tag:**
+
 - EAS Build production profile
 - App store submission via EAS Submit
 
@@ -914,15 +1058,15 @@ inngest.createFunction(
 
 ## 13. Testing Strategy
 
-| Layer | Tool | What Gets Tested |
-|-------|------|-----------------|
-| Unit | Vitest 4.1.x | Zod schemas, utils, Zustand store logic, tRPC procedures, tool implementations, knowledge base logic |
-| Integration | Vitest + MSW 2.12.x | tRPC → Drizzle → test DB (Neon branch), WebSocket protocol, Inngest jobs, knowledge ingestion pipeline |
-| Web E2E | Playwright 1.59.x | Dashboard auth, org management, session list, analytics, knowledge base verification workflow |
-| Mobile E2E | Maestro 2.4.x | Onboarding, org join, session start/stop, settings |
-| WebSocket | MSW v2 `ws.link()` | Gemini protocol: setup → audio → toolCall → toolResponse → turnComplete → interruption → reconnection |
-| AI Tools | Vitest + mocked Gemini | Each tool's `call()`, `validateInput()`, prompt generation |
-| Knowledge | Vitest + test Qdrant | Ingestion, compilation, retrieval, verification flow |
+| Layer       | Tool                   | What Gets Tested                                                                                       |
+| ----------- | ---------------------- | ------------------------------------------------------------------------------------------------------ |
+| Unit        | Vitest 4.1.x           | Zod schemas, utils, Zustand store logic, tRPC procedures, tool implementations, knowledge base logic   |
+| Integration | Vitest + MSW 2.12.x    | tRPC → Drizzle → test DB (Neon branch), WebSocket protocol, Inngest jobs, knowledge ingestion pipeline |
+| Web E2E     | Playwright 1.59.x      | Dashboard auth, org management, session list, analytics, knowledge base verification workflow          |
+| Mobile E2E  | Maestro 2.4.x          | Onboarding, org join, session start/stop, settings                                                     |
+| WebSocket   | MSW v2 `ws.link()`     | Gemini protocol: setup → audio → toolCall → toolResponse → turnComplete → interruption → reconnection  |
+| AI Tools    | Vitest + mocked Gemini | Each tool's `call()`, `validateInput()`, prompt generation                                             |
+| Knowledge   | Vitest + test Qdrant   | Ingestion, compilation, retrieval, verification flow                                                   |
 
 ---
 
@@ -930,26 +1074,26 @@ inngest.createFunction(
 
 Deliberately deferred from v1 but architecturally accounted for:
 
-| Feature | When | Why Deferred |
-|---------|------|-------------|
-| **Human expert handoff** | Phase 1 | Safety-critical, low implementation complexity |
-| **Revenue opportunity identification** | Phase 1 (in AI prompts) | Business owner value prop, no extra infra |
-| **Offline AI (Gemma 4 E2B via LiteRT)** | Phase 2 | LiteRT integration, on-device model validation needed |
-| **Public REST API** | Phase 2 | `zod-to-openapi` prep in place; premature before PMF |
-| **Session recording & playback** | Phase 2 | Privacy consent framework needed; recommended for liability defense |
-| **Dispatcher view** | Phase 2 | Needs job/ticket model; not in MVP scope |
-| **AR annotation layer** | Phase 2-3 | YOLO + ARKit/ARCore on smartphone; no extra hardware |
-| **Structured compliance checklists** | Phase 2 | Digital sign-off, exportable PDF for regulatory audits |
-| **F-Gas certification tracking** | Phase 2 | Dashboard feature, 7-year refresher alerts (EU 2024/573) |
-| **Equipment recognition database** | Phase 2 | Curated per-org via dashboard; AI enriches from visual data |
-| **ServiceTitan/Housecall Pro integration** | Phase 3 | Partnership discussions; webhook system must be proven first |
-| **Smart glasses support** | When Meta Orion ships | Expo camera abstraction allows input source swap |
-| **BIM/Digital Twin integration** | Phase 3 | Enterprise building data; context injection layer supports it |
-| **White-labeling** | Enterprise tier | Org settings schema supports per-org branding |
-| **DACH expansion** | After Vienna validation | i18n + multilingual AI already in place |
-| **SOC 2 Type II** | Before first enterprise deal | ~6 months lead time |
-| **TimescaleDB** | session_events > 10M rows | Postgres extension, no migration needed |
-| **OpenTelemetry** | Phase 2 (with billing) | `@vercel/otel`, distributed tracing for cost attribution |
+| Feature                                    | When                         | Why Deferred                                                        |
+| ------------------------------------------ | ---------------------------- | ------------------------------------------------------------------- |
+| **Human expert handoff**                   | Phase 1                      | Safety-critical, low implementation complexity                      |
+| **Revenue opportunity identification**     | Phase 1 (in AI prompts)      | Business owner value prop, no extra infra                           |
+| **Offline AI (Gemma 4 E2B via LiteRT)**    | Phase 2                      | LiteRT integration, on-device model validation needed               |
+| **Public REST API**                        | Phase 2                      | `zod-to-openapi` prep in place; premature before PMF                |
+| **Session recording & playback**           | Phase 2                      | Privacy consent framework needed; recommended for liability defense |
+| **Dispatcher view**                        | Phase 2                      | Needs job/ticket model; not in MVP scope                            |
+| **AR annotation layer**                    | Phase 2-3                    | YOLO + ARKit/ARCore on smartphone; no extra hardware                |
+| **Structured compliance checklists**       | Phase 2                      | Digital sign-off, exportable PDF for regulatory audits              |
+| **F-Gas certification tracking**           | Phase 2                      | Dashboard feature, 7-year refresher alerts (EU 2024/573)            |
+| **Equipment recognition database**         | Phase 2                      | Curated per-org via dashboard; AI enriches from visual data         |
+| **ServiceTitan/Housecall Pro integration** | Phase 3                      | Partnership discussions; webhook system must be proven first        |
+| **Smart glasses support**                  | When Meta Orion ships        | Expo camera abstraction allows input source swap                    |
+| **BIM/Digital Twin integration**           | Phase 3                      | Enterprise building data; context injection layer supports it       |
+| **White-labeling**                         | Enterprise tier              | Org settings schema supports per-org branding                       |
+| **DACH expansion**                         | After Vienna validation      | i18n + multilingual AI already in place                             |
+| **SOC 2 Type II**                          | Before first enterprise deal | ~6 months lead time                                                 |
+| **TimescaleDB**                            | session_events > 10M rows    | Postgres extension, no migration needed                             |
+| **OpenTelemetry**                          | Phase 2 (with billing)       | `@vercel/otel`, distributed tracing for cost attribution            |
 
 ---
 
@@ -959,7 +1103,7 @@ Complete monorepo bootstrapping, all versions pinned to April 2026 latest stable
 
 ```bash
 # 1. Monorepo initialization
-mkdir hvac-copilot && cd hvac-copilot
+mkdir aucta && cd aucta
 git init
 bun init -y
 
@@ -973,7 +1117,7 @@ mkdir -p tooling/{scripts,docker}
 mkdir -p docs
 
 # 4. Dashboard (Next.js 16)
-cd apps/dashboard
+cd apps/web
 bunx create-next-app@latest . --typescript --tailwind --app --src-dir=false --turbopack
 cd ../..
 
@@ -986,12 +1130,12 @@ cd ../..
 bun add -d turbo typescript@6 @biomejs/biome vitest @playwright/test
 
 # 7. Dashboard dependencies
-bun add next@16 react@19 react-dom@19 --filter apps/dashboard
+bun add next@16 react@19 react-dom@19 --filter apps/web
 bun add @trpc/server @trpc/client @trpc/next @tanstack/react-query zod drizzle-orm \
   @neondatabase/serverless better-auth @upstash/redis @upstash/ratelimit inngest \
-  posthog-js @sentry/nextjs stripe --filter apps/dashboard
-bun add -d drizzle-kit --filter apps/dashboard
-bunx --cwd apps/dashboard shadcn@latest init
+  posthog-js @sentry/nextjs stripe --filter apps/web
+bun add -d drizzle-kit --filter apps/web
+bunx --cwd apps/web shadcn@latest init
 
 # 8. Mobile dependencies
 bun add expo-router expo-camera expo-av expo-keep-awake expo-secure-store \
@@ -1026,7 +1170,7 @@ bun add @asteasolutions/zod-to-openapi --filter packages/shared
 # 16. Neon CLI setup
 brew install neonctl
 neonctl auth
-neonctl projects create --name hvac-copilot --region-id aws-eu-central-1
+neonctl projects create --name aucta --region-id aws-eu-central-1
 
 # 17. Upstash Redis
 brew tap upstash/tap && brew install upstash
@@ -1043,4 +1187,4 @@ cd packages/db && bunx drizzle-kit generate && bunx drizzle-kit migrate
 
 ---
 
-*This document is the engineering baseline. For business strategy, regulatory compliance, investor material, and risk management, see [LEGAL-ADMIN.md](./LEGAL-ADMIN.md).*
+_This document is the engineering baseline for **Aucta**. For business strategy, regulatory compliance, investor material, and risk management, see [LEGAL-ADMIN.md](./LEGAL-ADMIN.md). For AI agent development guidelines, see [AGENTS.md](./AGENTS.md). For spec-driven development, see [SPEC-WORKFLOW.md](./SPEC-WORKFLOW.md)._

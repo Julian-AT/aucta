@@ -29,31 +29,31 @@ Every person who touches or is affected by the product. Architecture, permission
 
 ### 2.1 Internal to the HVAC Business
 
-| Role | Surface | What They Need | Key Metrics They Care About |
-|------|---------|---------------|---------------------------|
-| **Business Owner** | Dashboard | ROI justification, cost control, competitive advantage, compliance | Revenue per technician, callback rate, training cost reduction, AI cost per session |
-| **Operations Manager** | Dashboard | Workforce oversight, scheduling efficiency, quality assurance | Active sessions, session quality scores, technician utilization, error rates |
-| **Dispatcher** | Dashboard (future) | Job assignment context, technician skill matching | Technician availability, skill-job matching, first-time fix rate |
-| **Technician (experienced)** | Mobile App | Quick reference, validation of decisions, documentation | Session speed, parts identified, confidence in unfamiliar equipment |
-| **Technician (new hire)** | Mobile App | Step-by-step guidance, language support, safety reminders | Learning curve reduction, time to first solo job, safety compliance |
-| **Apprentice** | Mobile App | Training mode, supervised learning, skill assessment | Skills verified, training hours logged, supervisor sign-off |
+| Role                         | Surface            | What They Need                                                     | Key Metrics They Care About                                                         |
+| ---------------------------- | ------------------ | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| **Business Owner**           | Dashboard          | ROI justification, cost control, competitive advantage, compliance | Revenue per technician, callback rate, training cost reduction, AI cost per session |
+| **Operations Manager**       | Dashboard          | Workforce oversight, scheduling efficiency, quality assurance      | Active sessions, session quality scores, technician utilization, error rates        |
+| **Dispatcher**               | Dashboard (future) | Job assignment context, technician skill matching                  | Technician availability, skill-job matching, first-time fix rate                    |
+| **Technician (experienced)** | Mobile App         | Quick reference, validation of decisions, documentation            | Session speed, parts identified, confidence in unfamiliar equipment                 |
+| **Technician (new hire)**    | Mobile App         | Step-by-step guidance, language support, safety reminders          | Learning curve reduction, time to first solo job, safety compliance                 |
+| **Apprentice**               | Mobile App         | Training mode, supervised learning, skill assessment               | Skills verified, training hours logged, supervisor sign-off                         |
 
 ### 2.2 External
 
-| Role | Interaction | What They Need |
-|------|-------------|---------------|
-| **End Customer** (homeowner/building manager) | Indirect — sees technician using the app | Faster, more accurate service; confidence in the technician |
-| **Equipment Manufacturer** | Integration partner (future) | Product manuals and diagnostics surfaced through AI; brand visibility |
-| **Regulatory Body** | Compliance verification | Proof that safety procedures were followed; audit trail |
-| **Insurance Provider** | Risk assessment | Evidence of standardized procedures; reduced incident rates |
+| Role                                          | Interaction                              | What They Need                                                        |
+| --------------------------------------------- | ---------------------------------------- | --------------------------------------------------------------------- |
+| **End Customer** (homeowner/building manager) | Indirect — sees technician using the app | Faster, more accurate service; confidence in the technician           |
+| **Equipment Manufacturer**                    | Integration partner (future)             | Product manuals and diagnostics surfaced through AI; brand visibility |
+| **Regulatory Body**                           | Compliance verification                  | Proof that safety procedures were followed; audit trail               |
+| **Insurance Provider**                        | Risk assessment                          | Evidence of standardized procedures; reduced incident rates           |
 
 ### 2.3 Internal to Our Company
 
-| Role | Surface | What They Need |
-|------|---------|---------------|
-| **Sales/BD** | CRM + landing page analytics | Lead tracking, conversion metrics, demo scheduling |
-| **Customer Success** | Dashboard admin view | Onboarding progress, usage trends, churn signals |
-| **Product/Engineering** | Internal analytics | Feature adoption, session quality, error rates, model performance |
+| Role                    | Surface                      | What They Need                                                    |
+| ----------------------- | ---------------------------- | ----------------------------------------------------------------- |
+| **Sales/BD**            | CRM + landing page analytics | Lead tracking, conversion metrics, demo scheduling                |
+| **Customer Success**    | Dashboard admin view         | Onboarding progress, usage trends, churn signals                  |
+| **Product/Engineering** | Internal analytics           | Feature adoption, session quality, error rates, model performance |
 
 ---
 
@@ -63,11 +63,11 @@ Every person who touches or is affected by the product. Architecture, permission
 
 This product occupies a new category — **AI Skill Augmentation** — that sits alongside existing FSM software, not in competition with it.
 
-| Category | Examples | What They Do | Our Relationship |
-|----------|----------|-------------|-----------------|
-| Field Service Management | ServiceTitan ($250–400/tech/mo), Housecall Pro, Jobber | Scheduling, dispatch, invoicing, CRM | **Complement** — we make their technicians better, not replace their workflows |
-| Connected Worker Platforms | Augmentir, Atheer, ScopeAR | Digitized checklists, remote expert assist | **Compete** — they require pre-authored SOPs; we reason in real time |
-| General AI Assistants | ChatGPT, Gemini app, Claude | General knowledge, text-based | **Differentiate** — we are purpose-built for physical work with live video |
+| Category                   | Examples                                               | What They Do                               | Our Relationship                                                               |
+| -------------------------- | ------------------------------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------ |
+| Field Service Management   | ServiceTitan ($250–400/tech/mo), Housecall Pro, Jobber | Scheduling, dispatch, invoicing, CRM       | **Complement** — we make their technicians better, not replace their workflows |
+| Connected Worker Platforms | Augmentir, Atheer, ScopeAR                             | Digitized checklists, remote expert assist | **Compete** — they require pre-authored SOPs; we reason in real time           |
+| General AI Assistants      | ChatGPT, Gemini app, Claude                            | General knowledge, text-based              | **Differentiate** — we are purpose-built for physical work with live video     |
 
 ### 3.2 Why We Win
 
@@ -108,6 +108,7 @@ The product must integrate with, not replace, the tools HVAC businesses already 
 5. **Between sessions:** View past session summaries → see personal stats → update language preference → check for app updates
 
 **Critical UX Requirements:**
+
 - Maximum two taps to start a session from app launch
 - Large, glove-friendly touch targets (technicians wear work gloves)
 - High-contrast UI readable in direct sunlight
@@ -122,12 +123,14 @@ The product must integrate with, not replace, the tools HVAC businesses already 
 **Dashboard Sections:**
 
 **Overview (Home):**
+
 - Live activity: active sessions right now (count + technician names)
 - Today's key numbers: sessions completed, total AI time, estimated cost
 - Week/month trends: session volume, avg duration, language distribution
 - Alerts: low-rated sessions, unusually long sessions, connection failures
 
 **Team Management:**
+
 - Technician roster with status (online/offline/in-session)
 - Invite flow: generate code/link → set role (technician/manager) → set expiry
 - Individual technician profiles: session history, performance trend, language, specialties
@@ -135,12 +138,14 @@ The product must integrate with, not replace, the tools HVAC businesses already 
 - Skill matrix: which technicians have handled which equipment types (derived from session metadata)
 
 **Session Explorer:**
+
 - Searchable/filterable session history across entire organization
 - Session detail view: timeline of events, duration, language, token usage, cost, feedback
 - Transcript viewer (when available): AI responses with timestamps
 - Export: CSV/PDF for compliance documentation
 
 **Analytics:**
+
 - Usage trends: sessions per day/week/month, peak usage hours
 - Cost analysis: total AI cost, cost per session, cost per technician, projected monthly spend
 - Quality metrics: average feedback rating, reconnection rate, error rate
@@ -150,6 +155,7 @@ The product must integrate with, not replace, the tools HVAC businesses already 
 - First-time fix rate correlation: if integrated with FSM, track whether AI-assisted jobs have fewer callbacks
 
 **Organization Settings:**
+
 - Company profile, billing, subscription management
 - AI configuration: custom system prompt additions (company-specific procedures, safety protocols, preferred brands)
 - Data retention settings
@@ -172,13 +178,13 @@ The AI's value compounds when it has context beyond general HVAC knowledge. This
 
 ### 5.1 Context Layers (Injected into Gemini System Prompt)
 
-| Layer | Source | Scope | Example |
-|-------|--------|-------|---------|
-| **Base HVAC knowledge** | Curated system prompt | All organizations | General HVAC principles, safety procedures, common equipment |
-| **Organization context** | Org settings in dashboard | Per-org | "We are Klimatechnik GmbH, we primarily service Daikin and Mitsubishi units, our safety protocol requires XYZ" |
-| **Equipment library** | Uploaded manuals/specs (future) | Per-org | Specific model numbers, wiring diagrams, error code lookups |
-| **Session history** | Aggregated from past sessions | Per-technician | "This technician has handled 47 Daikin VRV installations" |
-| **Job context** | FSM integration (future) | Per-session | "This is a maintenance call for a 2019 Daikin FTXM, customer reported error code U4" |
+| Layer                    | Source                          | Scope             | Example                                                                                                        |
+| ------------------------ | ------------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Base HVAC knowledge**  | Curated system prompt           | All organizations | General HVAC principles, safety procedures, common equipment                                                   |
+| **Organization context** | Org settings in dashboard       | Per-org           | "We are Klimatechnik GmbH, we primarily service Daikin and Mitsubishi units, our safety protocol requires XYZ" |
+| **Equipment library**    | Uploaded manuals/specs (future) | Per-org           | Specific model numbers, wiring diagrams, error code lookups                                                    |
+| **Session history**      | Aggregated from past sessions   | Per-technician    | "This technician has handled 47 Daikin VRV installations"                                                      |
+| **Job context**          | FSM integration (future)        | Per-session       | "This is a maintenance call for a 2019 Daikin FTXM, customer reported error code U4"                           |
 
 ### 5.2 System Prompt Architecture
 
@@ -208,6 +214,7 @@ HVAC work involves real physical risks. The product must actively support safety
 ### 6.2 Compliance Documentation
 
 Session logs serve as a lightweight compliance trail:
+
 - Timestamp of every AI session
 - Equipment identified (when detectable)
 - Safety warnings issued
@@ -226,17 +233,18 @@ As an Austria-based SaaS processing personal data of EU residents, GDPR complian
 
 **Data Classification:**
 
-| Data Type | Classification | Legal Basis | Retention |
-|-----------|---------------|-------------|-----------|
-| User account data (name, email) | Personal data | Contract necessity (Art. 6(1)(b)) | Duration of account + 30 days |
-| Audio recordings (AI sessions) | Personal data (voice biometric potential) | Legitimate interest (Art. 6(1)(f)) | Not stored by default — streamed and discarded |
-| Video frames (AI sessions) | Personal data (may contain faces) | Legitimate interest (Art. 6(1)(f)) | Not stored by default — streamed and discarded |
-| Session metadata (timestamps, duration, tokens) | Personal data (linked to user) | Contract necessity | Per org data retention setting, default 12 months |
-| Analytics aggregates | Anonymized/pseudonymized | Legitimate interest | Indefinite |
+| Data Type                                       | Classification                            | Legal Basis                        | Retention                                         |
+| ----------------------------------------------- | ----------------------------------------- | ---------------------------------- | ------------------------------------------------- |
+| User account data (name, email)                 | Personal data                             | Contract necessity (Art. 6(1)(b))  | Duration of account + 30 days                     |
+| Audio recordings (AI sessions)                  | Personal data (voice biometric potential) | Legitimate interest (Art. 6(1)(f)) | Not stored by default — streamed and discarded    |
+| Video frames (AI sessions)                      | Personal data (may contain faces)         | Legitimate interest (Art. 6(1)(f)) | Not stored by default — streamed and discarded    |
+| Session metadata (timestamps, duration, tokens) | Personal data (linked to user)            | Contract necessity                 | Per org data retention setting, default 12 months |
+| Analytics aggregates                            | Anonymized/pseudonymized                  | Legitimate interest                | Indefinite                                        |
 
 **Critical architectural decision:** Audio and video frames are streamed directly from the mobile app to Gemini's API via WebSocket. They are NOT stored on our servers. This eliminates the largest GDPR surface area. Session metadata (timestamps, duration, cost, feedback) is stored and subject to standard GDPR controls.
 
 **Required implementations:**
+
 - **Datenschutzerklärung (Privacy Policy):** German-language, DSGVO-compliant, listing every processing activity with legal basis, retention period, and sub-processor
 - **Impressum:** Required by Austrian law (Mediengesetz, E-Commerce-Gesetz), must be accessible within 2 clicks from every page
 - **Data Processing Agreements (AVV/AV-Vertrag):** Signed DPAs with all sub-processors (Neon, Upstash, Vercel, Google/Gemini, Resend, Sentry, PostHog)
@@ -256,6 +264,7 @@ The HVAC AI Copilot is a **deployer** of a general-purpose AI model (Gemini), no
 **Risk classification:** The product likely falls under **limited risk (transparency obligations)**, not high risk. It does not involve biometric identification, critical infrastructure control, employment decisions, or any Annex III category. It provides guidance and recommendations; it does not make autonomous decisions affecting individuals' rights.
 
 **Required transparency measures (by August 2, 2026):**
+
 - **AI interaction disclosure:** Users (technicians) must be clearly informed they are interacting with an AI system, not a human expert. This must be shown at session start and in the app's information section.
 - **AI-generated content marking:** If session summaries or reports are generated by AI, they must be marked as AI-generated.
 - **No emotion recognition in workplace:** The AI must not assess, infer, or report technicians' emotional states to their employers. Session quality is measured by explicit feedback and objective metrics only.
@@ -265,6 +274,7 @@ The HVAC AI Copilot is a **deployer** of a general-purpose AI model (Gemini), no
 ### 7.3 F-Gas Regulation (EU 517/2014)
 
 Technicians working with fluorinated refrigerants must hold valid F-Gas certification. The product should:
+
 - Not replace or substitute certification requirements
 - Include a disclaimer that AI guidance does not replace certified training
 - Reference F-Gas procedures when relevant in AI guidance
@@ -275,18 +285,19 @@ Technicians working with fluorinated refrigerants must hold valid F-Gas certific
 
 ### 8.1 Data Security
 
-| Layer | Measure |
-|-------|---------|
-| **Data in transit** | TLS 1.3 for all HTTP/WSS connections |
-| **Data at rest** | Neon Postgres encrypts at rest by default (AES-256); Upstash Redis encrypts at rest |
-| **API key security** | Gemini API key never reaches the client; ephemeral tokens with constrained permissions |
-| **Authentication** | Better Auth with session tokens stored in `expo-secure-store` (iOS Keychain / Android Keystore) |
-| **Authorization** | Role-based access control via Better Auth organization plugin; permissions checked in tRPC middleware |
-| **Input validation** | Zod schemas on every tRPC procedure; server-side validation only (never trust client) |
+| Layer                | Measure                                                                                               |
+| -------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Data in transit**  | TLS 1.3 for all HTTP/WSS connections                                                                  |
+| **Data at rest**     | Neon Postgres encrypts at rest by default (AES-256); Upstash Redis encrypts at rest                   |
+| **API key security** | Gemini API key never reaches the client; ephemeral tokens with constrained permissions                |
+| **Authentication**   | Better Auth with session tokens stored in `expo-secure-store` (iOS Keychain / Android Keystore)       |
+| **Authorization**    | Role-based access control via Better Auth organization plugin; permissions checked in tRPC middleware |
+| **Input validation** | Zod schemas on every tRPC procedure; server-side validation only (never trust client)                 |
 
 ### 8.2 Audit Trail
 
 Every significant action is logged to an `audit_log` table:
+
 - User authentication events (login, logout, failed attempts)
 - Organization changes (member added/removed, role changed, settings modified)
 - Session lifecycle events (started, ended, failed)
@@ -298,6 +309,7 @@ Each audit entry includes: timestamp, actor (user ID), action type, target entit
 ### 8.3 Organizational Data Isolation
 
 Multi-tenant architecture with strict data isolation:
+
 - Every database query includes `org_id` filtering — enforced at the tRPC middleware level, not left to individual router implementations
 - Technicians can only see their own sessions; managers can see sessions within their org; owners can see everything in their org
 - No cross-org data access is possible through the API
@@ -310,94 +322,94 @@ Every decision is justified with a single reason. Open-source is chosen over pai
 
 ### 9.1 Monorepo Foundation
 
-| Decision | Tool | Why |
-|----------|------|-----|
-| Build orchestrator | **Turborepo** | Vercel-native, minimal config, auto-detects workspace structure |
-| Package manager + runtime | **Bun** | 25–30× faster installs than npm; transparent `node_modules` for Metro compatibility; Turborepo supports `bun.lock` since v2.6 |
-| Language | **TypeScript (strict)** | End-to-end type safety from DB schema to mobile UI |
+| Decision                  | Tool                    | Why                                                                                                                           |
+| ------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Build orchestrator        | **Turborepo**           | Vercel-native, minimal config, auto-detects workspace structure                                                               |
+| Package manager + runtime | **Bun**                 | 25–30× faster installs than npm; transparent `node_modules` for Metro compatibility; Turborepo supports `bun.lock` since v2.6 |
+| Language                  | **TypeScript (strict)** | End-to-end type safety from DB schema to mobile UI                                                                            |
 
 ### 9.2 Frontend
 
-| Decision | Tool | Why |
-|----------|------|-----|
-| Mobile framework | **Expo SDK 53+** | Managed workflow, EAS Build/Update, New Architecture by default |
-| Mobile navigation | **Expo Router** | File-based routing, typed routes, deep linking |
-| Dashboard framework | **Next.js 15** | App Router, RSC for data-heavy views, Vercel-native |
-| Dashboard styling | **Tailwind CSS v4** | Utility-first, shared design tokens |
-| Mobile styling | **NativeWind v4 + Tailwind v3** | v5 unstable; v4 production-proven |
-| Dashboard components | **shadcn/ui** | Copy-paste ownership, Radix primitives, accessible |
-| Mobile components | **React Native Reusables** | shadcn philosophy for React Native, NativeWind-based |
-| Client state (live sessions) | **Zustand** | `getState()`/`setState()` outside React — required for WebSocket + native audio callbacks |
-| Server state | **TanStack Query v5** | Request/response caching for tRPC |
-| i18n | **react-i18next + expo-localization** | Cross-platform, TypeScript key autocomplete |
+| Decision                     | Tool                                  | Why                                                                                       |
+| ---------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Mobile framework             | **Expo SDK 53+**                      | Managed workflow, EAS Build/Update, New Architecture by default                           |
+| Mobile navigation            | **Expo Router**                       | File-based routing, typed routes, deep linking                                            |
+| Dashboard framework          | **Next.js 15**                        | App Router, RSC for data-heavy views, Vercel-native                                       |
+| Dashboard styling            | **Tailwind CSS v4**                   | Utility-first, shared design tokens                                                       |
+| Mobile styling               | **NativeWind v4 + Tailwind v3**       | v5 unstable; v4 production-proven                                                         |
+| Dashboard components         | **shadcn/ui**                         | Copy-paste ownership, Radix primitives, accessible                                        |
+| Mobile components            | **React Native Reusables**            | shadcn philosophy for React Native, NativeWind-based                                      |
+| Client state (live sessions) | **Zustand**                           | `getState()`/`setState()` outside React — required for WebSocket + native audio callbacks |
+| Server state                 | **TanStack Query v5**                 | Request/response caching for tRPC                                                         |
+| i18n                         | **react-i18next + expo-localization** | Cross-platform, TypeScript key autocomplete                                               |
 
 ### 9.3 API & Data
 
-| Decision | Tool | Why |
-|----------|------|-----|
-| Internal API | **tRPC v11** | End-to-end type safety; 700K+ weekly downloads |
-| Validation | **Zod** | Single schema validates tRPC input, forms, and DB inserts |
-| ORM | **Drizzle ORM** | 7.4KB footprint, sub-500ms serverless cold starts, SQL-like API |
-| Database | **Neon Postgres (EU region)** | Serverless, branching for previews, EU data residency available |
-| Cache | **Upstash Redis (EU region)** | HTTP-based, rate limiting, ephemeral token caching |
+| Decision     | Tool                          | Why                                                             |
+| ------------ | ----------------------------- | --------------------------------------------------------------- |
+| Internal API | **tRPC v11**                  | End-to-end type safety; 700K+ weekly downloads                  |
+| Validation   | **Zod**                       | Single schema validates tRPC input, forms, and DB inserts       |
+| ORM          | **Drizzle ORM**               | 7.4KB footprint, sub-500ms serverless cold starts, SQL-like API |
+| Database     | **Neon Postgres (EU region)** | Serverless, branching for previews, EU data residency available |
+| Cache        | **Upstash Redis (EU region)** | HTTP-based, rate limiting, ephemeral token caching              |
 
 ### 9.4 Authentication
 
-| Decision | Tool | Why |
-|----------|------|-----|
+| Decision       | Tool            | Why                                                                                                      |
+| -------------- | --------------- | -------------------------------------------------------------------------------------------------------- |
 | Auth framework | **Better Auth** | Open-source, self-hosted, org plugin with RBAC, Expo plugin, data in your Postgres — zero vendor lock-in |
 
 **Organization model:** `organization()` plugin with roles: `owner`, `manager`, `technician`. Permissions: `org:sessions:view`, `org:sessions:manage`, `org:team:invite`, `org:team:manage`, `org:settings:edit`, `org:billing:manage`, `org:analytics:view`, `org:analytics:export`.
 
 ### 9.5 AI / Real-Time
 
-| Decision | Tool | Why |
-|----------|------|-----|
-| AI model | **Gemini 2.5 Flash Live Preview** | Real-time multimodal (video + audio) via WebSocket; 1 FPS video; auto language detection; lowest live-streaming cost |
-| API key security | **Ephemeral tokens** | Short-lived, constrained to system prompt + tools; eliminates WebSocket proxy |
-| Audio recording | **@speechmatics/expo-two-way-audio** | PCM 16kHz/16-bit/mono matching Gemini input; built-in AEC |
-| Audio playback | **react-native-audio-api** | `AudioBufferQueueSourceNode` for streaming PCM at 24kHz |
-| Video capture | **expo-camera** | 1 FPS JPEG capture at 768×768 |
+| Decision         | Tool                                 | Why                                                                                                                  |
+| ---------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| AI model         | **Gemini 2.5 Flash Live Preview**    | Real-time multimodal (video + audio) via WebSocket; 1 FPS video; auto language detection; lowest live-streaming cost |
+| API key security | **Ephemeral tokens**                 | Short-lived, constrained to system prompt + tools; eliminates WebSocket proxy                                        |
+| Audio recording  | **@speechmatics/expo-two-way-audio** | PCM 16kHz/16-bit/mono matching Gemini input; built-in AEC                                                            |
+| Audio playback   | **react-native-audio-api**           | `AudioBufferQueueSourceNode` for streaming PCM at 24kHz                                                              |
+| Video capture    | **expo-camera**                      | 1 FPS JPEG capture at 768×768                                                                                        |
 
 ### 9.6 Infrastructure & Deployment
 
-| Decision | Tool | Why |
-|----------|------|-----|
-| Dashboard hosting | **Vercel** | Native Turborepo support, preview deploys, edge functions |
-| Mobile CI/CD | **EAS Build + EAS Workflows** | M4 Pro builds, OTA updates, GitHub Actions integration |
-| CI pipeline | **GitHub Actions** | Turborepo remote caching |
-| WebSocket proxy (future) | **Fly.io** | Only if web-based AI sessions needed; $2/month |
+| Decision                 | Tool                          | Why                                                       |
+| ------------------------ | ----------------------------- | --------------------------------------------------------- |
+| Dashboard hosting        | **Vercel**                    | Native Turborepo support, preview deploys, edge functions |
+| Mobile CI/CD             | **EAS Build + EAS Workflows** | M4 Pro builds, OTA updates, GitHub Actions integration    |
+| CI pipeline              | **GitHub Actions**            | Turborepo remote caching                                  |
+| WebSocket proxy (future) | **Fly.io**                    | Only if web-based AI sessions needed; $2/month            |
 
 ### 9.7 Observability & Quality
 
-| Decision | Tool | Why |
-|----------|------|-----|
+| Decision                  | Tool                        | Why                                                            |
+| ------------------------- | --------------------------- | -------------------------------------------------------------- |
 | Analytics + feature flags | **PostHog** (self-hostable) | Replaces 3 paid services; unlimited flags on free tier; RN SDK |
-| Error tracking | **Sentry** | First-class Expo + Next.js SDKs; free tier |
-| Linting + formatting | **Biome** | Single tool, 35× faster than ESLint + Prettier |
-| Unit/integration tests | **Vitest** | Vite-native, shared config |
-| Web E2E | **Playwright** | WebSocket mocking support |
-| Mobile E2E | **Maestro** | Expo-recommended, YAML-based |
-| API/WS mocking | **MSW v2** | `ws.link()` for WebSocket interception |
+| Error tracking            | **Sentry**                  | First-class Expo + Next.js SDKs; free tier                     |
+| Linting + formatting      | **Biome**                   | Single tool, 35× faster than ESLint + Prettier                 |
+| Unit/integration tests    | **Vitest**                  | Vite-native, shared config                                     |
+| Web E2E                   | **Playwright**              | WebSocket mocking support                                      |
+| Mobile E2E                | **Maestro**                 | Expo-recommended, YAML-based                                   |
+| API/WS mocking            | **MSW v2**                  | `ws.link()` for WebSocket interception                         |
 
 ### 9.8 Payments & Email
 
-| Decision | Tool | Why |
-|----------|------|-----|
-| Web payments | **Stripe** | Dashboard checkout, billing portal |
-| Mobile subscriptions | **RevenueCat** | App Store/Play Store receipts, free under $2,500/month |
-| Transactional email | **React Email + Resend** | React templates, 3,000 free emails/month |
+| Decision             | Tool                     | Why                                                    |
+| -------------------- | ------------------------ | ------------------------------------------------------ |
+| Web payments         | **Stripe**               | Dashboard checkout, billing portal                     |
+| Mobile subscriptions | **RevenueCat**           | App Store/Play Store receipts, free under $2,500/month |
+| Transactional email  | **React Email + Resend** | React templates, 3,000 free emails/month               |
 
 ### 9.9 Mobile-Specific
 
-| Decision | Tool | Why |
-|----------|------|-----|
-| Screen wake lock | **expo-keep-awake** | Prevents dimming during sessions |
-| Android background audio | **@notifee/react-native** | Foreground service for sustained audio |
-| Push notifications | **expo-notifications** | Job alerts, session summaries |
-| OTA updates | **expo-updates** | Field-deployed B2B app; can't always update via store |
-| Local storage | **MMKV** | 30× faster than AsyncStorage, synchronous |
-| Connectivity | **@react-native-community/netinfo** | Offline detection + reconnection |
+| Decision                 | Tool                                | Why                                                   |
+| ------------------------ | ----------------------------------- | ----------------------------------------------------- |
+| Screen wake lock         | **expo-keep-awake**                 | Prevents dimming during sessions                      |
+| Android background audio | **@notifee/react-native**           | Foreground service for sustained audio                |
+| Push notifications       | **expo-notifications**              | Job alerts, session summaries                         |
+| OTA updates              | **expo-updates**                    | Field-deployed B2B app; can't always update via store |
+| Local storage            | **MMKV**                            | 30× faster than AsyncStorage, synchronous             |
+| Connectivity             | **@react-native-community/netinfo** | Offline detection + reconnection                      |
 
 ---
 
@@ -498,7 +510,7 @@ Zod schema (packages/shared)
     → tRPC input validation (packages/api)
     → Drizzle table definition (packages/db)
     → Inferred row types (packages/db/types)
-    → TanStack Query hooks (apps/mobile, apps/dashboard)
+    → TanStack Query hooks (apps/mobile, apps/web)
     → UI rendering (type-checked props)
 ```
 
@@ -553,18 +565,19 @@ All tables managed via Drizzle ORM. Better Auth manages its own tables (user, se
 
 ### 12.1 Application Tables
 
-| Table | Purpose | Key Fields |
-|-------|---------|-----------|
-| `ai_sessions` | One row per AI guidance session | id, org_id, user_id, status (active/completed/failed/timeout), started_at, ended_at, duration_ms, model_version, language_detected, token_count_input, token_count_output, cost_usd, feedback_rating, feedback_note, metadata (jsonb) |
-| `session_events` | Granular event log per session | id, session_id, event_type (connect/disconnect/reconnect/audio_start/video_start/model_response/error/tool_use/feedback), timestamp, latency_ms, data (jsonb) |
-| `technician_profiles` | Extended technician data | id, user_id, org_id, preferred_language, specialties (jsonb), total_sessions, total_duration_ms, average_rating, last_active_at |
-| `invite_codes` | Org invitation system | id, org_id, code (6-char), created_by, role (technician/manager), max_uses, used_count, expires_at |
-| `audit_log` | Immutable action trail | id, org_id, actor_id, action_type, target_entity, target_id, ip_address, metadata (jsonb), created_at |
-| `org_settings` | Per-org AI + app configuration | id, org_id, custom_system_prompt, data_retention_days, notification_prefs (jsonb), billing_config (jsonb) |
+| Table                 | Purpose                         | Key Fields                                                                                                                                                                                                                            |
+| --------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ai_sessions`         | One row per AI guidance session | id, org_id, user_id, status (active/completed/failed/timeout), started_at, ended_at, duration_ms, model_version, language_detected, token_count_input, token_count_output, cost_usd, feedback_rating, feedback_note, metadata (jsonb) |
+| `session_events`      | Granular event log per session  | id, session_id, event_type (connect/disconnect/reconnect/audio_start/video_start/model_response/error/tool_use/feedback), timestamp, latency_ms, data (jsonb)                                                                         |
+| `technician_profiles` | Extended technician data        | id, user_id, org_id, preferred_language, specialties (jsonb), total_sessions, total_duration_ms, average_rating, last_active_at                                                                                                       |
+| `invite_codes`        | Org invitation system           | id, org_id, code (6-char), created_by, role (technician/manager), max_uses, used_count, expires_at                                                                                                                                    |
+| `audit_log`           | Immutable action trail          | id, org_id, actor_id, action_type, target_entity, target_id, ip_address, metadata (jsonb), created_at                                                                                                                                 |
+| `org_settings`        | Per-org AI + app configuration  | id, org_id, custom_system_prompt, data_retention_days, notification_prefs (jsonb), billing_config (jsonb)                                                                                                                             |
 
 ### 12.2 Scaling Considerations
 
 At early stage, Postgres handles everything. When `session_events` exceeds tens of millions of rows:
+
 - Add **TimescaleDB** as a Postgres extension for time-based partitioning and 90–95% compression
 - No separate database needed; no migration; just `CREATE EXTENSION timescaledb` and convert the table
 
@@ -587,11 +600,11 @@ Pricing anchored against the value delivered, not against ServiceTitan ($250–4
 
 **Proposed tiers (subject to validation):**
 
-| Tier | Price | Includes | Target |
-|------|-------|----------|--------|
-| **Starter** | Free | 3 technicians, 50 sessions/month, basic dashboard | Solo operators, trial |
-| **Professional** | €29/tech/month | Unlimited sessions, full analytics, priority support, custom AI instructions | 5–20 tech businesses |
-| **Enterprise** | Custom | SSO, API access, dedicated support, SLA, custom integrations | 20+ tech businesses, MSPs |
+| Tier             | Price          | Includes                                                                     | Target                    |
+| ---------------- | -------------- | ---------------------------------------------------------------------------- | ------------------------- |
+| **Starter**      | Free           | 3 technicians, 50 sessions/month, basic dashboard                            | Solo operators, trial     |
+| **Professional** | €29/tech/month | Unlimited sessions, full analytics, priority support, custom AI instructions | 5–20 tech businesses      |
+| **Enterprise**   | Custom         | SSO, API access, dedicated support, SLA, custom integrations                 | 20+ tech businesses, MSPs |
 
 **Usage metering:** Track sessions per technician per month. Overage on Starter tier triggers upgrade prompt, not a hard block.
 
@@ -601,43 +614,46 @@ Pricing anchored against the value delivered, not against ServiceTitan ($250–4
 
 ## 14. Deployment & DNS
 
-| Domain | Points To | Managed By |
-|--------|-----------|-----------|
-| `domain.com` | Framer | Framer DNS |
-| `app.domain.com` | Vercel | CNAME → `cname.vercel-dns.com` |
-| Mobile app | App Store / Google Play | EAS Build |
+| Domain           | Points To               | Managed By                     |
+| ---------------- | ----------------------- | ------------------------------ |
+| `domain.com`     | Framer                  | Framer DNS                     |
+| `app.domain.com` | Vercel                  | CNAME → `cname.vercel-dns.com` |
+| Mobile app       | App Store / Google Play | EAS Build                      |
 
 ### 14.1 Estimated Monthly Costs (Early Stage)
 
-| Service | Cost |
-|---------|------|
-| Vercel Pro | €20 |
-| Neon Postgres (EU, Launch) | €19 |
-| Upstash Redis (EU) | €0–5 |
-| EAS Build (free tier) | €0 |
-| Framer Basic | €5–15 |
-| PostHog (free / self-hosted) | €0 |
-| Sentry (free tier) | €0 |
-| Resend (free tier) | €0 |
-| Better Auth | €0 (open-source) |
-| Gemini API | ~€10–50 (usage) |
-| **Total** | **~€55–110/month** |
+| Service                      | Cost               |
+| ---------------------------- | ------------------ |
+| Vercel Pro                   | €20                |
+| Neon Postgres (EU, Launch)   | €19                |
+| Upstash Redis (EU)           | €0–5               |
+| EAS Build (free tier)        | €0                 |
+| Framer Basic                 | €5–15              |
+| PostHog (free / self-hosted) | €0                 |
+| Sentry (free tier)           | €0                 |
+| Resend (free tier)           | €0                 |
+| Better Auth                  | €0 (open-source)   |
+| Gemini API                   | ~€10–50 (usage)    |
+| **Total**                    | **~€55–110/month** |
 
 ---
 
 ## 15. CI/CD Pipeline
 
 **On every push:**
+
 - Biome lint + format check
 - TypeScript type-check (`turbo run typecheck`)
 - Vitest unit tests (`turbo run test`)
 - Build all packages (`turbo run build` with remote caching)
 
 **On push to main:**
+
 - Vercel auto-deploys dashboard (preview → production)
 - If `apps/mobile/**` or `packages/**` changed: trigger EAS Build (preview profile)
 
 **On release tag:**
+
 - EAS Build production profile
 - App store submission via EAS Submit
 
@@ -645,13 +661,13 @@ Pricing anchored against the value delivered, not against ServiceTitan ($250–4
 
 ## 16. Testing Strategy
 
-| Layer | Tool | What Gets Tested |
-|-------|------|-----------------|
-| Unit | Vitest | Zod schemas, utils, Zustand store logic, tRPC procedures |
-| Integration | Vitest + MSW v2 | tRPC → Drizzle → test DB, WebSocket protocol |
-| Web E2E | Playwright | Dashboard auth, org management, session list, analytics |
-| Mobile E2E | Maestro | Onboarding, org join, session start/stop, settings |
-| WebSocket | MSW v2 `ws.link()` | Gemini protocol: setup → audio → turnComplete → interruption → reconnection |
+| Layer       | Tool               | What Gets Tested                                                            |
+| ----------- | ------------------ | --------------------------------------------------------------------------- |
+| Unit        | Vitest             | Zod schemas, utils, Zustand store logic, tRPC procedures                    |
+| Integration | Vitest + MSW v2    | tRPC → Drizzle → test DB, WebSocket protocol                                |
+| Web E2E     | Playwright         | Dashboard auth, org management, session list, analytics                     |
+| Mobile E2E  | Maestro            | Onboarding, org join, session start/stop, settings                          |
+| WebSocket   | MSW v2 `ws.link()` | Gemini protocol: setup → audio → turnComplete → interruption → reconnection |
 
 ---
 
@@ -659,19 +675,19 @@ Pricing anchored against the value delivered, not against ServiceTitan ($250–4
 
 Deliberately deferred from v1 but architecturally accounted for:
 
-| Feature | When | Why Deferred |
-|---------|------|-------------|
-| **Smart glasses support** | When Meta Orion or similar reaches market | Expo camera abstraction allows input source swap |
-| **Offline AI (on-device model)** | When suitable small models exist | Zustand session store is backend-agnostic |
-| **Public REST API** | Phase 2/3 | Third-party integrations need stable API; premature before product-market fit |
-| **ServiceTitan/Housecall Pro integration** | Phase 3 | Requires partnership discussions; webhook system must be proven first |
-| **Session recording & playback** | Phase 2 | Privacy implications require consent framework; session_events schema supports it |
-| **Dispatcher view** | Phase 2 | Needs job/ticket model; not in MVP scope |
-| **Equipment recognition database** | Phase 2 | Curated per-org via dashboard; AI enriches from visual data |
-| **White-labeling** | Enterprise tier | Org settings schema supports per-org branding |
-| **DACH expansion** | After Vienna validation | i18n + multilingual AI already in place |
-| **SOC 2 Type II** | Before first enterprise deal | Required for enterprise procurement; start process ~6 months before needed |
-| **TimescaleDB** | When session_events > 10M rows | Postgres extension, no migration needed |
+| Feature                                    | When                                      | Why Deferred                                                                      |
+| ------------------------------------------ | ----------------------------------------- | --------------------------------------------------------------------------------- |
+| **Smart glasses support**                  | When Meta Orion or similar reaches market | Expo camera abstraction allows input source swap                                  |
+| **Offline AI (on-device model)**           | When suitable small models exist          | Zustand session store is backend-agnostic                                         |
+| **Public REST API**                        | Phase 2/3                                 | Third-party integrations need stable API; premature before product-market fit     |
+| **ServiceTitan/Housecall Pro integration** | Phase 3                                   | Requires partnership discussions; webhook system must be proven first             |
+| **Session recording & playback**           | Phase 2                                   | Privacy implications require consent framework; session_events schema supports it |
+| **Dispatcher view**                        | Phase 2                                   | Needs job/ticket model; not in MVP scope                                          |
+| **Equipment recognition database**         | Phase 2                                   | Curated per-org via dashboard; AI enriches from visual data                       |
+| **White-labeling**                         | Enterprise tier                           | Org settings schema supports per-org branding                                     |
+| **DACH expansion**                         | After Vienna validation                   | i18n + multilingual AI already in place                                           |
+| **SOC 2 Type II**                          | Before first enterprise deal              | Required for enterprise procurement; start process ~6 months before needed        |
+| **TimescaleDB**                            | When session_events > 10M rows            | Postgres extension, no migration needed                                           |
 
 ---
 
@@ -693,4 +709,4 @@ Deliberately deferred from v1 but architecturally accounted for:
 
 ---
 
-*This document is a living artifact. It will be updated as decisions are made, features are validated, and the team grows.*
+_This document is a living artifact. It will be updated as decisions are made, features are validated, and the team grows._
