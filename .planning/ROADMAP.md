@@ -51,12 +51,13 @@ Plans:
   3. logFinding tool records structured observations (category, description, severity) to session metadata
   4. System prompt includes HVAC safety disclaimers, AI scope limitations, and F-Gas EU 2024/573 regulation references
   5. Tool dispatcher resolves Gemini function call events to the correct tool, validates input via Zod, and returns structured responses
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
 - [x] 02-01-PLAN.md — packages/ai/ foundation: buildTool() factory, system prompt layers (core, HVAC, safety), builder
 - [x] 02-02-PLAN.md — Initial tools: lookupErrorCode with static JSON data, logFinding with in-memory store
 - [x] 02-03-PLAN.md — Integration: tool registry, dispatcher, ephemeral token tRPC endpoint
+- [ ] 02-04-PLAN.md — Gap closure: fix ToolDef variance, Modality enum, setTimeout type, unused parameter
 
 ### Phase 3: Live Streaming Session
 **Goal**: A technician can have a complete real-time AI conversation by pointing their camera at HVAC equipment and speaking naturally
@@ -118,7 +119,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation and Auth | 6/6 | Executing | - |
-| 2. AI Pipeline and Tool System | 0/3 | Planned | - |
+| 2. AI Pipeline and Tool System | 3/4 | Gap closure | - |
 | 3. Live Streaming Session | 0/0 | Not started | - |
 | 4. Session Lifecycle | 0/0 | Not started | - |
 | 5. Knowledge Base | 0/0 | Not started | - |
