@@ -1,0 +1,19 @@
+{
+  "name": "@aucta/ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tools/*": "./src/tools/*.ts",
+    "./prompts/*": "./src/prompts/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.3.0",
+    "@aucta/shared": "workspace:*"
+  }
+}
