@@ -12,17 +12,18 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Ephemeral token system: API issues short-lived tokens so Gemini API key never reaches the client — Validated in Phase 2
+- [x] Layered system prompt assembly (core role, HVAC expertise, safety rules, org overlay, knowledge context) — Validated in Phase 2
+- [x] Tool system architecture: buildTool() factory, tool registry, tool dispatcher for Gemini function calling — Validated in Phase 2
+- [x] Turborepo monorepo with Bun, TypeScript strict, Biome, shared packages (ai, api, db, auth, shared, config) — Validated in Phase 1
+- [x] Better Auth with organization plugin, roles (owner/manager/technician), invite codes, RBAC permissions — Validated in Phase 1
+- [x] tRPC API with org-scoped middleware, rate limiting via Upstash Redis — Validated in Phase 1
+- [x] CI pipeline: Biome lint, TypeScript typecheck, Vitest tests, Turborepo build — Validated in Phase 1
 
 ### Active
 
-- [ ] Turborepo monorepo with Bun, TypeScript strict, Biome, shared packages (ai, api, db, auth, shared, config)
-- [ ] Better Auth with organization plugin, roles (owner/manager/technician), invite codes, RBAC permissions
 - [ ] Expo SDK 55 mobile app with Expo Router, NativeWind v5, camera + audio capture
 - [ ] Live AI session: camera JPEG stream (1 FPS) + PCM audio (16kHz) → Gemini 2.5 Flash Live via WebSocket → spoken guidance + text
-- [ ] Ephemeral token system: API issues short-lived tokens so Gemini API key never reaches the client
-- [ ] Layered system prompt assembly (core role, HVAC expertise, safety rules, org overlay, knowledge context)
-- [ ] Tool system architecture: buildTool() factory, tool registry, tool dispatcher for Gemini function calling
 - [ ] 2-3 initial tools: lookupErrorCode, searchKnowledgeBase, logFinding
 - [ ] Session orchestration engine: WebSocket lifecycle, reconnection with sessionResumption, event logging
 - [ ] Neon Postgres (EU Frankfurt) with Drizzle ORM, repository pattern, DTO boundaries
@@ -66,7 +67,7 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 
 **Regulatory landscape:** GDPR (Austria-based, EU data residency), EU AI Act transparency (deadline August 2, 2026), F-Gas EU 2024/573, Product Liability Directive 2024/2853 (transposition by December 9, 2026). Privacy-by-design: audio/video streamed directly to Gemini, never stored on our servers.
 
-**Existing codebase:** Greenfield. Monorepo initialized with agents/ directory containing engineering rules and domain knowledge. TECH-SPEC.md and LEGAL-ADMIN.md provide the full product specification.
+**Existing codebase:** Phase 2 complete. Monorepo with full auth system, AI tool pipeline (buildTool factory, registry, dispatcher), ephemeral Gemini tokens, system prompt assembly, lookupErrorCode and logFinding tools. Next: live streaming session (Phase 3).
 
 ## Constraints
 
@@ -106,4 +107,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after initialization*
+*Last updated: 2026-04-04 after Phase 2 completion*
