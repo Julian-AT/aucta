@@ -1,5 +1,6 @@
 import type { CameraView } from "expo-camera";
-import { CAPTURE_INTERVAL_MS, JPEG_QUALITY } from "./protocol";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import { CAPTURE_INTERVAL_MS, JPEG_QUALITY, FRAME_MAX_DIMENSION } from "./protocol";
 
 export interface FrameCaptureDeps {
   cameraRef: React.RefObject<CameraView>;
@@ -8,6 +9,9 @@ export interface FrameCaptureDeps {
 
 /**
  * Captures JPEG frames from the expo-camera CameraView ref at 1 FPS.
+ * Each frame is resized to max 768px on the longest dimension (SESS-02)
+ * before being sent to Gemini for bandwidth optimization.
+ *
  * Includes a guard flag to prevent concurrent captures (pitfall #2 from research:
  * takePictureAsync may take 200-500ms on some devices).
  */
@@ -32,11 +36,24 @@ export class FrameCapture {
       this.isCapturing = true;
       try {
         const photo = await this.deps.cameraRef.current.takePictureAsync({
-          base64: true,
           quality: JPEG_QUALITY,
         });
-        if (photo?.base64) {
-          this.deps.onFrame(photo.base64);
+        if (photo?.uri) {
+          // Resize to max 768px on longest dimension (SESS-02)
+          const resizeAction =
+            photo.width >= photo.height
+              ? { resize: { width: FRAME_MAX_DIMENSION } }
+              : { resize: { height: FRAME_MAX_DIMENSION } };
+
+          const resized = await manipulateAsync(
+            photo.uri,
+            [resizeAction],
+            { base64: true, format: SaveFormat.JPEG, compress: JPEG_QUALITY },
+          );
+
+          if (resized.base64) {
+            this.deps.onFrame(resized.base64);
+          }
         }
       } catch {
         // Camera may be paused when app is backgrounded (D-08), skip frame silently

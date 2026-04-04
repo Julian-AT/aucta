@@ -1,6 +1,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { FrameCapture } from "./frame-capture";
 
+const mockManipulateAsync = vi.fn().mockResolvedValue({
+  base64: "resized-jpeg-data",
+  uri: "file://resized.jpg",
+  width: 768,
+  height: 576,
+});
+
+vi.mock("expo-image-manipulator", () => ({
+  manipulateAsync: (...args: unknown[]) => mockManipulateAsync(...args),
+  SaveFormat: { JPEG: "jpeg" },
+}));
+
 describe("FrameCapture", () => {
   let frameCapture: FrameCapture;
   let onFrame: ReturnType<typeof vi.fn>;
@@ -10,11 +22,23 @@ describe("FrameCapture", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     onFrame = vi.fn();
-    mockTakePictureAsync = vi.fn().mockResolvedValue({ base64: "test-jpeg-data" });
+    mockTakePictureAsync = vi.fn().mockResolvedValue({
+      uri: "file://test-photo.jpg",
+      width: 3024,
+      height: 4032,
+      base64: "full-res-data",
+    });
     cameraRef = { current: { takePictureAsync: mockTakePictureAsync } };
     frameCapture = new FrameCapture({
       cameraRef: cameraRef as any,
       onFrame,
+    });
+    mockManipulateAsync.mockClear();
+    mockManipulateAsync.mockResolvedValue({
+      base64: "resized-jpeg-data",
+      uri: "file://resized.jpg",
+      width: 768,
+      height: 576,
     });
   });
 
@@ -38,23 +62,22 @@ describe("FrameCapture", () => {
     expect(mockTakePictureAsync).toHaveBeenCalledTimes(2);
   });
 
-  it("each interval calls takePictureAsync with base64 and quality options", async () => {
+  it("each interval calls takePictureAsync with quality option", async () => {
     frameCapture.start();
     await vi.advanceTimersByTimeAsync(1000);
 
     expect(mockTakePictureAsync).toHaveBeenCalledWith(
       expect.objectContaining({
-        base64: true,
         quality: 0.6,
       }),
     );
   });
 
-  it("onFrame callback receives base64 string from captured photo", async () => {
+  it("onFrame callback receives resized base64 string from manipulateAsync", async () => {
     frameCapture.start();
     await vi.advanceTimersByTimeAsync(1000);
 
-    expect(onFrame).toHaveBeenCalledWith("test-jpeg-data");
+    expect(onFrame).toHaveBeenCalledWith("resized-jpeg-data");
   });
 
   it("concurrent capture guard prevents overlapping takePictureAsync calls", async () => {
@@ -78,7 +101,7 @@ describe("FrameCapture", () => {
     expect(mockTakePictureAsync).toHaveBeenCalledTimes(1);
 
     // Resolve the first capture to unlock the guard
-    resolveCapture({ base64: "delayed-data" });
+    resolveCapture({ uri: "file://delayed.jpg", width: 3024, height: 4032 });
     await vi.advanceTimersByTimeAsync(0);
 
     // Third interval should now be able to capture
@@ -106,6 +129,49 @@ describe("FrameCapture", () => {
 
   it("skips frame when camera ref is null", async () => {
     cameraRef.current = null;
+
+    frameCapture.start();
+    await vi.advanceTimersByTimeAsync(1000);
+
+    expect(onFrame).not.toHaveBeenCalled();
+  });
+
+  it("resizes landscape photos to 768px width", async () => {
+    mockTakePictureAsync.mockResolvedValue({
+      uri: "file://landscape.jpg",
+      width: 4032,
+      height: 3024,
+    });
+
+    frameCapture.start();
+    await vi.advanceTimersByTimeAsync(1000);
+
+    expect(mockManipulateAsync).toHaveBeenCalledWith(
+      "file://landscape.jpg",
+      [{ resize: { width: 768 } }],
+      expect.objectContaining({ base64: true, format: "jpeg" }),
+    );
+  });
+
+  it("resizes portrait photos to 768px height", async () => {
+    mockTakePictureAsync.mockResolvedValue({
+      uri: "file://portrait.jpg",
+      width: 3024,
+      height: 4032,
+    });
+
+    frameCapture.start();
+    await vi.advanceTimersByTimeAsync(1000);
+
+    expect(mockManipulateAsync).toHaveBeenCalledWith(
+      "file://portrait.jpg",
+      [{ resize: { height: 768 } }],
+      expect.objectContaining({ base64: true, format: "jpeg" }),
+    );
+  });
+
+  it("skips frame when manipulateAsync fails", async () => {
+    mockManipulateAsync.mockRejectedValueOnce(new Error("resize failed"));
 
     frameCapture.start();
     await vi.advanceTimersByTimeAsync(1000);

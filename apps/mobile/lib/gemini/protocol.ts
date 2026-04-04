@@ -10,6 +10,7 @@ export const AUDIO_OUTPUT_SAMPLE_RATE = 24000;
 // --- Video Constants ---
 export const CAPTURE_INTERVAL_MS = 1000;
 export const JPEG_QUALITY = 0.6;
+export const FRAME_MAX_DIMENSION = 768;
 
 // --- Reconnection Constants ---
 // Gemini's sessionResumption token expires after ~2 minutes of disconnection.

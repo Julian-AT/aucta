@@ -9,6 +9,17 @@ import { ToolRelay } from "../lib/gemini/tool-relay";
 import { useSessionStore } from "../stores/session-store";
 import { reconnectWithBackoff } from "../lib/gemini/reconnection";
 
+// Mock expo-image-manipulator to prevent react-native transitive import
+vi.mock("expo-image-manipulator", () => ({
+  manipulateAsync: vi.fn().mockResolvedValue({
+    base64: "mock-resized",
+    uri: "file://mock.jpg",
+    width: 768,
+    height: 576,
+  }),
+  SaveFormat: { JPEG: "jpeg" },
+}));
+
 // Mock WebSocket globally
 let lastCreatedWs: MockWebSocket;
 vi.stubGlobal(
