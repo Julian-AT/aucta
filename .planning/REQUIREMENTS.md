@@ -16,7 +16,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **INFRA-05**: Neon Postgres (EU Frankfurt) with Drizzle ORM schema, migrations, and repository pattern
 - [x] **INFRA-06**: Upstash Redis (EU) configured for rate limiting and ephemeral token caching
 - [ ] **INFRA-07**: Qdrant vector DB (EU) configured for knowledge base embeddings and hybrid search
-- [ ] **INFRA-08**: Inngest background job handler on Next.js API route
+- [x] **INFRA-08**: Inngest background job handler on Next.js API route
 
 ### Authentication & Organization
 
@@ -53,7 +53,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **SESS-09**: Technician can end session by tapping stop button or saying "end session"
 - [ ] **SESS-10**: Post-session feedback prompt: 1-5 stars + optional text note
 - [x] **SESS-11**: Session data persisted: start/end time, duration, language detected, tools used, feedback, token count
-- [ ] **SESS-12**: Post-session summary generated via Inngest background job (AI summarizes session events)
+- [x] **SESS-12**: Post-session summary generated via Inngest background job (AI summarizes session events)
 
 ### Knowledge Base
 
@@ -87,7 +87,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **COMP-04**: AI scope limitation: refuses to guide work outside competence boundaries (electrical requiring licensed electrician, gas work without F-Gas cert)
 - [x] **COMP-05**: F-Gas EU 2024/573 references in AI guidance when handling refrigerants (leak-check thresholds, low-GWP alternatives)
 - [x] **COMP-06**: Stream-and-discard architecture verified: no audio/video stored on our servers, only session metadata
-- [ ] **COMP-07**: AI-generated content labels on session summaries and knowledge base articles
+- [x] **COMP-07**: AI-generated content labels on session summaries and knowledge base articles
 - [x] **COMP-08**: No emotion recognition: session quality measured only by explicit feedback and objective metrics
 
 ## v2 Requirements
@@ -156,7 +156,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-05 | Phase 1 | Complete |
 | INFRA-06 | Phase 1 | Complete |
 | INFRA-07 | Phase 5 | Pending |
-| INFRA-08 | Phase 4 | Pending |
+| INFRA-08 | Phase 4 | Complete |
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Complete |
 | AUTH-03 | Phase 1 | Complete |
@@ -184,7 +184,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SESS-09 | Phase 3 | Complete |
 | SESS-10 | Phase 4 | Pending |
 | SESS-11 | Phase 4 | Complete |
-| SESS-12 | Phase 4 | Pending |
+| SESS-12 | Phase 4 | Complete |
 | KB-01 | Phase 5 | Pending |
 | KB-02 | Phase 5 | Pending |
 | KB-03 | Phase 5 | Pending |
@@ -209,7 +209,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COMP-04 | Phase 2 | Complete |
 | COMP-05 | Phase 2 | Complete |
 | COMP-06 | Phase 3 | Complete |
-| COMP-07 | Phase 4 | Pending |
+| COMP-07 | Phase 4 | Complete |
 | COMP-08 | Phase 4 | Complete |
 
 **Coverage:**
