@@ -16,6 +16,8 @@
     "zod": "^4.3.0",
     "@upstash/redis": "^1.37.0",
     "@upstash/ratelimit": "^2.0.0",
+    "@google/genai": "^1.48.0",
+    "@aucta/ai": "workspace:*",
     "@aucta/auth": "workspace:*",
     "@aucta/db": "workspace:*",
     "@aucta/shared": "workspace:*"
