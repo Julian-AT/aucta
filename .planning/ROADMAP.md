@@ -56,7 +56,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — packages/ai/ foundation: buildTool() factory, system prompt layers (core, HVAC, safety), builder
 - [x] 02-02-PLAN.md — Initial tools: lookupErrorCode with static JSON data, logFinding with in-memory store
-- [ ] 02-03-PLAN.md — Integration: tool registry, dispatcher, ephemeral token tRPC endpoint
+- [x] 02-03-PLAN.md — Integration: tool registry, dispatcher, ephemeral token tRPC endpoint
 
 ### Phase 3: Live Streaming Session
 **Goal**: A technician can have a complete real-time AI conversation by pointing their camera at HVAC equipment and speaking naturally

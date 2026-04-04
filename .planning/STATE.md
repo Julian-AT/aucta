@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-04-04T12:45:46.048Z"
+status: verifying
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-04-04T12:53:35.131Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
   percent: 100
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 
 Phase: 02 (ai-pipeline-and-tool-system) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-04
 
 Progress: [██████████] 100%
@@ -58,6 +58,7 @@ Progress: [██████████] 100%
 | Phase 01 P05 | 3min | 2 tasks | 21 files |
 | Phase 02 P01 | 3min | 2 tasks | 12 files |
 | Phase 02 P02 | 6min | 2 tasks | 12 files |
+| Phase 02 P03 | 5min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,9 @@ Recent decisions affecting current work:
 - [Phase 02]: PromptLayer interface with id/content/required for composable prompt assembly
 - [Phase 02]: createXxxTool() factory pattern for dependency injection into buildTool-based tools
 - [Phase 02]: Discriminated union output (found: true/false) for lookup tools instead of throwing on not-found
+- [Phase 02]: Ephemeral token endpoint uses GoogleGenAI constructor-level httpOptions { apiVersion: v1alpha } for all token operations
+- [Phase 02]: Tool declarations returned separately in token response for mobile client WebSocket setup
+- [Phase 02]: dispatchToolCalls catches ZodError from validateInput to distinguish validation from execution errors
 
 ### Pending Todos
 
@@ -102,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T12:45:46.045Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-04-04T12:53:35.129Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
