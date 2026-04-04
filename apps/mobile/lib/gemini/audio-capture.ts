@@ -1,68 +1,98 @@
-import { AudioContext } from "react-native-audio-api";
-import { AUDIO_INPUT_SAMPLE_RATE } from "./protocol";
+import { AUDIO_INPUT_SAMPLE_RATE, AUDIO_INPUT_CHANNELS } from "./protocol";
+
+/**
+ * Convert Float32 PCM samples (-1.0 to 1.0) to base64-encoded Int16 PCM.
+ * Gemini Live API expects 16-bit PCM, 16kHz, little-endian.
+ */
+function float32ToPcm16Base64(float32: Float32Array): string {
+  const int16 = new Int16Array(float32.length);
+  for (let i = 0; i < float32.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32[i]));
+    int16[i] = s < 0 ? s * 32768 : s * 32767;
+  }
+  const bytes = new Uint8Array(int16.buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
 
 export interface AudioCaptureDeps {
   onChunk: (pcmBase64: string) => void;
 }
 
 /**
- * Captures microphone audio as PCM 16kHz chunks using react-native-audio-api.
+ * Captures microphone audio as PCM 16kHz chunks using react-native-audio-api's
+ * AudioRecorder. Streams Float32 PCM from onAudioReady callback, converts to
+ * Int16 base64, and delivers via deps.onChunk().
  *
- * The internal implementation uses AudioContext for microphone capture.
- * The class is structured so the audio processing pipeline can be swapped
- * without changing the public interface -- if react-native-audio-api's
- * microphone capture proves unreliable (pre-1.0 library), the fallback
- * is expo-audio file-based recording in short segments.
- *
- * Contract: chunks of base64-encoded PCM data at ~16kHz flow to the onChunk callback.
+ * Contract: chunks of base64-encoded 16-bit PCM data at 16kHz flow to the onChunk callback.
  */
 export class AudioCapture {
-  private ctx: AudioContext | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private recorder: any = null;
   private isCapturing = false;
 
   constructor(private deps: AudioCaptureDeps) {}
 
   /**
    * Begin microphone capture.
-   * Creates AudioContext at AUDIO_INPUT_SAMPLE_RATE and sets up
-   * audio processing to extract PCM chunks as base64-encoded strings.
-   *
-   * NOTE: react-native-audio-api microphone capture API is pre-1.0.
-   * The exact API (AudioWorklet, ScriptProcessorNode, or custom)
-   * depends on library capabilities. This implementation provides
-   * the framework; device testing will validate the pipeline.
+   * Creates an AudioRecorder, registers onAudioReady with 16kHz/mono/4096 config,
+   * and starts streaming PCM chunks to deps.onChunk().
    */
   async start(): Promise<void> {
     if (this.isCapturing) return;
 
-    this.ctx = new AudioContext({ sampleRate: AUDIO_INPUT_SAMPLE_RATE });
-    this.isCapturing = true;
+    // Lazy-load to avoid Expo Go crash at module evaluation time.
+    // react-native-audio-api is a native module only available in development builds.
+    const mod = await import("react-native-audio-api");
+    const { AudioRecorder } = mod;
+    this.recorder = new AudioRecorder();
 
-    // Microphone capture setup placeholder:
-    // In production, this would use:
-    // 1. navigator.mediaDevices.getUserMedia() equivalent, or
-    // 2. AudioContext microphone source with AudioWorklet for PCM extraction
-    // 3. Each chunk is base64-encoded and passed to deps.onChunk()
-    //
-    // The exact API depends on react-native-audio-api's microphone support.
-    // Device testing in Plan 05 integration will validate this pipeline.
+    const result = this.recorder.onAudioReady(
+      {
+        sampleRate: AUDIO_INPUT_SAMPLE_RATE,
+        bufferLength: 4096,
+        channelCount: AUDIO_INPUT_CHANNELS,
+      },
+      (event: { buffer: { getChannelData(channel: number): Float32Array } }) => {
+        const float32 = event.buffer.getChannelData(0);
+        const base64Pcm = float32ToPcm16Base64(float32);
+        this.deps.onChunk(base64Pcm);
+      },
+    );
+
+    if (result.status === "error") {
+      throw new Error(`AudioRecorder.onAudioReady failed: ${result.message}`);
+    }
+
+    const startResult = this.recorder.start();
+    if (startResult.status === "error") {
+      throw new Error(`AudioRecorder.start failed: ${startResult.message}`);
+    }
+
+    this.isCapturing = true;
   }
 
   /**
-   * Stop microphone capture. Disconnects audio nodes.
+   * Pause microphone capture. Disconnects audio stream without releasing recorder.
    */
   stop(): void {
+    this.recorder?.pause();
     this.isCapturing = false;
   }
 
   /**
-   * Close AudioContext and release all resources.
+   * Stop recording and release all resources.
    */
   destroy(): void {
     this.stop();
-    if (this.ctx) {
-      this.ctx.close();
-      this.ctx = null;
-    }
+    this.recorder?.stop();
+    this.recorder?.clearOnAudioReady();
+    this.recorder?.clearOnError();
+    this.recorder = null;
   }
 }
+
+export { float32ToPcm16Base64 };
