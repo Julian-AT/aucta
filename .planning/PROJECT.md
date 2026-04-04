@@ -19,13 +19,16 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 - [x] Better Auth with organization plugin, roles (owner/manager/technician), invite codes, RBAC permissions — Validated in Phase 1
 - [x] tRPC API with org-scoped middleware, rate limiting via Upstash Redis — Validated in Phase 1
 - [x] CI pipeline: Biome lint, TypeScript typecheck, Vitest tests, Turborepo build — Validated in Phase 1
+- [x] Live AI session: camera JPEG stream (1 FPS, 768px) + PCM audio (16kHz) → Gemini 2.5 Flash Live via WebSocket → spoken guidance — Validated in Phase 3
+- [x] Session orchestration engine: WebSocket lifecycle, reconnection with sessionResumption, audio/video pipelines — Validated in Phase 3
+- [x] Session UI: non-dismissible AI indicator, connection status, audio indicator, stop button, end session dialog, connection lost overlay — Validated in Phase 3
+- [x] Voice command session end via Gemini endSession tool call — Validated in Phase 3
+- [x] EU AI Act Art. 50 compliance: non-dismissible AI indicator during sessions — Validated in Phase 3
 
 ### Active
 
 - [ ] Expo SDK 55 mobile app with Expo Router, NativeWind v5, camera + audio capture
-- [ ] Live AI session: camera JPEG stream (1 FPS) + PCM audio (16kHz) → Gemini 2.5 Flash Live via WebSocket → spoken guidance + text
 - [ ] 2-3 initial tools: lookupErrorCode, searchKnowledgeBase, logFinding
-- [ ] Session orchestration engine: WebSocket lifecycle, reconnection with sessionResumption, event logging
 - [ ] Neon Postgres (EU Frankfurt) with Drizzle ORM, repository pattern, DTO boundaries
 - [ ] Full knowledge base backend: ingest (session, manual, feedback), compile (wiki articles), verify (confidence levels, review queue), retrieve (hybrid BM25 + vector via Qdrant), health (coverage gaps, consistency)
 - [ ] Knowledge article schema with 4-tier confidence levels (unverified, technician_reviewed, expert_approved, manufacturer_sourced)
@@ -33,7 +36,6 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 - [ ] tRPC API with org-scoped middleware, rate limiting via Upstash Redis
 - [ ] Upstash Redis for ephemeral token caching and rate limiting
 - [ ] Qdrant vector DB (EU) for knowledge base embeddings and hybrid retrieval
-- [ ] EU AI Act Art. 50 compliance: non-dismissible AI indicator during sessions
 - [ ] Glove-friendly touch targets (56x56dp), high-contrast UI, audio-first interaction
 - [ ] i18n foundation with react-i18next (en, de, tr, sr, hr, pl, ro)
 - [ ] Sentry error tracking + PostHog analytics integration
@@ -67,7 +69,7 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 
 **Regulatory landscape:** GDPR (Austria-based, EU data residency), EU AI Act transparency (deadline August 2, 2026), F-Gas EU 2024/573, Product Liability Directive 2024/2853 (transposition by December 9, 2026). Privacy-by-design: audio/video streamed directly to Gemini, never stored on our servers.
 
-**Existing codebase:** Phase 2 complete. Monorepo with full auth system, AI tool pipeline (buildTool factory, registry, dispatcher), ephemeral Gemini tokens, system prompt assembly, lookupErrorCode and logFinding tools. Next: live streaming session (Phase 3).
+**Existing codebase:** Phase 3 complete. Monorepo with full auth system, AI tool pipeline, ephemeral Gemini tokens, system prompt assembly, live streaming session (WebSocket lifecycle, audio/video pipelines, session UI, voice commands). Next: session lifecycle management (Phase 4).
 
 ## Constraints
 
@@ -107,4 +109,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-04 after Phase 2 completion*
+*Last updated: 2026-04-04 after Phase 3 completion*
