@@ -90,12 +90,13 @@ Plans:
   2. Session metadata is persisted: start/end time, duration, language detected, tools used, feedback, and token count
   3. Post-session summary is automatically generated via Inngest background job and labeled as AI-generated content
   4. Recent session summaries and frequently used knowledge articles are cached locally for offline access via MMKV
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — Schema, DTOs, and repositories: ai_sessions, session_findings, session_tool_calls tables, Zod schemas, repository classes with tests
+- [ ] 04-02-PLAN.md — Server integration: tRPC session lifecycle endpoints (create/end/feedback/incremental persistence), Inngest summary pipeline with Gemini 2.5 Pro, Bun server handler
+- [ ] 04-03-PLAN.md — Mobile lifecycle: MMKV offline cache, session store extensions, incremental persistence wiring, feedback screen with star rating, last session card on Home
 
 ### Phase 5: Knowledge Base
 **Goal**: The platform accumulates organizational HVAC expertise from sessions and serves it back to technicians with confidence-weighted retrieval
@@ -124,5 +125,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Foundation and Auth | 6/6 | Executing | - |
 | 2. AI Pipeline and Tool System | 3/4 | Gap closure | - |
 | 3. Live Streaming Session | 5/7 | Gap closure | - |
-| 4. Session Lifecycle | 0/0 | Not started | - |
+| 4. Session Lifecycle | 0/3 | Planning complete | - |
 | 5. Knowledge Base | 0/0 | Not started | - |
