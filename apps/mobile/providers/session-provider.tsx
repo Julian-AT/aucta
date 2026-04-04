@@ -25,17 +25,18 @@ const SessionContext = createContext<SessionContextValue>({
 export function SessionProvider({ children }: { children: ReactNode }) {
   const { data: sessionData, isPending } = authClient.useSession();
 
-  const session = sessionData
-    ? {
-        user: {
-          id: sessionData.user.id,
-          name: sessionData.user.name,
-          email: sessionData.user.email,
-        },
-        activeOrganizationId:
-          sessionData.session.activeOrganizationId ?? null,
-      }
-    : null;
+  const session =
+    sessionData?.user && sessionData?.session
+      ? {
+          user: {
+            id: sessionData.user.id,
+            name: sessionData.user.name,
+            email: sessionData.user.email,
+          },
+          activeOrganizationId:
+            sessionData.session.activeOrganizationId ?? null,
+        }
+      : null;
 
   const isAuthenticated = !!session;
   const hasOrganization = !!session?.activeOrganizationId;
