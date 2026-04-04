@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+// Hoist mock functions so they're available when vi.mock factories run
+const { mockCreate, mockDispatchToolCalls } = vi.hoisted(() => ({
+  mockCreate: vi.fn(),
+  mockDispatchToolCalls: vi.fn(),
+}));
+
 // Mock @google/genai before any imports that use it
-const mockCreate = vi.fn();
 vi.mock("@google/genai", () => {
   const MockGoogleGenAI = vi.fn(function (this: { authTokens: { create: typeof mockCreate } }) {
     this.authTokens = { create: mockCreate };
@@ -9,6 +14,15 @@ vi.mock("@google/genai", () => {
   return {
     GoogleGenAI: MockGoogleGenAI,
     Modality: { AUDIO: "AUDIO", TEXT: "TEXT", IMAGE: "IMAGE", MODALITY_UNSPECIFIED: "MODALITY_UNSPECIFIED" },
+  };
+});
+
+// Mock dispatchToolCalls from @aucta/ai while keeping real tool/prompt exports
+vi.mock("@aucta/ai", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@aucta/ai")>();
+  return {
+    ...actual,
+    dispatchToolCalls: mockDispatchToolCalls,
   };
 });
 
@@ -191,5 +205,95 @@ describe("sessionRouter", () => {
         httpOptions: { apiVersion: "v1alpha" },
       }),
     );
+  });
+
+  describe("dispatchToolCalls", () => {
+    const orgCaller = () =>
+      sessionRouter.createCaller({
+        session: {
+          userId: "user_1",
+          activeOrganizationId: "org_1",
+          user: { id: "user_1" },
+        },
+        headers: new Headers(),
+        ip: "127.0.0.1",
+      });
+
+    beforeEach(() => {
+      mockDispatchToolCalls.mockReset();
+    });
+
+    it("accepts valid functionCalls array and returns functionResponses", async () => {
+      mockDispatchToolCalls.mockResolvedValue({
+        functionResponses: [
+          {
+            id: "call_1",
+            name: "lookupErrorCode",
+            response: { found: true, manufacturer: "Daikin", code: "U0" },
+          },
+        ],
+      });
+
+      const caller = orgCaller();
+      const result = await caller.dispatchToolCalls({
+        functionCalls: [
+          { id: "call_1", name: "lookupErrorCode", args: { code: "U0" } },
+        ],
+      });
+
+      expect(result.functionResponses).toHaveLength(1);
+      expect(result.functionResponses[0]!.id).toBe("call_1");
+      expect(result.functionResponses[0]!.name).toBe("lookupErrorCode");
+    });
+
+    it("calls dispatchToolCalls with correct context including orgId", async () => {
+      mockDispatchToolCalls.mockResolvedValue({
+        functionResponses: [],
+      });
+
+      const caller = orgCaller();
+      await caller.dispatchToolCalls({
+        functionCalls: [
+          { id: "call_1", name: "lookupErrorCode", args: { code: "E1" } },
+        ],
+      });
+
+      expect(mockDispatchToolCalls).toHaveBeenCalledWith(
+        expect.objectContaining({
+          functionCalls: [
+            expect.objectContaining({ id: "call_1", name: "lookupErrorCode" }),
+          ],
+        }),
+        expect.anything(),
+        expect.objectContaining({
+          orgId: "org_1",
+          userId: "user_1",
+          sessionId: "live",
+        }),
+      );
+    });
+
+    it("passes through tool responses including errors for unknown tools", async () => {
+      mockDispatchToolCalls.mockResolvedValue({
+        functionResponses: [
+          {
+            id: "call_2",
+            name: "unknownTool",
+            response: { error: "Unknown tool: unknownTool", code: "TOOL_NOT_FOUND" },
+          },
+        ],
+      });
+
+      const caller = orgCaller();
+      const result = await caller.dispatchToolCalls({
+        functionCalls: [
+          { id: "call_2", name: "unknownTool", args: {} },
+        ],
+      });
+
+      expect(result.functionResponses[0]!.response).toEqual(
+        expect.objectContaining({ code: "TOOL_NOT_FOUND" }),
+      );
+    });
   });
 });
