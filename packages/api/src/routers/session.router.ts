@@ -6,15 +6,18 @@ import {
 } from "../middleware/rate-limit.js";
 import { errorConverter } from "../middleware/error-converter.js";
 import { GoogleGenAI, Modality } from "@google/genai";
+import { z } from "zod";
 import {
   buildEffectiveSystemPrompt,
   coreRolePrompt,
   hvacExpertisePrompt,
   safetyRulesPrompt,
   assembleToolPool,
+  dispatchToolCalls,
   lookupErrorCodeTool,
   logFindingTool,
 } from "@aucta/ai";
+import type { ToolContext } from "@aucta/ai";
 
 const GEMINI_LIVE_MODEL =
   process.env.GEMINI_LIVE_MODEL ?? "gemini-2.5-flash-live-preview";
@@ -68,5 +71,32 @@ export const sessionRouter = router({
         model: GEMINI_LIVE_MODEL,
         toolDeclarations: pool.functionDeclarations,
       };
+    }),
+
+  dispatchToolCalls: orgProcedure
+    .use(errorConverter)
+    .input(
+      z.object({
+        functionCalls: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            args: z.record(z.string(), z.any()),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const pool = assembleToolPool([lookupErrorCodeTool, logFindingTool]);
+      const context: ToolContext = {
+        orgId: ctx.orgId,
+        userId: ctx.userId,
+        sessionId: "live",
+      };
+      return dispatchToolCalls(
+        { functionCalls: input.functionCalls },
+        pool,
+        context,
+      );
     }),
 });
