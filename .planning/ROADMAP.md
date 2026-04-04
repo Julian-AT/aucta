@@ -75,7 +75,7 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md — Foundation: dependencies, permissions, overlay tokens, test infra, Gemini protocol types, Zustand session store, server-side tool dispatch endpoint
 - [ ] 03-02-PLAN.md — WebSocket: GeminiConnection class (lifecycle, setup, message parsing, send methods) and reconnection logic (exponential backoff, 2-min timeout)
-- [ ] 03-03-PLAN.md — Media pipelines: audio playback (PCM 24kHz gapless scheduling), audio capture (PCM 16kHz), frame capture (1 FPS JPEG), tool relay (tRPC dispatch)
+- [x] 03-03-PLAN.md — Media pipelines: audio playback (PCM 24kHz gapless scheduling), audio capture (PCM 16kHz), frame capture (1 FPS JPEG), tool relay (tRPC dispatch)
 - [ ] 03-04-PLAN.md — Session UI components: AI indicator, connection status, audio indicator, stop button, AI disclosure modal, end session dialog, connection lost overlay, SessionHUD
 - [ ] 03-05-PLAN.md — Integration: useGeminiSession orchestration hook, SessionScreen, navigation wiring, device verification checkpoint
 
