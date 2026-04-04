@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-04T12:36:14.338Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-04T12:45:46.048Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 100
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 02 (ai-pipeline-and-tool-system) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-04
 
@@ -57,6 +57,7 @@ Progress: [██████████] 100%
 | Phase 01 P03 | 3min | 2 tasks | 11 files |
 | Phase 01 P05 | 3min | 2 tasks | 21 files |
 | Phase 02 P01 | 3min | 2 tasks | 12 files |
+| Phase 02 P02 | 6min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,8 @@ Recent decisions affecting current work:
 - [Phase 02]: z.toJSONSchema() with $schema stripping for Gemini function declaration compatibility
 - [Phase 02]: ToolDef objects are Object.freeze'd for immutability
 - [Phase 02]: PromptLayer interface with id/content/required for composable prompt assembly
+- [Phase 02]: createXxxTool() factory pattern for dependency injection into buildTool-based tools
+- [Phase 02]: Discriminated union output (found: true/false) for lookup tools instead of throwing on not-found
 
 ### Pending Todos
 
@@ -99,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T12:36:14.336Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-04T12:45:46.045Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

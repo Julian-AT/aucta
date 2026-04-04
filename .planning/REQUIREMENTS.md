@@ -34,9 +34,9 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **TOOL-01**: buildTool() factory that enforces consistent tool structure: call(), prompt(), validateInput(), isReadOnly(), Zod schemas
 - [ ] **TOOL-02**: Tool registry (assembleToolPool) that registers all tools and exports Gemini function declarations
 - [ ] **TOOL-03**: Tool dispatcher that resolves Gemini toolCall events to matching tools, validates input, returns toolResponse
-- [ ] **TOOL-04**: lookupErrorCode tool: given manufacturer + error code, returns meaning, repair steps, severity
+- [x] **TOOL-04**: lookupErrorCode tool: given manufacturer + error code, returns meaning, repair steps, severity
 - [ ] **TOOL-05**: searchKnowledgeBase tool: hybrid search (BM25 + vector) with confidence-weighted retrieval and source attribution
-- [ ] **TOOL-06**: logFinding tool: logs structured observations (category, description, severity) to session metadata
+- [x] **TOOL-06**: logFinding tool: logs structured observations (category, description, severity) to session metadata
 - [ ] **TOOL-07**: Ephemeral token endpoint: authenticates user, builds layered system prompt, registers tool declarations, issues short-lived Gemini token with locked constraints
 - [x] **TOOL-08**: Layered system prompt assembly: core role, HVAC expertise, safety rules, org overlay, knowledge base context, session history, AI Act transparency
 
@@ -168,9 +168,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TOOL-01 | Phase 2 | Complete |
 | TOOL-02 | Phase 2 | Pending |
 | TOOL-03 | Phase 2 | Pending |
-| TOOL-04 | Phase 2 | Pending |
+| TOOL-04 | Phase 2 | Complete |
 | TOOL-05 | Phase 5 | Pending |
-| TOOL-06 | Phase 2 | Pending |
+| TOOL-06 | Phase 2 | Complete |
 | TOOL-07 | Phase 2 | Pending |
 | TOOL-08 | Phase 2 | Complete |
 | SESS-01 | Phase 3 | Pending |
