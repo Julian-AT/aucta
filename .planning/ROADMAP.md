@@ -69,7 +69,7 @@ Plans:
   3. AI auto-detects the technician's language and responds in the same language, tool calls execute mid-conversation without interrupting audio
   4. Session reconnects automatically after network drops with context preserved via sessionResumption handle and exponential backoff
   5. Session UI has glove-friendly touch targets (56x56dp minimum), high-contrast readability in direct sunlight, works in both orientations, and audio/video are streamed to Gemini without being stored on Aucta servers
-**Plans**: 5 plans
+**Plans**: 7 plans
 **UI hint**: yes
 
 Plans:
@@ -78,6 +78,8 @@ Plans:
 - [x] 03-03-PLAN.md — Media pipelines: audio playback (PCM 24kHz gapless scheduling), audio capture (PCM 16kHz), frame capture (1 FPS JPEG), tool relay (tRPC dispatch)
 - [x] 03-04-PLAN.md — Session UI components: AI indicator, connection status, audio indicator, stop button, AI disclosure modal, end session dialog, connection lost overlay, SessionHUD
 - [x] 03-05-PLAN.md — Integration: useGeminiSession orchestration hook, SessionScreen, navigation wiring, device verification checkpoint
+- [ ] 03-06-PLAN.md — Gap closure: implement AudioCapture microphone pipeline (AudioRecorder) + lazy react-native-audio-api imports
+- [ ] 03-07-PLAN.md — Gap closure: voice command end session via Gemini tool call + JPEG 768px resize
 
 ### Phase 4: Session Lifecycle
 **Goal**: Sessions have a complete lifecycle with feedback collection, data persistence, automated summaries, and offline access to past results
@@ -121,6 +123,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation and Auth | 6/6 | Executing | - |
 | 2. AI Pipeline and Tool System | 3/4 | Gap closure | - |
-| 3. Live Streaming Session | 5/5 | Complete   | 2026-04-04 |
+| 3. Live Streaming Session | 5/7 | Gap closure | - |
 | 4. Session Lifecycle | 0/0 | Not started | - |
 | 5. Knowledge Base | 0/0 | Not started | - |
