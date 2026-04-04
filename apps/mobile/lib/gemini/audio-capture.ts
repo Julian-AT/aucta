@@ -1,5 +1,14 @@
-import { AudioContext } from "react-native-audio-api";
 import { AUDIO_INPUT_SAMPLE_RATE } from "./protocol";
+
+// Lazy import to avoid crashing module evaluation when native module
+// is unavailable (e.g., Expo Go without dev build).
+function getAudioContext(): typeof import("react-native-audio-api").AudioContext {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mod = require("react-native-audio-api") as typeof import("react-native-audio-api");
+  return mod.AudioContext;
+}
+
+type AudioContextInstance = InstanceType<ReturnType<typeof getAudioContext>>;
 
 export interface AudioCaptureDeps {
   onChunk: (pcmBase64: string) => void;
@@ -17,7 +26,7 @@ export interface AudioCaptureDeps {
  * Contract: chunks of base64-encoded PCM data at ~16kHz flow to the onChunk callback.
  */
 export class AudioCapture {
-  private ctx: AudioContext | null = null;
+  private ctx: AudioContextInstance | null = null;
   private isCapturing = false;
 
   constructor(private deps: AudioCaptureDeps) {}
@@ -35,7 +44,8 @@ export class AudioCapture {
   async start(): Promise<void> {
     if (this.isCapturing) return;
 
-    this.ctx = new AudioContext({ sampleRate: AUDIO_INPUT_SAMPLE_RATE });
+    const Ctx = getAudioContext();
+    this.ctx = new Ctx({ sampleRate: AUDIO_INPUT_SAMPLE_RATE });
     this.isCapturing = true;
 
     // Microphone capture setup placeholder:
