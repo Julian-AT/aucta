@@ -47,8 +47,8 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [ ] **SESS-03**: Microphone streams PCM audio (16kHz, 16-bit, mono) to Gemini Live via WebSocket
 - [ ] **SESS-04**: AI spoken guidance streams back as PCM audio (24kHz) and plays through device speaker in real time
 - [ ] **SESS-05**: Gemini auto-detects technician's language and responds in the same language (24+ languages, 30 HD voices)
-- [ ] **SESS-06**: Tool calls execute mid-conversation without interrupting audio stream (async function calling)
-- [ ] **SESS-07**: Context window compression (SlidingWindow) configured in setup message to support sessions >10 minutes
+- [x] **SESS-06**: Tool calls execute mid-conversation without interrupting audio stream (async function calling)
+- [x] **SESS-07**: Context window compression (SlidingWindow) configured in setup message to support sessions >10 minutes
 - [ ] **SESS-08**: Reconnection with exponential backoff (1s → 2s → 4s → max 30s) using Gemini sessionResumption handle
 - [ ] **SESS-09**: Technician can end session by tapping stop button or saying "end session"
 - [ ] **SESS-10**: Post-session feedback prompt: 1-5 stars + optional text note
@@ -71,12 +71,12 @@ Requirements for the first milestone. Each maps to roadmap phases.
 ### Mobile UX
 
 - [ ] **UX-01**: Glove-friendly touch targets (minimum 56x56dp) for all interactive elements during session
-- [ ] **UX-02**: High-contrast UI readable in direct sunlight (WCAG AAA contrast ratios)
+- [x] **UX-02**: High-contrast UI readable in direct sunlight (WCAG AAA contrast ratios)
 - [ ] **UX-03**: Audio-first interaction: no typing required during active session
 - [ ] **UX-04**: Works in portrait and landscape orientation
-- [ ] **UX-05**: Screen stays awake during active session (expo-keep-awake)
+- [x] **UX-05**: Screen stays awake during active session (expo-keep-awake)
 - [ ] **UX-06**: Offline cached references: recent session summaries and frequently used KB articles cached via MMKV
-- [ ] **UX-07**: Clear connection status indicator: "Connected", "Reconnecting...", "Connection lost" with last AI response visible
+- [x] **UX-07**: Clear connection status indicator: "Connected", "Reconnecting...", "Connection lost" with last AI response visible
 - [ ] **UX-08**: Visual feedback during AI processing (animated indicator showing AI is thinking/speaking)
 
 ### EU Compliance
@@ -178,8 +178,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SESS-03 | Phase 3 | Pending |
 | SESS-04 | Phase 3 | Pending |
 | SESS-05 | Phase 3 | Pending |
-| SESS-06 | Phase 3 | Pending |
-| SESS-07 | Phase 3 | Pending |
+| SESS-06 | Phase 3 | Complete |
+| SESS-07 | Phase 3 | Complete |
 | SESS-08 | Phase 3 | Pending |
 | SESS-09 | Phase 3 | Pending |
 | SESS-10 | Phase 4 | Pending |
@@ -196,12 +196,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KB-09 | Phase 5 | Pending |
 | KB-10 | Phase 5 | Pending |
 | UX-01 | Phase 3 | Pending |
-| UX-02 | Phase 3 | Pending |
+| UX-02 | Phase 3 | Complete |
 | UX-03 | Phase 3 | Pending |
 | UX-04 | Phase 3 | Pending |
-| UX-05 | Phase 3 | Pending |
+| UX-05 | Phase 3 | Complete |
 | UX-06 | Phase 4 | Pending |
-| UX-07 | Phase 3 | Pending |
+| UX-07 | Phase 3 | Complete |
 | UX-08 | Phase 3 | Pending |
 | COMP-01 | Phase 3 | Pending |
 | COMP-02 | Phase 3 | Pending |

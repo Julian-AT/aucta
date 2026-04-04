@@ -73,7 +73,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01-PLAN.md — Foundation: dependencies, permissions, overlay tokens, test infra, Gemini protocol types, Zustand session store, server-side tool dispatch endpoint
+- [x] 03-01-PLAN.md — Foundation: dependencies, permissions, overlay tokens, test infra, Gemini protocol types, Zustand session store, server-side tool dispatch endpoint
 - [ ] 03-02-PLAN.md — WebSocket: GeminiConnection class (lifecycle, setup, message parsing, send methods) and reconnection logic (exponential backoff, 2-min timeout)
 - [ ] 03-03-PLAN.md — Media pipelines: audio playback (PCM 24kHz gapless scheduling), audio capture (PCM 16kHz), frame capture (1 FPS JPEG), tool relay (tRPC dispatch)
 - [ ] 03-04-PLAN.md — Session UI components: AI indicator, connection status, audio indicator, stop button, AI disclosure modal, end session dialog, connection lost overlay, SessionHUD
@@ -121,6 +121,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation and Auth | 6/6 | Executing | - |
 | 2. AI Pipeline and Tool System | 3/4 | Gap closure | - |
-| 3. Live Streaming Session | 0/5 | Planned | - |
+| 3. Live Streaming Session | 1/5 | In Progress|  |
 | 4. Session Lifecycle | 0/0 | Not started | - |
 | 5. Knowledge Base | 0/0 | Not started | - |
