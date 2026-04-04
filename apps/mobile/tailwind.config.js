@@ -1,11 +1,11 @@
-import type { Config } from "tailwindcss";
-
-export default {
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./providers/**/*.{ts,tsx}",
   ],
+  presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
@@ -19,10 +19,10 @@ export default {
         "border-focus": "var(--color-border-focus)",
       },
       fontSize: {
-        body: ["16px", { lineHeight: "24px" }],
-        label: ["14px", { lineHeight: "20px" }],
-        heading: ["20px", { lineHeight: "24px" }],
-        display: ["28px", { lineHeight: "32px" }],
+        body: ["16px", { lineHeight: "24px", fontWeight: "400" }],
+        label: ["14px", { lineHeight: "20px", fontWeight: "600" }],
+        heading: ["20px", { lineHeight: "24px", fontWeight: "600" }],
+        display: ["28px", { lineHeight: "32px", fontWeight: "600" }],
       },
       spacing: {
         xs: "4px",
@@ -36,4 +36,4 @@ export default {
     },
   },
   plugins: [],
-} satisfies Config;
+};
