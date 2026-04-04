@@ -21,7 +21,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 ### Authentication & Organization
 
 - [x] **AUTH-01**: User can create account with email and password via Better Auth
-- [ ] **AUTH-02**: User can log in and session persists across app restarts (expo-secure-store on mobile)
+- [x] **AUTH-02**: User can log in and session persists across app restarts (expo-secure-store on mobile)
 - [x] **AUTH-03**: User can create an organization and become its owner
 - [x] **AUTH-04**: Owner can generate invite codes with role assignment (technician/manager) and expiry
 - [x] **AUTH-05**: Technician can join an organization by entering invite code or scanning QR
@@ -158,7 +158,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-07 | Phase 5 | Pending |
 | INFRA-08 | Phase 4 | Pending |
 | AUTH-01 | Phase 1 | Complete |
-| AUTH-02 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Complete |
 | AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 1 | Complete |
