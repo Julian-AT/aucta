@@ -79,7 +79,7 @@ Plans:
 - [x] 03-04-PLAN.md — Session UI components: AI indicator, connection status, audio indicator, stop button, AI disclosure modal, end session dialog, connection lost overlay, SessionHUD
 - [x] 03-05-PLAN.md — Integration: useGeminiSession orchestration hook, SessionScreen, navigation wiring, device verification checkpoint
 - [x] 03-06-PLAN.md — Gap closure: implement AudioCapture microphone pipeline (AudioRecorder) + lazy react-native-audio-api imports
-- [ ] 03-07-PLAN.md — Gap closure: voice command end session via Gemini tool call + JPEG 768px resize
+- [x] 03-07-PLAN.md — Gap closure: voice command end session via Gemini tool call + JPEG 768px resize
 
 ### Phase 4: Session Lifecycle
 **Goal**: Sessions have a complete lifecycle with feedback collection, data persistence, automated summaries, and offline access to past results
