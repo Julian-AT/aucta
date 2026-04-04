@@ -1,0 +1,23 @@
+{
+  "name": "@aucta/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/root.ts",
+    "./trpc": "./src/trpc.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@trpc/server": "^11.16.0",
+    "zod": "^4.3.0",
+    "@upstash/redis": "^1.37.0",
+    "@upstash/ratelimit": "^2.0.0",
+    "@aucta/auth": "workspace:*",
+    "@aucta/db": "workspace:*",
+    "@aucta/shared": "workspace:*"
+  }
+}
