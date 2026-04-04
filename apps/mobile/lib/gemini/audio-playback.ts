@@ -1,13 +1,5 @@
+import { AudioContext } from "react-native-audio-api";
 import { AUDIO_OUTPUT_SAMPLE_RATE } from "./protocol";
-
-// Lazy import to avoid crashing module evaluation when native module
-// is unavailable (e.g., Expo Go without dev build).
-// react-native-audio-api requires a dev build with native modules.
-function getAudioContext(): typeof import("react-native-audio-api").AudioContext {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require("react-native-audio-api") as typeof import("react-native-audio-api");
-  return mod.AudioContext;
-}
 
 /**
  * Decode a base64 string to a Uint8Array.
@@ -50,12 +42,11 @@ function pcm16ToFloat32(pcmBytes: Uint8Array): Float32Array {
  * Supports barge-in via interrupt() which cancels all scheduled audio.
  */
 export class AudioPlayback {
-  private ctx: InstanceType<ReturnType<typeof getAudioContext>>;
+  private ctx: AudioContext;
   private nextStartTime: number;
 
   constructor() {
-    const Ctx = getAudioContext();
-    this.ctx = new Ctx({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
+    this.ctx = new AudioContext({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
     this.nextStartTime = this.ctx.currentTime;
   }
 
@@ -87,8 +78,7 @@ export class AudioPlayback {
    */
   interrupt(): void {
     this.ctx.close();
-    const Ctx = getAudioContext();
-    this.ctx = new Ctx({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
+    this.ctx = new AudioContext({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
     this.nextStartTime = this.ctx.currentTime;
   }
 
