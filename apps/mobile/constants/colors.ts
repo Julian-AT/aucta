@@ -21,3 +21,14 @@ export const darkColors = {
   borderDefault: "#334155",
   borderFocus: "#3B82F6",
 } as const;
+
+export const overlayColors = {
+  overlayBg: "rgba(0, 0, 0, 0.6)",
+  overlayBgLight: "rgba(0, 0, 0, 0.4)",
+  overlayText: "#FFFFFF",
+  overlayTextMuted: "rgba(255, 255, 255, 0.7)",
+  statusConnected: "#22C55E",
+  statusReconnecting: "#F59E0B",
+  statusLost: "#EF4444",
+  aiIndicatorBg: "rgba(0, 0, 0, 0.7)",
+} as const;

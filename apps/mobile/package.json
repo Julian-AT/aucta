@@ -8,12 +8,15 @@
     "dev": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@aucta/api": "workspace:*",
     "@aucta/shared": "workspace:*",
     "@better-auth/expo": "^1.5.6",
+    "@notifee/react-native": "^9.1.8",
+    "@react-native-community/netinfo": "^12.0.1",
     "@react-navigation/bottom-tabs": "^7.15.5",
     "@tanstack/react-query": "^5.96.2",
     "@trpc/client": "^11.16.0",
@@ -23,6 +26,7 @@
     "expo": "~55.0.11",
     "expo-camera": "~55.0.13",
     "expo-constants": "~55.0.11",
+    "expo-keep-awake": "~55.0.6",
     "expo-linking": "~55.0.11",
     "expo-localization": "~55.0.11",
     "expo-network": "^55.0.11",
@@ -34,6 +38,7 @@
     "react": "19.2.0",
     "react-i18next": "^17.0.2",
     "react-native": "0.83.4",
+    "react-native-audio-api": "^0.11.7",
     "react-native-css-interop": "^0.2.3",
     "react-native-reanimated": "4.2.1",
     "react-native-safe-area-context": "~5.6.2",
@@ -46,6 +51,7 @@
   "devDependencies": {
     "@babel/plugin-transform-react-jsx": "^7.28.6",
     "@types/react": "^19.2.14",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vitest": "^4.1.0"
   }
 }
