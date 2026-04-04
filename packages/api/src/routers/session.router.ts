@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { router } from "../trpc.js";
 import { orgProcedure } from "../middleware/org-scope.js";
 import {
@@ -18,9 +19,20 @@ import {
   logFindingTool,
 } from "@aucta/ai";
 import type { ToolContext } from "@aucta/ai";
+import { SessionRepository } from "@aucta/db/repositories/session.repository";
+import { SessionFindingRepository } from "@aucta/db/repositories/session-finding.repository";
+import { SessionToolCallRepository } from "@aucta/db/repositories/session-tool-call.repository";
+import { db } from "@aucta/db/client";
+import { CreateSessionFindingDTO } from "@aucta/shared/schemas/session-finding.schema";
+import { CreateSessionToolCallDTO } from "@aucta/shared/schemas/session-tool-call.schema";
+import { inngest } from "../jobs/inngest-client.js";
 
 const GEMINI_LIVE_MODEL =
   process.env.GEMINI_LIVE_MODEL ?? "gemini-2.5-flash-live-preview";
+
+const sessionRepo = new SessionRepository(db);
+const findingRepo = new SessionFindingRepository(db);
+const toolCallRepo = new SessionToolCallRepository(db);
 
 export const sessionRouter = router({
   createToken: orgProcedure
@@ -98,5 +110,116 @@ export const sessionRouter = router({
         pool,
         context,
       );
+    }),
+
+  createSession: orgProcedure
+    .use(errorConverter)
+    .input(z.object({ modelVersion: z.string().optional() }).optional())
+    .mutation(async ({ input, ctx }) => {
+      const session = await sessionRepo.create({
+        orgId: ctx.orgId,
+        userId: ctx.userId,
+        modelVersion: input?.modelVersion,
+      });
+      return { sessionId: session.id };
+    }),
+
+  endSession: orgProcedure
+    .use(errorConverter)
+    .input(
+      z.object({
+        sessionId: z.string(),
+        status: z.enum(["completed", "failed", "timeout", "abandoned"]),
+        durationMs: z.number().int().optional(),
+        languageDetected: z.string().optional(),
+        tokenCountInput: z.number().int().optional(),
+        tokenCountOutput: z.number().int().optional(),
+        toolsUsed: z.array(z.string()).optional(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const updated = await sessionRepo.updateEnd(input.sessionId, {
+        status: input.status,
+        endedAt: new Date(),
+        durationMs: input.durationMs,
+        languageDetected: input.languageDetected,
+        tokenCountInput: input.tokenCountInput,
+        tokenCountOutput: input.tokenCountOutput,
+        toolsUsed: input.toolsUsed,
+      });
+
+      await inngest.send({
+        name: "session/ended",
+        data: { sessionId: input.sessionId },
+      });
+
+      return updated;
+    }),
+
+  addFinding: orgProcedure
+    .use(errorConverter)
+    .input(CreateSessionFindingDTO)
+    .mutation(async ({ input }) => {
+      return findingRepo.create(input);
+    }),
+
+  addToolCall: orgProcedure
+    .use(errorConverter)
+    .input(CreateSessionToolCallDTO)
+    .mutation(async ({ input }) => {
+      return toolCallRepo.create(input);
+    }),
+
+  submitFeedback: orgProcedure
+    .use(errorConverter)
+    .input(
+      z.object({
+        sessionId: z.string(),
+        rating: z.number().int().min(1).max(5),
+        note: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      return sessionRepo.updateFeedback(input.sessionId, {
+        rating: input.rating,
+        note: input.note,
+      });
+    }),
+
+  getSession: orgProcedure
+    .use(errorConverter)
+    .input(z.object({ sessionId: z.string() }))
+    .query(async ({ input }) => {
+      const session = await sessionRepo.findById(input.sessionId);
+      if (!session) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Session ${input.sessionId} not found`,
+        });
+      }
+      return session;
+    }),
+
+  getRecentSessions: orgProcedure
+    .use(errorConverter)
+    .query(async ({ ctx }) => {
+      return sessionRepo.findRecentByOrg(ctx.orgId, 20);
+    }),
+
+  getSessionSummary: orgProcedure
+    .use(errorConverter)
+    .input(z.object({ sessionId: z.string() }))
+    .query(async ({ input }) => {
+      const session = await sessionRepo.findById(input.sessionId);
+      if (!session) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Session ${input.sessionId} not found`,
+        });
+      }
+      return {
+        summary: session.summary,
+        isAiGenerated: session.isAiGenerated,
+      };
     }),
 });

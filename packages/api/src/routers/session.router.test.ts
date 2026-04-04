@@ -6,6 +6,33 @@ const { mockCreate, mockDispatchToolCalls } = vi.hoisted(() => ({
   mockDispatchToolCalls: vi.fn(),
 }));
 
+// Hoist mock repository instances
+const {
+  mockSessionRepo,
+  mockFindingRepo,
+  mockToolCallRepo,
+  mockInngestSend,
+} = vi.hoisted(() => ({
+  mockSessionRepo: {
+    create: vi.fn(),
+    findById: vi.fn(),
+    updateEnd: vi.fn(),
+    updateFeedback: vi.fn(),
+    updateSummary: vi.fn(),
+    findRecentByOrg: vi.fn(),
+    findWithDetails: vi.fn(),
+  },
+  mockFindingRepo: {
+    create: vi.fn(),
+    findBySessionId: vi.fn(),
+  },
+  mockToolCallRepo: {
+    create: vi.fn(),
+    findBySessionId: vi.fn(),
+  },
+  mockInngestSend: vi.fn(),
+}));
+
 // Mock @google/genai before any imports that use it
 vi.mock("@google/genai", () => {
   const MockGoogleGenAI = vi.fn(function (this: { authTokens: { create: typeof mockCreate } }) {
@@ -55,9 +82,56 @@ vi.mock("@upstash/ratelimit", () => ({
   })),
 }));
 
+// Mock repositories -- use class pattern so `new` works
+vi.mock("@aucta/db/repositories/session.repository", () => ({
+  SessionRepository: class {
+    create = mockSessionRepo.create;
+    findById = mockSessionRepo.findById;
+    updateEnd = mockSessionRepo.updateEnd;
+    updateFeedback = mockSessionRepo.updateFeedback;
+    updateSummary = mockSessionRepo.updateSummary;
+    findRecentByOrg = mockSessionRepo.findRecentByOrg;
+    findWithDetails = mockSessionRepo.findWithDetails;
+  },
+}));
+
+vi.mock("@aucta/db/repositories/session-finding.repository", () => ({
+  SessionFindingRepository: class {
+    create = mockFindingRepo.create;
+    findBySessionId = mockFindingRepo.findBySessionId;
+  },
+}));
+
+vi.mock("@aucta/db/repositories/session-tool-call.repository", () => ({
+  SessionToolCallRepository: class {
+    create = mockToolCallRepo.create;
+    findBySessionId = mockToolCallRepo.findBySessionId;
+  },
+}));
+
+// Mock db client
+vi.mock("@aucta/db/client", () => ({
+  db: {},
+}));
+
+// Mock Inngest client
+vi.mock("../jobs/inngest-client.js", () => ({
+  inngest: { send: mockInngestSend },
+}));
+
 import { sessionRouter } from "./session.router.js";
 
 describe("sessionRouter", () => {
+  const orgCaller = () =>
+    sessionRouter.createCaller({
+      session: {
+        userId: "user_1",
+        activeOrganizationId: "org_1",
+      },
+      headers: new Headers(),
+      ip: "127.0.0.1",
+    });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockCreate.mockResolvedValue({
@@ -208,17 +282,6 @@ describe("sessionRouter", () => {
   });
 
   describe("dispatchToolCalls", () => {
-    const orgCaller = () =>
-      sessionRouter.createCaller({
-        session: {
-          userId: "user_1",
-          activeOrganizationId: "org_1",
-          user: { id: "user_1" },
-        },
-        headers: new Headers(),
-        ip: "127.0.0.1",
-      });
-
     beforeEach(() => {
       mockDispatchToolCalls.mockReset();
     });
@@ -294,6 +357,368 @@ describe("sessionRouter", () => {
       expect(result.functionResponses[0]!.response).toEqual(
         expect.objectContaining({ code: "TOOL_NOT_FOUND" }),
       );
+    });
+  });
+
+  describe("createSession", () => {
+    it("creates a session with status connecting and returns sessionId", async () => {
+      mockSessionRepo.create.mockResolvedValue({
+        id: "ses_abc123",
+        orgId: "org_1",
+        userId: "user_1",
+        status: "connecting",
+        startedAt: new Date(),
+        endedAt: null,
+        durationMs: null,
+        modelVersion: null,
+        languageDetected: null,
+        tokenCountInput: null,
+        tokenCountOutput: null,
+        feedbackRating: null,
+        feedbackNote: null,
+        summary: null,
+        isAiGenerated: false,
+        toolsUsed: null,
+        metadata: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const caller = orgCaller();
+      const result = await caller.createSession({});
+
+      expect(result).toHaveProperty("sessionId", "ses_abc123");
+      expect(mockSessionRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orgId: "org_1",
+          userId: "user_1",
+        }),
+      );
+    });
+
+    it("passes modelVersion when provided", async () => {
+      mockSessionRepo.create.mockResolvedValue({
+        id: "ses_abc456",
+        orgId: "org_1",
+        userId: "user_1",
+        status: "connecting",
+        startedAt: new Date(),
+        endedAt: null,
+        durationMs: null,
+        modelVersion: "gemini-2.5-flash-live-preview",
+        languageDetected: null,
+        tokenCountInput: null,
+        tokenCountOutput: null,
+        feedbackRating: null,
+        feedbackNote: null,
+        summary: null,
+        isAiGenerated: false,
+        toolsUsed: null,
+        metadata: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const caller = orgCaller();
+      await caller.createSession({ modelVersion: "gemini-2.5-flash-live-preview" });
+
+      expect(mockSessionRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          modelVersion: "gemini-2.5-flash-live-preview",
+        }),
+      );
+    });
+  });
+
+  describe("endSession", () => {
+    it("updates session and sends Inngest event", async () => {
+      const updatedSession = {
+        id: "ses_abc123",
+        orgId: "org_1",
+        userId: "user_1",
+        status: "completed" as const,
+        startedAt: new Date(),
+        endedAt: new Date(),
+        durationMs: 60000,
+        modelVersion: null,
+        languageDetected: "en",
+        tokenCountInput: 1000,
+        tokenCountOutput: 500,
+        feedbackRating: null,
+        feedbackNote: null,
+        summary: null,
+        isAiGenerated: false,
+        toolsUsed: ["lookupErrorCode"],
+        metadata: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      mockSessionRepo.updateEnd.mockResolvedValue(updatedSession);
+      mockInngestSend.mockResolvedValue(undefined);
+
+      const caller = orgCaller();
+      const result = await caller.endSession({
+        sessionId: "ses_abc123",
+        status: "completed",
+        durationMs: 60000,
+        languageDetected: "en",
+        tokenCountInput: 1000,
+        tokenCountOutput: 500,
+        toolsUsed: ["lookupErrorCode"],
+      });
+
+      expect(result.id).toBe("ses_abc123");
+      expect(mockSessionRepo.updateEnd).toHaveBeenCalledWith(
+        "ses_abc123",
+        expect.objectContaining({
+          status: "completed",
+          durationMs: 60000,
+        }),
+      );
+      expect(mockInngestSend).toHaveBeenCalledWith({
+        name: "session/ended",
+        data: { sessionId: "ses_abc123" },
+      });
+    });
+  });
+
+  describe("addFinding", () => {
+    it("persists a finding row", async () => {
+      const finding = {
+        id: "fnd_abc",
+        sessionId: "ses_abc123",
+        category: "safety" as const,
+        description: "Refrigerant leak detected",
+        severity: "high" as const,
+        equipmentModel: "FTXM25",
+        manufacturer: "Daikin",
+        createdAt: new Date(),
+      };
+      mockFindingRepo.create.mockResolvedValue(finding);
+
+      const caller = orgCaller();
+      const result = await caller.addFinding({
+        sessionId: "ses_abc123",
+        category: "safety",
+        description: "Refrigerant leak detected",
+        severity: "high",
+        equipmentModel: "FTXM25",
+        manufacturer: "Daikin",
+      });
+
+      expect(result.id).toBe("fnd_abc");
+      expect(mockFindingRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sessionId: "ses_abc123",
+          category: "safety",
+          severity: "high",
+        }),
+      );
+    });
+  });
+
+  describe("addToolCall", () => {
+    it("persists a tool call row", async () => {
+      const toolCall = {
+        id: "tc_abc",
+        sessionId: "ses_abc123",
+        toolName: "lookupErrorCode",
+        input: { code: "U0" },
+        output: { found: true },
+        durationMs: 150,
+        success: true,
+        errorMessage: null,
+        createdAt: new Date(),
+      };
+      mockToolCallRepo.create.mockResolvedValue(toolCall);
+
+      const caller = orgCaller();
+      const result = await caller.addToolCall({
+        sessionId: "ses_abc123",
+        toolName: "lookupErrorCode",
+        input: { code: "U0" },
+        output: { found: true },
+        durationMs: 150,
+        success: true,
+      });
+
+      expect(result.id).toBe("tc_abc");
+      expect(mockToolCallRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sessionId: "ses_abc123",
+          toolName: "lookupErrorCode",
+          success: true,
+        }),
+      );
+    });
+  });
+
+  describe("submitFeedback", () => {
+    it("updates session with rating and note", async () => {
+      const updatedSession = {
+        id: "ses_abc123",
+        orgId: "org_1",
+        userId: "user_1",
+        status: "completed" as const,
+        startedAt: new Date(),
+        endedAt: new Date(),
+        durationMs: 60000,
+        modelVersion: null,
+        languageDetected: null,
+        tokenCountInput: null,
+        tokenCountOutput: null,
+        feedbackRating: 4,
+        feedbackNote: "Very helpful!",
+        summary: null,
+        isAiGenerated: false,
+        toolsUsed: null,
+        metadata: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      mockSessionRepo.updateFeedback.mockResolvedValue(updatedSession);
+
+      const caller = orgCaller();
+      const result = await caller.submitFeedback({
+        sessionId: "ses_abc123",
+        rating: 4,
+        note: "Very helpful!",
+      });
+
+      expect(result.feedbackRating).toBe(4);
+      expect(mockSessionRepo.updateFeedback).toHaveBeenCalledWith(
+        "ses_abc123",
+        { rating: 4, note: "Very helpful!" },
+      );
+    });
+
+    it("rejects rating outside 1-5 range", async () => {
+      const caller = orgCaller();
+      await expect(
+        caller.submitFeedback({ sessionId: "ses_abc123", rating: 0 }),
+      ).rejects.toThrow();
+      await expect(
+        caller.submitFeedback({ sessionId: "ses_abc123", rating: 6 }),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe("getSession", () => {
+    it("returns session by id", async () => {
+      const session = {
+        id: "ses_abc123",
+        orgId: "org_1",
+        userId: "user_1",
+        status: "completed" as const,
+        startedAt: new Date(),
+        endedAt: new Date(),
+        durationMs: 60000,
+        modelVersion: null,
+        languageDetected: null,
+        tokenCountInput: null,
+        tokenCountOutput: null,
+        feedbackRating: null,
+        feedbackNote: null,
+        summary: null,
+        isAiGenerated: false,
+        toolsUsed: null,
+        metadata: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      mockSessionRepo.findById.mockResolvedValue(session);
+
+      const caller = orgCaller();
+      const result = await caller.getSession({ sessionId: "ses_abc123" });
+
+      expect(result.id).toBe("ses_abc123");
+    });
+
+    it("throws NOT_FOUND for missing session", async () => {
+      mockSessionRepo.findById.mockResolvedValue(null);
+
+      const caller = orgCaller();
+      await expect(
+        caller.getSession({ sessionId: "ses_nonexistent" }),
+      ).rejects.toThrow("Session ses_nonexistent not found");
+    });
+  });
+
+  describe("getRecentSessions", () => {
+    it("returns last 20 sessions for the org", async () => {
+      const sessions = [
+        {
+          id: "ses_1",
+          orgId: "org_1",
+          userId: "user_1",
+          status: "completed" as const,
+          startedAt: new Date(),
+          endedAt: new Date(),
+          durationMs: 30000,
+          modelVersion: null,
+          languageDetected: null,
+          tokenCountInput: null,
+          tokenCountOutput: null,
+          feedbackRating: null,
+          feedbackNote: null,
+          summary: null,
+          isAiGenerated: false,
+          toolsUsed: null,
+          metadata: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+      mockSessionRepo.findRecentByOrg.mockResolvedValue(sessions);
+
+      const caller = orgCaller();
+      const result = await caller.getRecentSessions();
+
+      expect(result).toHaveLength(1);
+      expect(mockSessionRepo.findRecentByOrg).toHaveBeenCalledWith("org_1", 20);
+    });
+  });
+
+  describe("getSessionSummary", () => {
+    it("returns summary and isAiGenerated flag", async () => {
+      mockSessionRepo.findById.mockResolvedValue({
+        id: "ses_abc123",
+        orgId: "org_1",
+        userId: "user_1",
+        status: "completed" as const,
+        startedAt: new Date(),
+        endedAt: new Date(),
+        durationMs: 60000,
+        modelVersion: null,
+        languageDetected: null,
+        tokenCountInput: null,
+        tokenCountOutput: null,
+        feedbackRating: null,
+        feedbackNote: null,
+        summary: "## Session Summary\n\nTest summary",
+        isAiGenerated: true,
+        toolsUsed: null,
+        metadata: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const caller = orgCaller();
+      const result = await caller.getSessionSummary({ sessionId: "ses_abc123" });
+
+      expect(result).toEqual({
+        summary: "## Session Summary\n\nTest summary",
+        isAiGenerated: true,
+      });
+    });
+
+    it("throws NOT_FOUND for missing session", async () => {
+      mockSessionRepo.findById.mockResolvedValue(null);
+
+      const caller = orgCaller();
+      await expect(
+        caller.getSessionSummary({ sessionId: "ses_nonexistent" }),
+      ).rejects.toThrow("Session ses_nonexistent not found");
     });
   });
 });
