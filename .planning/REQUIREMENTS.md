@@ -46,10 +46,10 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **SESS-02**: Camera streams JPEG frames (1 FPS, 768px, base64) to Gemini Live via WebSocket
 - [x] **SESS-03**: Microphone streams PCM audio (16kHz, 16-bit, mono) to Gemini Live via WebSocket
 - [x] **SESS-04**: AI spoken guidance streams back as PCM audio (24kHz) and plays through device speaker in real time
-- [ ] **SESS-05**: Gemini auto-detects technician's language and responds in the same language (24+ languages, 30 HD voices)
+- [x] **SESS-05**: Gemini auto-detects technician's language and responds in the same language (24+ languages, 30 HD voices)
 - [x] **SESS-06**: Tool calls execute mid-conversation without interrupting audio stream (async function calling)
 - [x] **SESS-07**: Context window compression (SlidingWindow) configured in setup message to support sessions >10 minutes
-- [ ] **SESS-08**: Reconnection with exponential backoff (1s → 2s → 4s → max 30s) using Gemini sessionResumption handle
+- [x] **SESS-08**: Reconnection with exponential backoff (1s → 2s → 4s → max 30s) using Gemini sessionResumption handle
 - [ ] **SESS-09**: Technician can end session by tapping stop button or saying "end session"
 - [ ] **SESS-10**: Post-session feedback prompt: 1-5 stars + optional text note
 - [ ] **SESS-11**: Session data persisted: start/end time, duration, language detected, tools used, feedback, token count
@@ -177,10 +177,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SESS-02 | Phase 3 | Complete |
 | SESS-03 | Phase 3 | Complete |
 | SESS-04 | Phase 3 | Complete |
-| SESS-05 | Phase 3 | Pending |
+| SESS-05 | Phase 3 | Complete |
 | SESS-06 | Phase 3 | Complete |
 | SESS-07 | Phase 3 | Complete |
-| SESS-08 | Phase 3 | Pending |
+| SESS-08 | Phase 3 | Complete |
 | SESS-09 | Phase 3 | Pending |
 | SESS-10 | Phase 4 | Pending |
 | SESS-11 | Phase 4 | Pending |
