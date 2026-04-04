@@ -1,0 +1,285 @@
+{
+  "manufacturer": "Fujitsu",
+  "codes": [
+    {
+      "code": "EE:EE",
+      "meaning": "Communication error between indoor and outdoor units",
+      "severity": "high",
+      "repairSteps": [
+        "Check wiring connections between indoor and outdoor units",
+        "Verify correct wire configuration (S1/S2/S3)",
+        "Check for voltage at outdoor unit terminals",
+        "Inspect cables for damage or water ingress",
+        "Reset both units and monitor for recurrence"
+      ],
+      "possibleCauses": ["Wiring fault", "Outdoor unit not powered", "Cable damage", "PCB communication fault"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "00",
+      "meaning": "Communication error from wired remote controller",
+      "severity": "low",
+      "repairSteps": [
+        "Check wiring between remote controller and indoor unit",
+        "Verify correct polarity of controller wiring",
+        "Inspect controller connections for corrosion",
+        "Reset controller by disconnecting power",
+        "Replace controller if wiring is confirmed correct"
+      ],
+      "possibleCauses": ["Wiring fault", "Controller malfunction", "Polarity error"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "01",
+      "meaning": "Indoor unit PCB communication error",
+      "severity": "medium",
+      "repairSteps": [
+        "Reset indoor unit power supply",
+        "Check indoor PCB LED indicators for status",
+        "Inspect PCB for visible damage",
+        "Check all PCB connectors are fully seated",
+        "Replace PCB if error persists after power reset"
+      ],
+      "possibleCauses": ["PCB malfunction", "Loose connector", "Power supply issue"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "02",
+      "meaning": "Indoor unit thermistor error (room temperature sensor)",
+      "severity": "medium",
+      "repairSteps": [
+        "Locate room temperature thermistor on indoor unit",
+        "Measure thermistor resistance and compare to chart",
+        "Check connector at indoor PCB",
+        "Verify sensor is not displaced from correct position",
+        "Replace thermistor if resistance is outside tolerance"
+      ],
+      "possibleCauses": ["Thermistor open circuit", "Thermistor short circuit", "Connector fault"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "03",
+      "meaning": "Indoor unit coil thermistor error (pipe temperature sensor)",
+      "severity": "medium",
+      "repairSteps": [
+        "Locate pipe thermistor on indoor heat exchanger",
+        "Measure resistance and compare to specification",
+        "Check wiring to indoor PCB",
+        "Ensure sensor is properly clipped to pipe",
+        "Replace thermistor if faulty"
+      ],
+      "possibleCauses": ["Thermistor failure", "Poor thermal contact", "Wiring issue"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "04",
+      "meaning": "Indoor unit fan motor error",
+      "severity": "high",
+      "repairSteps": [
+        "Check for obstructions in indoor fan",
+        "Verify fan motor connector on PCB",
+        "Measure fan motor winding resistance",
+        "Check fan motor capacitor if applicable",
+        "Replace fan motor if windings are faulty"
+      ],
+      "possibleCauses": ["Fan motor failure", "Obstruction", "Capacitor fault", "PCB output fault"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "05",
+      "meaning": "Indoor unit drain error - condensate overflow",
+      "severity": "medium",
+      "repairSteps": [
+        "Clear condensate drain line blockage",
+        "Clean drain pan thoroughly",
+        "Check drain pump operation if fitted",
+        "Verify float switch operation",
+        "Check for correct installation angle"
+      ],
+      "possibleCauses": ["Blocked drain", "Pump failure", "Float switch stuck", "Installation error"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "06",
+      "meaning": "Outdoor unit freeze or overheat protection",
+      "severity": "medium",
+      "repairSteps": [
+        "Check outdoor coil for ice in heating mode",
+        "Verify defrost cycle is initiating correctly",
+        "Check outdoor thermistors",
+        "Verify refrigerant charge level",
+        "Inspect 4-way valve operation"
+      ],
+      "possibleCauses": ["Defrost failure", "Low charge", "4-way valve fault", "Thermistor error"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "07",
+      "meaning": "Outdoor unit PCB or inverter circuit error",
+      "severity": "high",
+      "repairSteps": [
+        "Check outdoor PCB LED indicators",
+        "Inspect PCB for burnt components",
+        "Measure supply voltage at outdoor terminals",
+        "Check inverter power module",
+        "Replace PCB if confirmed faulty"
+      ],
+      "possibleCauses": ["PCB failure", "Inverter module fault", "Power surge damage"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "08",
+      "meaning": "Compressor overcurrent protection activated",
+      "severity": "critical",
+      "repairSteps": [
+        "Measure supply voltage at outdoor unit",
+        "Check compressor winding resistance",
+        "Verify refrigerant pressures",
+        "Inspect compressor electrical connections",
+        "Check for liquid flood-back to compressor"
+      ],
+      "possibleCauses": ["Low voltage", "Compressor mechanical fault", "Refrigerant issue", "Wiring fault"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "09",
+      "meaning": "Compressor motor protection activated",
+      "severity": "critical",
+      "repairSteps": [
+        "Allow compressor to cool for 30 minutes",
+        "Check system pressures",
+        "Verify supply voltage",
+        "Measure compressor winding insulation resistance",
+        "Check compressor running current against specification"
+      ],
+      "possibleCauses": ["Compressor overheating", "High head pressure", "Low voltage", "Winding deterioration"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "0A",
+      "meaning": "Discharge temperature abnormality",
+      "severity": "high",
+      "repairSteps": [
+        "Check refrigerant charge level",
+        "Inspect for leaks in the refrigerant circuit",
+        "Verify expansion valve operation",
+        "Check discharge temperature thermistor",
+        "Verify indoor airflow is adequate"
+      ],
+      "possibleCauses": ["Low charge", "EEV fault", "Thermistor error", "Restricted airflow"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "A1",
+      "meaning": "Indoor unit PCB fault",
+      "severity": "high",
+      "repairSteps": [
+        "Power cycle the indoor unit",
+        "Check all connectors on indoor PCB",
+        "Inspect for visible PCB damage",
+        "Verify supply voltage to indoor unit",
+        "Replace indoor PCB if error persists"
+      ],
+      "possibleCauses": ["PCB component failure", "Power supply fault", "Connector issue"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "A3",
+      "meaning": "Drain level control system malfunction",
+      "severity": "medium",
+      "repairSteps": [
+        "Check drain pan water level",
+        "Clean drain pan and drain line",
+        "Test drain pump if installed",
+        "Check float switch or drain sensor operation",
+        "Verify drain line gradient"
+      ],
+      "possibleCauses": ["Blocked drain", "Pump malfunction", "Sensor fault", "Improper drain slope"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "A5",
+      "meaning": "Indoor unit anti-freeze protection activated",
+      "severity": "medium",
+      "repairSteps": [
+        "Check and clean air filter",
+        "Verify indoor fan is operating at correct speed",
+        "Check refrigerant charge",
+        "Inspect indoor coil for frost/ice",
+        "Verify coil thermistor operation"
+      ],
+      "possibleCauses": ["Dirty filter", "Fan speed issue", "Low charge", "Thermistor fault"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "A6",
+      "meaning": "Indoor fan motor lock error",
+      "severity": "high",
+      "repairSteps": [
+        "Check for obstructions in fan assembly",
+        "Verify fan motor connector",
+        "Measure fan motor winding resistance",
+        "Check for fan blade damage or imbalance",
+        "Replace fan motor if confirmed faulty"
+      ],
+      "possibleCauses": ["Obstruction", "Motor bearing seizure", "Winding fault", "Blade damage"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "A7",
+      "meaning": "Swing motor or louver position error",
+      "severity": "low",
+      "repairSteps": [
+        "Manually return louvers to home position",
+        "Check swing motor connector",
+        "Inspect swing mechanism for obstructions",
+        "Replace swing motor if faulty",
+        "Reset indoor unit power"
+      ],
+      "possibleCauses": ["Motor failure", "Mechanical obstruction", "Connector issue"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "A8",
+      "meaning": "Power supply overvoltage protection",
+      "severity": "high",
+      "repairSteps": [
+        "Measure supply voltage at unit terminals",
+        "Check for voltage spikes with a power quality meter",
+        "Install surge protection if not present",
+        "Verify transformer tap settings if applicable",
+        "Contact power company if voltage consistently high"
+      ],
+      "possibleCauses": ["High mains voltage", "Voltage spikes", "Transformer issue"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "A9",
+      "meaning": "Electronic expansion valve malfunction",
+      "severity": "high",
+      "repairSteps": [
+        "Check EEV coil resistance",
+        "Verify wiring to EEV",
+        "Check for debris in valve",
+        "Measure superheat and subcooling values",
+        "Replace EEV if coil is open or shorted"
+      ],
+      "possibleCauses": ["EEV coil failure", "Valve blockage", "Wiring fault", "PCB output fault"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "E1",
+      "meaning": "High pressure trip on outdoor unit",
+      "severity": "critical",
+      "repairSteps": [
+        "Clean outdoor coil thoroughly",
+        "Verify outdoor fan operation",
+        "Check refrigerant charge level",
+        "Inspect for non-condensable gases",
+        "Verify high-pressure switch is functional"
+      ],
+      "possibleCauses": ["Dirty outdoor coil", "Fan failure", "Overcharge", "Non-condensable gases"],
+      "equipmentTypes": ["split", "multi-split"]
+    }
+  ]
+}
