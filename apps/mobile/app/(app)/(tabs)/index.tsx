@@ -1,10 +1,19 @@
 import { View, Text, Pressable, Alert } from "react-native";
 import { ScreenContainer } from "@/components/common/ScreenContainer";
 import { useSession } from "@/providers/session-provider";
+import { useTRPC } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 import { Zap } from "lucide-react-native";
 
 export default function HomeScreen() {
   const { session } = useSession();
+  const trpc = useTRPC();
+
+  const orgQuery = useQuery(
+    trpc.org.getCurrent.queryOptions(undefined, {
+      enabled: !!session?.activeOrganizationId,
+    }),
+  );
 
   function handleStartSession() {
     Alert.alert(
@@ -18,7 +27,7 @@ export default function HomeScreen() {
     <ScreenContainer>
       <View className="flex-1 justify-center items-center gap-xl">
         <Text className="text-display text-text-primary text-center">
-          {session?.activeOrganizationId ? "Your Organization" : "Aucta"}
+          {orgQuery.data?.name ?? "Aucta"}
         </Text>
 
         <Pressable
