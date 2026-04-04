@@ -249,7 +249,7 @@ Displayed as a full-screen overlay on top of the frozen camera feed with overlay
 
 | Step | Trigger | UI State | Duration |
 |------|---------|----------|----------|
-| 1a. Tap stop | User taps stop button | EndSessionDialog appears: "End this session?" with "End Session" (destructive) + "Cancel" | Until user responds |
+| 1a. Tap stop | User taps stop button | EndSessionDialog appears: "End this session?" with "End Session" (destructive) + "Keep Going" | Until user responds |
 | 1b. Voice end | User says "end session" | AI confirms verbally: "Ending the session now. Goodbye." | 2-3s |
 | 2. Session closes | User confirms or AI completes verbal | Camera stops, WebSocket closes, navigate to Home | Immediate |
 
@@ -285,7 +285,7 @@ Displayed as a full-screen overlay on top of the frozen camera feed with overlay
 | End session dialog title | "End this session?" |
 | End session dialog body | "Your session will end and you will return to the home screen." |
 | End session confirm | "End Session" |
-| End session cancel | "Cancel" |
+| End session secondary | "Keep Going" |
 | Connection lost heading | "Connection Lost" |
 | Connection lost body | "Your session has ended due to a network issue. Your work is not affected." |
 | Connection lost CTA | "Start New Session" |
