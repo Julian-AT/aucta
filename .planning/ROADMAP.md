@@ -57,7 +57,7 @@ Plans:
 - [x] 02-01-PLAN.md — packages/ai/ foundation: buildTool() factory, system prompt layers (core, HVAC, safety), builder
 - [x] 02-02-PLAN.md — Initial tools: lookupErrorCode with static JSON data, logFinding with in-memory store
 - [x] 02-03-PLAN.md — Integration: tool registry, dispatcher, ephemeral token tRPC endpoint
-- [ ] 02-04-PLAN.md — Gap closure: fix ToolDef variance, Modality enum, setTimeout type, unused parameter
+- [x] 02-04-PLAN.md — Gap closure: fix ToolDef variance, Modality enum, setTimeout type, unused parameter
 
 ### Phase 3: Live Streaming Session
 **Goal**: A technician can have a complete real-time AI conversation by pointing their camera at HVAC equipment and speaking naturally
