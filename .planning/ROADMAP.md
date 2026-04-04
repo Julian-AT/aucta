@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Foundation and Auth** - Monorepo, database, auth with orgs/roles/invites, CI pipeline, EAS dev builds
 - [ ] **Phase 2: AI Pipeline and Tool System** - Ephemeral tokens, system prompt assembly, tool factory/registry/dispatcher, initial tools
-- [ ] **Phase 3: Live Streaming Session** - Camera + audio streaming to Gemini Live, spoken guidance, tool calls, reconnection, session UI
+- [x] **Phase 3: Live Streaming Session** - Camera + audio streaming to Gemini Live, spoken guidance, tool calls, reconnection, session UI (completed 2026-04-04)
 - [ ] **Phase 4: Session Lifecycle** - Post-session feedback, data persistence, automated summaries, offline caching, content labels
 - [ ] **Phase 5: Knowledge Base** - Hybrid search, session ingestion, article compilation, verification queue, health monitoring
 
@@ -77,7 +77,7 @@ Plans:
 - [x] 03-02-PLAN.md — WebSocket: GeminiConnection class (lifecycle, setup, message parsing, send methods) and reconnection logic (exponential backoff, 2-min timeout)
 - [x] 03-03-PLAN.md — Media pipelines: audio playback (PCM 24kHz gapless scheduling), audio capture (PCM 16kHz), frame capture (1 FPS JPEG), tool relay (tRPC dispatch)
 - [x] 03-04-PLAN.md — Session UI components: AI indicator, connection status, audio indicator, stop button, AI disclosure modal, end session dialog, connection lost overlay, SessionHUD
-- [ ] 03-05-PLAN.md — Integration: useGeminiSession orchestration hook, SessionScreen, navigation wiring, device verification checkpoint
+- [x] 03-05-PLAN.md — Integration: useGeminiSession orchestration hook, SessionScreen, navigation wiring, device verification checkpoint
 
 ### Phase 4: Session Lifecycle
 **Goal**: Sessions have a complete lifecycle with feedback collection, data persistence, automated summaries, and offline access to past results
@@ -121,6 +121,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation and Auth | 6/6 | Executing | - |
 | 2. AI Pipeline and Tool System | 3/4 | Gap closure | - |
-| 3. Live Streaming Session | 1/5 | In Progress|  |
+| 3. Live Streaming Session | 5/5 | Complete   | 2026-04-04 |
 | 4. Session Lifecycle | 0/0 | Not started | - |
 | 5. Knowledge Base | 0/0 | Not started | - |

@@ -42,7 +42,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 
 ### Live Session
 
-- [ ] **SESS-01**: Technician can start a live AI session within two taps from app launch
+- [x] **SESS-01**: Technician can start a live AI session within two taps from app launch
 - [x] **SESS-02**: Camera streams JPEG frames (1 FPS, 768px, base64) to Gemini Live via WebSocket
 - [x] **SESS-03**: Microphone streams PCM audio (16kHz, 16-bit, mono) to Gemini Live via WebSocket
 - [x] **SESS-04**: AI spoken guidance streams back as PCM audio (24kHz) and plays through device speaker in real time
@@ -50,7 +50,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **SESS-06**: Tool calls execute mid-conversation without interrupting audio stream (async function calling)
 - [x] **SESS-07**: Context window compression (SlidingWindow) configured in setup message to support sessions >10 minutes
 - [x] **SESS-08**: Reconnection with exponential backoff (1s → 2s → 4s → max 30s) using Gemini sessionResumption handle
-- [ ] **SESS-09**: Technician can end session by tapping stop button or saying "end session"
+- [x] **SESS-09**: Technician can end session by tapping stop button or saying "end session"
 - [ ] **SESS-10**: Post-session feedback prompt: 1-5 stars + optional text note
 - [ ] **SESS-11**: Session data persisted: start/end time, duration, language detected, tools used, feedback, token count
 - [ ] **SESS-12**: Post-session summary generated via Inngest background job (AI summarizes session events)
@@ -86,7 +86,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **COMP-03**: Safety disclaimers in system prompt: "AI guidance does not replace professional training or certification"
 - [x] **COMP-04**: AI scope limitation: refuses to guide work outside competence boundaries (electrical requiring licensed electrician, gas work without F-Gas cert)
 - [x] **COMP-05**: F-Gas EU 2024/573 references in AI guidance when handling refrigerants (leak-check thresholds, low-GWP alternatives)
-- [ ] **COMP-06**: Stream-and-discard architecture verified: no audio/video stored on our servers, only session metadata
+- [x] **COMP-06**: Stream-and-discard architecture verified: no audio/video stored on our servers, only session metadata
 - [ ] **COMP-07**: AI-generated content labels on session summaries and knowledge base articles
 - [ ] **COMP-08**: No emotion recognition: session quality measured only by explicit feedback and objective metrics
 
@@ -173,7 +173,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TOOL-06 | Phase 2 | Complete |
 | TOOL-07 | Phase 2 | Complete |
 | TOOL-08 | Phase 2 | Complete |
-| SESS-01 | Phase 3 | Pending |
+| SESS-01 | Phase 3 | Complete |
 | SESS-02 | Phase 3 | Complete |
 | SESS-03 | Phase 3 | Complete |
 | SESS-04 | Phase 3 | Complete |
@@ -181,7 +181,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SESS-06 | Phase 3 | Complete |
 | SESS-07 | Phase 3 | Complete |
 | SESS-08 | Phase 3 | Complete |
-| SESS-09 | Phase 3 | Pending |
+| SESS-09 | Phase 3 | Complete |
 | SESS-10 | Phase 4 | Pending |
 | SESS-11 | Phase 4 | Pending |
 | SESS-12 | Phase 4 | Pending |
@@ -208,7 +208,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COMP-03 | Phase 2 | Complete |
 | COMP-04 | Phase 2 | Complete |
 | COMP-05 | Phase 2 | Complete |
-| COMP-06 | Phase 3 | Pending |
+| COMP-06 | Phase 3 | Complete |
 | COMP-07 | Phase 4 | Pending |
 | COMP-08 | Phase 4 | Pending |
 
