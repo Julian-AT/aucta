@@ -6,7 +6,10 @@ vi.mock("@google/genai", () => {
   const MockGoogleGenAI = vi.fn(function (this: { authTokens: { create: typeof mockCreate } }) {
     this.authTokens = { create: mockCreate };
   });
-  return { GoogleGenAI: MockGoogleGenAI };
+  return {
+    GoogleGenAI: MockGoogleGenAI,
+    Modality: { AUDIO: "AUDIO", TEXT: "TEXT", IMAGE: "IMAGE", MODALITY_UNSPECIFIED: "MODALITY_UNSPECIFIED" },
+  };
 });
 
 // Mock rate limiting to avoid Redis dependency

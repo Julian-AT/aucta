@@ -5,7 +5,7 @@ import {
   tokenLimiter,
 } from "../middleware/rate-limit.js";
 import { errorConverter } from "../middleware/error-converter.js";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Modality } from "@google/genai";
 import {
   buildEffectiveSystemPrompt,
   coreRolePrompt,
@@ -23,7 +23,7 @@ export const sessionRouter = router({
   createToken: orgProcedure
     .use(createRateLimitMiddleware(tokenLimiter))
     .use(errorConverter)
-    .mutation(async ({ ctx }) => {
+    .mutation(async ({ ctx: _ctx }) => {
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
         throw new Error("GEMINI_API_KEY environment variable is not set");
@@ -56,7 +56,7 @@ export const sessionRouter = router({
             model: GEMINI_LIVE_MODEL,
             config: {
               systemInstruction: systemPrompt,
-              responseModalities: ["AUDIO"],
+              responseModalities: [Modality.AUDIO],
             },
           },
         },
