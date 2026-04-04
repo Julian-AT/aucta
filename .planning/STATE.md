@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-04-03T22:04:18.181Z"
-last_activity: 2026-04-03
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-04-04T08:41:40.372Z"
+last_activity: 2026-04-04
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 4
   percent: 17
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 01 (foundation-and-auth) — EXECUTING
-Plan: 3 of 6 complete
+Plan: 4 of 6 complete
 Status: Ready to execute
-Last activity: 2026-04-03
+Last activity: 2026-04-04
 
 Progress: [█░░░░░░░░░] 17%
 
@@ -54,6 +54,7 @@ Progress: [█░░░░░░░░░] 17%
 *Updated after each plan completion*
 | Phase 01 P02 | 3min | 2 tasks | 17 files |
 | Phase 01 P04 | 2min | 2 tasks | 9 files |
+| Phase 01 P03 | 3min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Base auth client uses better-auth/client (framework-agnostic), not better-auth/react
 - [Phase 01]: Vitest workspace uses projects glob for auto-discovery of per-package test configs
 - [Phase 01]: db package test script uses --passWithNoTests for packages without tests yet
+- [Phase 01]: orgId exclusively from session.activeOrganizationId (D-15), enforced at middleware level
+- [Phase 01]: tRPC middleware chain: publicProcedure -> isAuthed -> protectedProcedure -> withOrgScope -> orgProcedure
+- [Phase 01]: ErrorWithCode to TRPCError conversion via middleware keeps services free of @trpc/server imports
 
 ### Pending Todos
 
@@ -87,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03T22:04:18.180Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-04-04T08:41:40.369Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
