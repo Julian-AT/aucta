@@ -54,7 +54,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — packages/ai/ foundation: buildTool() factory, system prompt layers (core, HVAC, safety), builder
+- [x] 02-01-PLAN.md — packages/ai/ foundation: buildTool() factory, system prompt layers (core, HVAC, safety), builder
 - [ ] 02-02-PLAN.md — Initial tools: lookupErrorCode with static JSON data, logFinding with in-memory store
 - [ ] 02-03-PLAN.md — Integration: tool registry, dispatcher, ephemeral token tRPC endpoint
 

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 2 context gathered
-last_updated: "2026-04-04T12:05:55.608Z"
-last_activity: 2026-04-04 -- All plans complete, NativeWind upgraded to v5
+status: executing
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-04-04T12:36:14.338Z"
+last_activity: 2026-04-04
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 9
+  completed_plans: 7
   percent: 100
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** A technician points their phone camera at HVAC equipment, speaks naturally in any language, and receives expert-level spoken guidance in real time.
-**Current focus:** Phase 01 — foundation-and-auth
+**Current focus:** Phase 02 — ai-pipeline-and-tool-system
 
 ## Current Position
 
-Phase: 01 (foundation-and-auth) — EXECUTING
-Plan: 6 of 6 complete
-Status: All plans executed — ready for phase verification
-Last activity: 2026-04-04 -- All plans complete, NativeWind upgraded to v5
+Phase: 02 (ai-pipeline-and-tool-system) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-04-04
 
 Progress: [██████████] 100%
 
@@ -56,6 +56,7 @@ Progress: [██████████] 100%
 | Phase 01 P04 | 2min | 2 tasks | 9 files |
 | Phase 01 P03 | 3min | 2 tasks | 11 files |
 | Phase 01 P05 | 3min | 2 tasks | 21 files |
+| Phase 02 P01 | 3min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,9 @@ Recent decisions affecting current work:
 - [Phase 01]: NativeWind upgraded to v5.0.0-preview.3 + Tailwind CSS v4 (user override of v4.2.3 stable recommendation)
 - [Phase 01]: tRPC v11 createTRPCContext pattern with cookie forwarding via getCookie()
 - [Phase 01]: Stack.Protected dual guard (isAuthenticated + hasOrganization) for auth routing
+- [Phase 02]: z.toJSONSchema() with $schema stripping for Gemini function declaration compatibility
+- [Phase 02]: ToolDef objects are Object.freeze'd for immutability
+- [Phase 02]: PromptLayer interface with id/content/required for composable prompt assembly
 
 ### Pending Todos
 
@@ -95,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T12:05:55.606Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-ai-pipeline-and-tool-system/02-CONTEXT.md
+Last session: 2026-04-04T12:36:14.336Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None

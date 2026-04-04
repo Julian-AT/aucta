@@ -31,14 +31,14 @@ Requirements for the first milestone. Each maps to roadmap phases.
 
 ### AI Pipeline & Tools
 
-- [ ] **TOOL-01**: buildTool() factory that enforces consistent tool structure: call(), prompt(), validateInput(), isReadOnly(), Zod schemas
+- [x] **TOOL-01**: buildTool() factory that enforces consistent tool structure: call(), prompt(), validateInput(), isReadOnly(), Zod schemas
 - [ ] **TOOL-02**: Tool registry (assembleToolPool) that registers all tools and exports Gemini function declarations
 - [ ] **TOOL-03**: Tool dispatcher that resolves Gemini toolCall events to matching tools, validates input, returns toolResponse
 - [ ] **TOOL-04**: lookupErrorCode tool: given manufacturer + error code, returns meaning, repair steps, severity
 - [ ] **TOOL-05**: searchKnowledgeBase tool: hybrid search (BM25 + vector) with confidence-weighted retrieval and source attribution
 - [ ] **TOOL-06**: logFinding tool: logs structured observations (category, description, severity) to session metadata
 - [ ] **TOOL-07**: Ephemeral token endpoint: authenticates user, builds layered system prompt, registers tool declarations, issues short-lived Gemini token with locked constraints
-- [ ] **TOOL-08**: Layered system prompt assembly: core role, HVAC expertise, safety rules, org overlay, knowledge base context, session history, AI Act transparency
+- [x] **TOOL-08**: Layered system prompt assembly: core role, HVAC expertise, safety rules, org overlay, knowledge base context, session history, AI Act transparency
 
 ### Live Session
 
@@ -83,9 +83,9 @@ Requirements for the first milestone. Each maps to roadmap phases.
 
 - [ ] **COMP-01**: Non-dismissible AI indicator visible throughout entire session (EU AI Act Art. 50) — cannot be covered by modals, keyboard, or rotation
 - [ ] **COMP-02**: AI disclosure at session start: "You are interacting with an AI system, not a human expert"
-- [ ] **COMP-03**: Safety disclaimers in system prompt: "AI guidance does not replace professional training or certification"
-- [ ] **COMP-04**: AI scope limitation: refuses to guide work outside competence boundaries (electrical requiring licensed electrician, gas work without F-Gas cert)
-- [ ] **COMP-05**: F-Gas EU 2024/573 references in AI guidance when handling refrigerants (leak-check thresholds, low-GWP alternatives)
+- [x] **COMP-03**: Safety disclaimers in system prompt: "AI guidance does not replace professional training or certification"
+- [x] **COMP-04**: AI scope limitation: refuses to guide work outside competence boundaries (electrical requiring licensed electrician, gas work without F-Gas cert)
+- [x] **COMP-05**: F-Gas EU 2024/573 references in AI guidance when handling refrigerants (leak-check thresholds, low-GWP alternatives)
 - [ ] **COMP-06**: Stream-and-discard architecture verified: no audio/video stored on our servers, only session metadata
 - [ ] **COMP-07**: AI-generated content labels on session summaries and knowledge base articles
 - [ ] **COMP-08**: No emotion recognition: session quality measured only by explicit feedback and objective metrics
@@ -165,14 +165,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-06 | Phase 1 | Complete |
 | AUTH-07 | Phase 1 | Complete |
 | AUTH-08 | Phase 1 | Complete |
-| TOOL-01 | Phase 2 | Pending |
+| TOOL-01 | Phase 2 | Complete |
 | TOOL-02 | Phase 2 | Pending |
 | TOOL-03 | Phase 2 | Pending |
 | TOOL-04 | Phase 2 | Pending |
 | TOOL-05 | Phase 5 | Pending |
 | TOOL-06 | Phase 2 | Pending |
 | TOOL-07 | Phase 2 | Pending |
-| TOOL-08 | Phase 2 | Pending |
+| TOOL-08 | Phase 2 | Complete |
 | SESS-01 | Phase 3 | Pending |
 | SESS-02 | Phase 3 | Pending |
 | SESS-03 | Phase 3 | Pending |
@@ -205,9 +205,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-08 | Phase 3 | Pending |
 | COMP-01 | Phase 3 | Pending |
 | COMP-02 | Phase 3 | Pending |
-| COMP-03 | Phase 2 | Pending |
-| COMP-04 | Phase 2 | Pending |
-| COMP-05 | Phase 2 | Pending |
+| COMP-03 | Phase 2 | Complete |
+| COMP-04 | Phase 2 | Complete |
+| COMP-05 | Phase 2 | Complete |
 | COMP-06 | Phase 3 | Pending |
 | COMP-07 | Phase 4 | Pending |
 | COMP-08 | Phase 4 | Pending |
