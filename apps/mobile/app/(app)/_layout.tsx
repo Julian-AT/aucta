@@ -4,6 +4,14 @@ export default function AppLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen
+        name="session"
+        options={{
+          headerShown: false,
+          animation: "fade",
+          gestureEnabled: false,
+        }}
+      />
     </Stack>
   );
 }

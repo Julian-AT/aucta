@@ -1,4 +1,5 @@
-import { View, Text, Pressable, Alert } from "react-native";
+import { View, Text, Pressable } from "react-native";
+import { useRouter } from "expo-router";
 import { ScreenContainer } from "@/components/common/ScreenContainer";
 import { useSession } from "@/providers/session-provider";
 import { useTRPC } from "@/lib/api";
@@ -8,6 +9,7 @@ import { Zap } from "lucide-react-native";
 export default function HomeScreen() {
   const { session } = useSession();
   const trpc = useTRPC();
+  const router = useRouter();
 
   const orgQuery = useQuery(
     trpc.org.getCurrent.queryOptions(undefined, {
@@ -16,11 +18,7 @@ export default function HomeScreen() {
   );
 
   function handleStartSession() {
-    Alert.alert(
-      "Coming Soon",
-      "Live AI sessions will be available in Phase 3. Stay tuned!",
-      [{ text: "OK" }],
-    );
+    router.push("/(app)/session");
   }
 
   return (
