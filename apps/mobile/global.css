@@ -3,35 +3,3 @@
 @import "tailwindcss/utilities.css";
 
 @import "nativewind/theme";
-
-@theme {
-  --color-background: var(--color-background);
-  --color-surface: var(--color-surface);
-  --color-accent: var(--color-accent);
-  --color-destructive: var(--color-destructive);
-  --color-text-primary: var(--color-text-primary);
-  --color-text-secondary: var(--color-text-secondary);
-  --color-border-default: var(--color-border-default);
-  --color-border-focus: var(--color-border-focus);
-
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
-  --spacing-3xl: 64px;
-
-  --font-size-body: 16px;
-  --font-size-body--line-height: 24px;
-  --font-size-label: 14px;
-  --font-size-label--line-height: 20px;
-  --font-size-heading: 20px;
-  --font-size-heading--line-height: 24px;
-  --font-size-display: 28px;
-  --font-size-display--line-height: 32px;
-}
-
-@source "./app/**/*.{ts,tsx}";
-@source "./components/**/*.{ts,tsx}";
-@source "./providers/**/*.{ts,tsx}";
