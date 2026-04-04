@@ -52,7 +52,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **SESS-08**: Reconnection with exponential backoff (1s → 2s → 4s → max 30s) using Gemini sessionResumption handle
 - [x] **SESS-09**: Technician can end session by tapping stop button or saying "end session"
 - [ ] **SESS-10**: Post-session feedback prompt: 1-5 stars + optional text note
-- [ ] **SESS-11**: Session data persisted: start/end time, duration, language detected, tools used, feedback, token count
+- [x] **SESS-11**: Session data persisted: start/end time, duration, language detected, tools used, feedback, token count
 - [ ] **SESS-12**: Post-session summary generated via Inngest background job (AI summarizes session events)
 
 ### Knowledge Base
@@ -88,7 +88,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **COMP-05**: F-Gas EU 2024/573 references in AI guidance when handling refrigerants (leak-check thresholds, low-GWP alternatives)
 - [x] **COMP-06**: Stream-and-discard architecture verified: no audio/video stored on our servers, only session metadata
 - [ ] **COMP-07**: AI-generated content labels on session summaries and knowledge base articles
-- [ ] **COMP-08**: No emotion recognition: session quality measured only by explicit feedback and objective metrics
+- [x] **COMP-08**: No emotion recognition: session quality measured only by explicit feedback and objective metrics
 
 ## v2 Requirements
 
@@ -183,7 +183,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SESS-08 | Phase 3 | Complete |
 | SESS-09 | Phase 3 | Complete |
 | SESS-10 | Phase 4 | Pending |
-| SESS-11 | Phase 4 | Pending |
+| SESS-11 | Phase 4 | Complete |
 | SESS-12 | Phase 4 | Pending |
 | KB-01 | Phase 5 | Pending |
 | KB-02 | Phase 5 | Pending |
@@ -210,7 +210,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COMP-05 | Phase 2 | Complete |
 | COMP-06 | Phase 3 | Complete |
 | COMP-07 | Phase 4 | Pending |
-| COMP-08 | Phase 4 | Pending |
+| COMP-08 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 62 total

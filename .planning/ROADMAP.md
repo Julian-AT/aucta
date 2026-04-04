@@ -94,7 +94,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 04-01-PLAN.md — Schema, DTOs, and repositories: ai_sessions, session_findings, session_tool_calls tables, Zod schemas, repository classes with tests
+- [x] 04-01-PLAN.md — Schema, DTOs, and repositories: ai_sessions, session_findings, session_tool_calls tables, Zod schemas, repository classes with tests
 - [ ] 04-02-PLAN.md — Server integration: tRPC session lifecycle endpoints (create/end/feedback/incremental persistence), Inngest summary pipeline with Gemini 2.5 Pro, Bun server handler
 - [ ] 04-03-PLAN.md — Mobile lifecycle: MMKV offline cache, session store extensions, incremental persistence wiring, feedback screen with star rating, last session card on Home
 
