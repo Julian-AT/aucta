@@ -44,17 +44,25 @@ export class MockAudioContext {
   currentTime = 0;
   destination = {};
   state: "running" | "closed" = "running";
+  /** Track all created sources for test assertions */
+  _sources: MockAudioBufferSourceNode[] = [];
+  /** Track all created buffers for test assertions */
+  _buffers: MockAudioBuffer[] = [];
 
   constructor(options?: { sampleRate?: number }) {
     this.sampleRate = options?.sampleRate ?? 44100;
   }
 
   createBuffer(channels: number, length: number, sampleRate: number): MockAudioBuffer {
-    return new MockAudioBuffer({ numberOfChannels: channels, length, sampleRate });
+    const buffer = new MockAudioBuffer({ numberOfChannels: channels, length, sampleRate });
+    this._buffers.push(buffer);
+    return buffer;
   }
 
   createBufferSource(): MockAudioBufferSourceNode {
-    return new MockAudioBufferSourceNode();
+    const source = new MockAudioBufferSourceNode();
+    this._sources.push(source);
+    return source;
   }
 
   async close(): Promise<void> {
