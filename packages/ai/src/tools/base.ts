@@ -5,6 +5,9 @@ import type {
   GeminiFunctionDeclaration,
 } from "../types.js";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for heterogeneous tool collections (registry, dispatcher). Runtime safety is enforced by Zod validation in validateInput().
+export type AnyToolDef = ToolDef<any, any>;
+
 export interface ToolDef<TInput, TOutput> {
   name: string;
   description: string;

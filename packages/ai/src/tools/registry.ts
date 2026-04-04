@@ -1,15 +1,15 @@
-import type { ToolDef, GeminiFunctionDeclaration } from "./base.js";
+import type { AnyToolDef, GeminiFunctionDeclaration } from "./base.js";
 
 export interface ToolPool {
-  tools: Map<string, ToolDef<unknown, unknown>>;
+  tools: Map<string, AnyToolDef>;
   functionDeclarations: GeminiFunctionDeclaration[];
-  getTool(name: string): ToolDef<unknown, unknown> | undefined;
+  getTool(name: string): AnyToolDef | undefined;
 }
 
 export function assembleToolPool(
-  tools: ToolDef<unknown, unknown>[],
+  tools: AnyToolDef[],
 ): ToolPool {
-  const toolMap = new Map<string, ToolDef<unknown, unknown>>();
+  const toolMap = new Map<string, AnyToolDef>();
 
   for (const tool of tools) {
     if (toolMap.has(tool.name)) {

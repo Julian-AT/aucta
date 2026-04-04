@@ -1,6 +1,7 @@
 export { buildTool } from "./tools/base.js";
 export type {
   ToolDef,
+  AnyToolDef,
   ToolContext,
   ToolResult,
   GeminiFunctionDeclaration,
