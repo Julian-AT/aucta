@@ -12,6 +12,7 @@ import {
 import { Link, router } from "expo-router";
 import { ScreenContainer } from "@/components/common/ScreenContainer";
 import { authClient } from "@/lib/auth-client";
+import { API_URL } from "@/lib/api-url";
 
 export default function SignUpScreen() {
   const [name, setName] = useState("");
@@ -62,22 +63,39 @@ export default function SignUpScreen() {
       });
 
       if (result.error) {
+        console.error("[SignUp] Error from auth:", {
+          message: result.error.message,
+          code: result.error.code,
+          status: result.error.status,
+        });
+
+        const msg = result.error.message?.toLowerCase() ?? "";
         if (
-          result.error.message?.toLowerCase().includes("already") ||
+          msg.includes("already") ||
           result.error.code === "USER_ALREADY_EXISTS"
         ) {
           setError(
             "An account with this email already exists. Try logging in instead.",
           );
+        } else if (msg.includes("network") || msg.includes("fetch")) {
+          setError(
+            `Cannot reach server at ${API_URL}. Make sure the API server is running.`,
+          );
         } else {
-          setError("Something went wrong. Please try again.");
+          setError(
+            result.error.message || "Something went wrong. Please try again.",
+          );
         }
         return;
       }
 
+      console.log("[SignUp] Success, navigating to org-choice");
       router.replace("/(auth)/org-choice");
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (e) {
+      console.error("[SignUp] Threw:", e);
+      const msg =
+        e instanceof Error ? e.message : String(e);
+      setError(msg || "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }

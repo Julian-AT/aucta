@@ -1,14 +1,22 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { organization } from "better-auth/plugins";
+import { expo } from "@better-auth/expo";
 import { db } from "@aucta/db/client";
 import { ac, manager, owner, technician } from "./permissions.js";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
   emailAndPassword: { enabled: true },
-  trustedOrigins: ["aucta://"],
+  trustedOrigins: [
+    "aucta://",
+    // Expo dev origins
+    ...(process.env.NODE_ENV !== "production"
+      ? ["exp://", "exp://**", "exp://192.168.*.*:*/**"]
+      : []),
+  ],
   plugins: [
+    expo(),
     organization({
       ac,
       roles: { owner, manager, technician },

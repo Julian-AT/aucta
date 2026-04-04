@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 import { authClient } from "@/lib/auth-client";
 
 interface SessionContextValue {
@@ -40,6 +40,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = !!session;
   const hasOrganization = !!session?.activeOrganizationId;
+
+  useEffect(() => {
+    console.log("[Session] State changed:", {
+      isAuthenticated,
+      hasOrganization,
+      activeOrgId: session?.activeOrganizationId ?? null,
+      userId: session?.user?.id ?? null,
+      isPending,
+      rawActiveOrgId: sessionData?.session?.activeOrganizationId,
+    });
+  }, [isAuthenticated, hasOrganization, isPending, session, sessionData]);
 
   return (
     <SessionContext.Provider

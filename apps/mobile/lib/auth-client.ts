@@ -2,9 +2,12 @@ import { createAuthClient } from "better-auth/react";
 import { expoClient } from "@better-auth/expo/client";
 import { organizationClient } from "better-auth/client/plugins";
 import * as SecureStore from "expo-secure-store";
+import { API_URL } from "./api-url";
+
+console.log("[Auth] Client baseURL:", API_URL);
 
 export const authClient = createAuthClient({
-  baseURL: process.env.EXPO_PUBLIC_API_URL!,
+  baseURL: API_URL,
   plugins: [
     expoClient({
       scheme: "aucta",

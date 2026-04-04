@@ -20,5 +20,8 @@
     "typescript": "^6.0.0",
     "@biomejs/biome": "^2.4.0",
     "vitest": "^4.1.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.0"
   }
 }

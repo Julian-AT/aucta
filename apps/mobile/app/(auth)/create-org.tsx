@@ -13,6 +13,8 @@ import { ScreenContainer } from "@/components/common/ScreenContainer";
 import { useTRPC } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 import { INDUSTRY_TYPES, type IndustryType } from "@aucta/shared/constants/industries";
+import { authClient } from "@/lib/auth-client";
+import { API_URL } from "@/lib/api-url";
 
 const INDUSTRY_LABELS: Record<IndustryType, string> = {
   hvac: "HVAC",
@@ -39,8 +41,47 @@ export default function CreateOrgScreen() {
   const trpc = useTRPC();
   const createOrgMutation = useMutation(
     trpc.org.create.mutationOptions({
+      async onSuccess(data) {
+        console.log("[CreateOrg] Mutation succeeded, orgId:", data.id);
+        try {
+          console.log("[CreateOrg] Calling setActive...");
+          await authClient.organization.setActive({
+            organizationId: data.id,
+          });
+          console.log("[CreateOrg] setActive done, refetching session...");
+        } catch (e) {
+          console.error("[CreateOrg] setActive failed:", e);
+        }
+        // Force session refetch so SessionProvider picks up activeOrganizationId
+        try {
+          const refreshed = await authClient.getSession();
+          console.log(
+            "[CreateOrg] Session refreshed, activeOrgId:",
+            refreshed.data?.session?.activeOrganizationId,
+          );
+        } catch (e) {
+          console.error("[CreateOrg] Session refresh failed:", e);
+        }
+      },
       onError(err) {
-        setError(err.message || "Something went wrong. Please try again.");
+        console.error("[CreateOrg] Mutation error:", {
+          message: err.message,
+          cause: (err as any).cause,
+        });
+
+        const isNetworkError =
+          err.message === "Network request failed" ||
+          err.message.includes("fetch failed") ||
+          err.message.includes("Failed to fetch");
+
+        if (isNetworkError) {
+          setError(
+            `Cannot reach server at ${API_URL}. ` +
+              "Make sure the API server is running and the URL is correct for your device.",
+          );
+        } else {
+          setError(err.message || "Something went wrong. Please try again.");
+        }
       },
     }),
   );

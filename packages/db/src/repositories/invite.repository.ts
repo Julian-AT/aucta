@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { InviteCodeDTO } from "@aucta/shared/schemas/invite.schema";
 import { InviteCodeDTO as InviteCodeDTOSchema } from "@aucta/shared/schemas/invite.schema";
 import type { DrizzleClient } from "../client.js";
@@ -52,20 +52,15 @@ export class InviteRepository {
   }
 
   async incrementUsage(id: string): Promise<void> {
-    const rows = await this.db
-      .select({ usedCount: inviteCodes.usedCount })
-      .from(inviteCodes)
-      .where(eq(inviteCodes.id, id));
+    const result = await this.db
+      .update(inviteCodes)
+      .set({ usedCount: sql`${inviteCodes.usedCount} + 1` })
+      .where(eq(inviteCodes.id, id))
+      .returning({ id: inviteCodes.id });
 
-    const row = rows[0];
-    if (!row) {
+    if (result.length === 0) {
       throw new Error(`Invite code ${id} not found for usage increment`);
     }
-
-    await this.db
-      .update(inviteCodes)
-      .set({ usedCount: row.usedCount + 1 })
-      .where(eq(inviteCodes.id, id));
   }
 
   async delete(id: string): Promise<void> {

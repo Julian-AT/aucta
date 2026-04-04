@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -54,12 +54,11 @@ export function InviteCodeInput({
     ]).start();
   }, [shakeAnim]);
 
-  // Shake when error is set
-  const prevErrorRef = useRef(error);
-  if (error && error !== prevErrorRef.current) {
-    shake();
-  }
-  prevErrorRef.current = error;
+  useEffect(() => {
+    if (error) {
+      shake();
+    }
+  }, [error, shake]);
 
   function handleChange(text: string) {
     const sanitized = text.toUpperCase().replace(/[^A-Z0-9]/g, "");

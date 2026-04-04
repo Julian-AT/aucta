@@ -10,6 +10,8 @@ import { Building2, Users, Shield } from "lucide-react-native";
 import { ScreenContainer } from "@/components/common/ScreenContainer";
 import { useTRPC } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
+import { authClient } from "@/lib/auth-client";
+import { API_URL } from "@/lib/api-url";
 
 export default function JoinPreviewScreen() {
   const { code, orgName, role, memberCount } = useLocalSearchParams<{
@@ -24,11 +26,46 @@ export default function JoinPreviewScreen() {
   const trpc = useTRPC();
   const joinMutation = useMutation(
     trpc.invite.join.mutationOptions({
+      async onSuccess(data) {
+        console.log("[JoinOrg] Mutation succeeded, orgId:", data.orgId);
+        try {
+          await authClient.organization.setActive({
+            organizationId: data.orgId,
+          });
+          console.log("[JoinOrg] setActive done, refetching session...");
+        } catch (e) {
+          console.error("[JoinOrg] setActive failed:", e);
+        }
+        try {
+          const refreshed = await authClient.getSession();
+          console.log(
+            "[JoinOrg] Session refreshed, activeOrgId:",
+            refreshed.data?.session?.activeOrganizationId,
+          );
+        } catch (e) {
+          console.error("[JoinOrg] Session refresh failed:", e);
+        }
+      },
       onError(err) {
-        if (err.message?.toLowerCase().includes("already")) {
+        console.error("[JoinOrg] Mutation error:", {
+          message: err.message,
+          cause: (err as any).cause,
+        });
+
+        const isNetworkError =
+          err.message === "Network request failed" ||
+          err.message.includes("fetch failed") ||
+          err.message.includes("Failed to fetch");
+
+        if (isNetworkError) {
+          setError(
+            `Cannot reach server at ${API_URL}. ` +
+              "Make sure the API server is running and the URL is correct for your device.",
+          );
+        } else if (err.message?.toLowerCase().includes("already")) {
           setError("You already belong to an organization.");
         } else {
-          setError("Something went wrong. Please try again.");
+          setError(err.message || "Something went wrong. Please try again.");
         }
       },
     }),
