@@ -43,6 +43,23 @@ export interface GeminiFunctionDecl {
   parameters: Record<string, unknown>;
 }
 
+/**
+ * Client-side tool declaration for voice-triggered session end (SESS-09, D-12).
+ * Gemini calls this when the user says "end session", "stop session",
+ * "that's all", "goodbye", or similar phrases indicating they want to finish.
+ * Handled locally on the mobile client -- NOT relayed to the server.
+ */
+export const END_SESSION_TOOL_DECL: GeminiFunctionDecl = {
+  name: "endSession",
+  description:
+    "End the current AI-assisted session. Call this tool when the user says 'end session', 'stop session', 'that is all', 'goodbye', or any phrase indicating they want to finish the conversation. Before calling, verbally confirm: 'Ending the session now. Goodbye.'",
+  parameters: {
+    type: "object",
+    properties: {},
+    required: [],
+  },
+};
+
 // --- Client -> Server Messages ---
 export interface RealtimeAudioInput {
   realtimeInput: {

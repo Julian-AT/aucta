@@ -344,6 +344,65 @@ describe("useGeminiSession orchestration", () => {
 
       expect(useSessionStore.getState().error).toBe("Connection refused");
     });
+
+    it("endSession tool call is handled client-side without server relay", async () => {
+      const mockDispatch = vi.fn();
+      const relay = new ToolRelay({ dispatchToolCalls: mockDispatch });
+
+      let connectionInstance: GeminiConnection;
+      let endSessionCalled = false;
+
+      const deps: GeminiConnectionDeps = {
+        onAudioData: vi.fn(),
+        onToolCall: async (toolCall) => {
+          const endSessionCall = toolCall.functionCalls.find(
+            (fc) => fc.name === "endSession",
+          );
+          if (endSessionCall) {
+            endSessionCalled = true;
+            connectionInstance.sendToolResponse([
+              {
+                id: endSessionCall.id,
+                name: "endSession",
+                response: { success: true },
+              },
+            ]);
+            return;
+          }
+          const result = await relay.relay(toolCall);
+          connectionInstance.sendToolResponse(result.functionResponses);
+        },
+        onTurnComplete: vi.fn(),
+        onResumptionUpdate: vi.fn(),
+        onGoAway: vi.fn(),
+        onSetupComplete: vi.fn(),
+        onDisconnect: vi.fn(),
+        onError: vi.fn(),
+      };
+
+      connectionInstance = new GeminiConnection(deps);
+      connectionInstance.connect({
+        token: "test-token",
+        model: "gemini-2.5-flash-live-preview",
+      });
+      lastCreatedWs.simulateOpen();
+
+      // Gemini sends endSession tool call
+      lastCreatedWs.simulateMessage({
+        toolCall: {
+          functionCalls: [
+            { id: "end-1", name: "endSession", args: {} },
+          ],
+        },
+      });
+
+      await vi.waitFor(() => {
+        expect(endSessionCalled).toBe(true);
+      });
+
+      // Verify server dispatch was NOT called
+      expect(mockDispatch).not.toHaveBeenCalled();
+    });
   });
 
   describe("session end", () => {

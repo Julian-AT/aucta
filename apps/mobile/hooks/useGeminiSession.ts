@@ -11,6 +11,7 @@ import { AudioCapture } from "@/lib/gemini/audio-capture";
 import { FrameCapture } from "@/lib/gemini/frame-capture";
 import { ToolRelay } from "@/lib/gemini/tool-relay";
 import { reconnectWithBackoff } from "@/lib/gemini/reconnection";
+import { END_SESSION_TOOL_DECL } from "@/lib/gemini/protocol";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import type { CameraView } from "expo-camera";
 
@@ -35,6 +36,7 @@ export function useGeminiSession(
   const captureRef = useRef<AudioCapture | null>(null);
   const frameCaptureRef = useRef<FrameCapture | null>(null);
   const toolRelayRef = useRef<ToolRelay | null>(null);
+  const endSessionRef = useRef<(() => void) | null>(null);
   const isCleaningUp = useRef(false);
 
   // Store last token data for reconnection
@@ -102,6 +104,31 @@ export function useGeminiSession(
       },
 
       onToolCall: async (toolCall) => {
+        // Check for client-side endSession tool (SESS-09, D-12)
+        const endSessionCall = toolCall.functionCalls.find(
+          (fc) => fc.name === "endSession",
+        );
+
+        if (endSessionCall) {
+          // Send success response back to Gemini so it can speak the goodbye
+          connectionRef.current?.sendToolResponse([
+            {
+              id: endSessionCall.id,
+              name: "endSession",
+              response: { success: true },
+            },
+          ]);
+
+          // Wait briefly for Gemini to speak "Ending the session now. Goodbye."
+          // then end the session. The 3-second delay allows the verbal confirmation
+          // to play before cleanup stops audio.
+          setTimeout(() => {
+            endSessionRef.current?.();
+          }, 3000);
+          return;
+        }
+
+        // Relay all other tool calls to server
         if (!toolRelayRef.current || !connectionRef.current) return;
         const result = await toolRelayRef.current.relay(toolCall);
         connectionRef.current.sendToolResponse(result.functionResponses);
@@ -217,7 +244,10 @@ export function useGeminiSession(
       tokenData = await createTokenMutation.mutateAsync(undefined);
       tokenDataRef.current = {
         model: tokenData.model,
-        toolDeclarations: tokenData.toolDeclarations,
+        toolDeclarations: [
+          ...(tokenData.toolDeclarations ?? []),
+          END_SESSION_TOOL_DECL,
+        ],
       };
     } catch (error) {
       const message =
@@ -261,7 +291,10 @@ export function useGeminiSession(
     connection.connect({
       token: tokenData.token,
       model: tokenData.model,
-      toolDeclarations: tokenData.toolDeclarations,
+      toolDeclarations: [
+        ...(tokenData.toolDeclarations ?? []),
+        END_SESSION_TOOL_DECL,
+      ],
     });
   }, [
     createTokenMutation,
@@ -280,6 +313,9 @@ export function useGeminiSession(
       store.getState().reset();
     }, 100);
   }, [cleanupResources, store]);
+
+  // Ref avoids stale closure in onToolCall callback from buildConnectionDeps
+  endSessionRef.current = endSession;
 
   // Cleanup on unmount
   useEffect(() => {
