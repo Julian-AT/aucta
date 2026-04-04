@@ -1,4 +1,3 @@
-import { AudioContext } from "react-native-audio-api";
 import { AUDIO_OUTPUT_SAMPLE_RATE } from "./protocol";
 
 /**
@@ -34,6 +33,22 @@ function pcm16ToFloat32(pcmBytes: Uint8Array): Float32Array {
   return float32;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AudioContextFactory = (options: { sampleRate: number }) => any;
+
+/**
+ * Default factory: lazily loads AudioContext from react-native-audio-api.
+ * Avoids Expo Go crash by deferring the require() until first use
+ * instead of importing at module evaluation time.
+ */
+function createNativeAudioContext(options: { sampleRate: number }) {
+  // Lazy-load to avoid Expo Go crash at module evaluation time.
+  // react-native-audio-api is a native module that is only available
+  // in development builds, not Expo Go.
+  const { AudioContext } = require("react-native-audio-api");
+  return new AudioContext(options);
+}
+
 /**
  * Plays back Gemini's 24kHz PCM audio response stream using
  * the Web Audio API pattern from react-native-audio-api.
@@ -42,11 +57,14 @@ function pcm16ToFloat32(pcmBytes: Uint8Array): Float32Array {
  * Supports barge-in via interrupt() which cancels all scheduled audio.
  */
 export class AudioPlayback {
-  private ctx: AudioContext;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private ctx: any;
   private nextStartTime: number;
+  private ctxFactory: AudioContextFactory;
 
-  constructor() {
-    this.ctx = new AudioContext({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
+  constructor(ctxFactory?: AudioContextFactory) {
+    this.ctxFactory = ctxFactory ?? createNativeAudioContext;
+    this.ctx = this.ctxFactory({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
     this.nextStartTime = this.ctx.currentTime;
   }
 
@@ -78,7 +96,7 @@ export class AudioPlayback {
    */
   interrupt(): void {
     this.ctx.close();
-    this.ctx = new AudioContext({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
+    this.ctx = this.ctxFactory({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
     this.nextStartTime = this.ctx.currentTime;
   }
 

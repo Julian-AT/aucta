@@ -25,24 +25,21 @@ vi.stubGlobal(
   },
 );
 
-// Mock AudioContext for audio-playback
-vi.mock("react-native-audio-api", () => {
-  class MockAudioContext {
-    currentTime = 0;
-    destination = {};
-    sampleRate = 24000;
-    createBuffer = vi.fn().mockReturnValue({
-      duration: 0.1,
-      copyToChannel: vi.fn(),
-    });
-    createBufferSource = vi.fn().mockReturnValue({
-      buffer: null as unknown,
-      connect: vi.fn(),
-      start: vi.fn(),
-    });
-    close = vi.fn();
-  }
-  return { AudioContext: MockAudioContext };
+// Mock AudioContext factory for audio-playback (constructor injection)
+const mockCtxFactory = (options: { sampleRate: number }) => ({
+  currentTime: 0,
+  destination: {},
+  sampleRate: options.sampleRate,
+  createBuffer: vi.fn().mockReturnValue({
+    duration: 0.1,
+    copyToChannel: vi.fn(),
+  }),
+  createBufferSource: vi.fn().mockReturnValue({
+    buffer: null as unknown,
+    connect: vi.fn(),
+    start: vi.fn(),
+  }),
+  close: vi.fn(),
 });
 
 // Mock atob for base64 decoding
@@ -75,7 +72,7 @@ describe("useGeminiSession orchestration", () => {
     it("connects all pipeline components into a working session", () => {
       // Simulate what useGeminiSession does internally:
       // 1. Create pipeline instances
-      const playback = new AudioPlayback();
+      const playback = new AudioPlayback(mockCtxFactory);
       const capture = new AudioCapture({
         onChunk: (pcmBase64: string) => {
           connection.sendAudio(pcmBase64);
@@ -147,7 +144,7 @@ describe("useGeminiSession orchestration", () => {
     });
 
     it("audio data from Gemini flows to playback and sets AI speaking", () => {
-      const playback = new AudioPlayback();
+      const playback = new AudioPlayback(mockCtxFactory);
       const deps: GeminiConnectionDeps = {
         onAudioData: (pcmBase64: string) => {
           playback.enqueueChunk(pcmBase64);
