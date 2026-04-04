@@ -70,19 +70,19 @@ Requirements for the first milestone. Each maps to roadmap phases.
 
 ### Mobile UX
 
-- [ ] **UX-01**: Glove-friendly touch targets (minimum 56x56dp) for all interactive elements during session
+- [x] **UX-01**: Glove-friendly touch targets (minimum 56x56dp) for all interactive elements during session
 - [x] **UX-02**: High-contrast UI readable in direct sunlight (WCAG AAA contrast ratios)
-- [ ] **UX-03**: Audio-first interaction: no typing required during active session
-- [ ] **UX-04**: Works in portrait and landscape orientation
+- [x] **UX-03**: Audio-first interaction: no typing required during active session
+- [x] **UX-04**: Works in portrait and landscape orientation
 - [x] **UX-05**: Screen stays awake during active session (expo-keep-awake)
 - [ ] **UX-06**: Offline cached references: recent session summaries and frequently used KB articles cached via MMKV
 - [x] **UX-07**: Clear connection status indicator: "Connected", "Reconnecting...", "Connection lost" with last AI response visible
-- [ ] **UX-08**: Visual feedback during AI processing (animated indicator showing AI is thinking/speaking)
+- [x] **UX-08**: Visual feedback during AI processing (animated indicator showing AI is thinking/speaking)
 
 ### EU Compliance
 
-- [ ] **COMP-01**: Non-dismissible AI indicator visible throughout entire session (EU AI Act Art. 50) — cannot be covered by modals, keyboard, or rotation
-- [ ] **COMP-02**: AI disclosure at session start: "You are interacting with an AI system, not a human expert"
+- [x] **COMP-01**: Non-dismissible AI indicator visible throughout entire session (EU AI Act Art. 50) — cannot be covered by modals, keyboard, or rotation
+- [x] **COMP-02**: AI disclosure at session start: "You are interacting with an AI system, not a human expert"
 - [x] **COMP-03**: Safety disclaimers in system prompt: "AI guidance does not replace professional training or certification"
 - [x] **COMP-04**: AI scope limitation: refuses to guide work outside competence boundaries (electrical requiring licensed electrician, gas work without F-Gas cert)
 - [x] **COMP-05**: F-Gas EU 2024/573 references in AI guidance when handling refrigerants (leak-check thresholds, low-GWP alternatives)
@@ -195,16 +195,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KB-08 | Phase 5 | Pending |
 | KB-09 | Phase 5 | Pending |
 | KB-10 | Phase 5 | Pending |
-| UX-01 | Phase 3 | Pending |
+| UX-01 | Phase 3 | Complete |
 | UX-02 | Phase 3 | Complete |
-| UX-03 | Phase 3 | Pending |
-| UX-04 | Phase 3 | Pending |
+| UX-03 | Phase 3 | Complete |
+| UX-04 | Phase 3 | Complete |
 | UX-05 | Phase 3 | Complete |
 | UX-06 | Phase 4 | Pending |
 | UX-07 | Phase 3 | Complete |
-| UX-08 | Phase 3 | Pending |
-| COMP-01 | Phase 3 | Pending |
-| COMP-02 | Phase 3 | Pending |
+| UX-08 | Phase 3 | Complete |
+| COMP-01 | Phase 3 | Complete |
+| COMP-02 | Phase 3 | Complete |
 | COMP-03 | Phase 2 | Complete |
 | COMP-04 | Phase 2 | Complete |
 | COMP-05 | Phase 2 | Complete |
