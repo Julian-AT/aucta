@@ -38,8 +38,8 @@ Plans:
 - [x] 01-02-PLAN.md — Database + auth: Drizzle ORM with Neon Postgres, Better Auth with org plugin and RBAC
 - [x] 01-03-PLAN.md — API layer: tRPC middleware (auth, org-scope, rate-limit, error-converter) + org and invite routers
 - [x] 01-04-PLAN.md — CI + test infrastructure: Vitest workspace config, packages/shared tests, GitHub Actions workflow
-- [ ] 01-05-PLAN.md — Mobile app foundation: Expo SDK 55, NativeWind v4, theme system, providers, Expo Router layouts
-- [ ] 01-06-PLAN.md — Mobile screens + EAS: Auth/onboarding screens, home, settings, InviteCodeInput, QRScanner, EAS config
+- [x] 01-05-PLAN.md — Mobile app foundation: Expo SDK 55, NativeWind v5, theme system, providers, Expo Router layouts
+- [x] 01-06-PLAN.md — Mobile screens + EAS: Auth/onboarding screens, home, settings, InviteCodeInput, QRScanner, EAS config
 
 ### Phase 2: AI Pipeline and Tool System
 **Goal**: The API can issue ephemeral Gemini tokens with locked system prompts and tool declarations, and tools can be dispatched and tested individually
@@ -117,7 +117,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and Auth | 0/6 | Planning complete | - |
+| 1. Foundation and Auth | 6/6 | Executing | - |
 | 2. AI Pipeline and Tool System | 0/0 | Not started | - |
 | 3. Live Streaming Session | 0/0 | Not started | - |
 | 4. Session Lifecycle | 0/0 | Not started | - |
