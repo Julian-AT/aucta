@@ -26,3 +26,17 @@ export {
   memberRelations,
   invitationRelations,
 } from "./auth.js";
+export {
+  knowledgeArticles,
+  confidenceLevelEnum,
+  articleCategoryEnum,
+  articleSourceTypeEnum,
+} from "./knowledge-articles.js";
+export {
+  knowledgeVerifications,
+  verificationStatusEnum,
+} from "./knowledge-verifications.js";
+export {
+  knowledgeLinks,
+  linkTypeEnum,
+} from "./knowledge-links.js";

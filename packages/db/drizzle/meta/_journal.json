@@ -22,6 +22,13 @@
       "when": 1775337040366,
       "tag": "0002_foamy_nighthawk",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775379620346,
+      "tag": "0003_funny_living_mummy",
+      "breakpoints": true
     }
   ]
 }
