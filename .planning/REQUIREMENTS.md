@@ -15,7 +15,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **INFRA-04**: CI pipeline: Biome lint, TypeScript typecheck, Vitest tests, Turborepo build with remote caching
 - [x] **INFRA-05**: Neon Postgres (EU Frankfurt) with Drizzle ORM schema, migrations, and repository pattern
 - [x] **INFRA-06**: Upstash Redis (EU) configured for rate limiting and ephemeral token caching
-- [ ] **INFRA-07**: Qdrant vector DB (EU) configured for knowledge base embeddings and hybrid search
+- [x] **INFRA-07**: Qdrant vector DB (EU) configured for knowledge base embeddings and hybrid search
 - [x] **INFRA-08**: Inngest background job handler on Next.js API route
 
 ### Authentication & Organization
@@ -155,7 +155,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-04 | Phase 1 | Complete |
 | INFRA-05 | Phase 1 | Complete |
 | INFRA-06 | Phase 1 | Complete |
-| INFRA-07 | Phase 5 | Pending |
+| INFRA-07 | Phase 5 | Complete |
 | INFRA-08 | Phase 4 | Complete |
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Complete |
