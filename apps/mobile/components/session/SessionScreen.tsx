@@ -77,12 +77,28 @@ export function SessionScreen() {
   const handleEndConfirm = useCallback(() => {
     setShowEndDialog(false);
     endSession();
-    router.replace("/(app)/(tabs)");
+    const serverSessionId = useSessionStore.getState().serverSessionId;
+    if (serverSessionId) {
+      router.replace({
+        pathname: "/(app)/feedback",
+        params: { sessionId: serverSessionId },
+      });
+    } else {
+      router.replace("/(app)/(tabs)");
+    }
   }, [endSession, router]);
 
   const handleStartNew = useCallback(() => {
     endSession();
-    router.replace("/(app)/(tabs)");
+    const serverSessionId = useSessionStore.getState().serverSessionId;
+    if (serverSessionId) {
+      router.replace({
+        pathname: "/(app)/feedback",
+        params: { sessionId: serverSessionId },
+      });
+    } else {
+      router.replace("/(app)/(tabs)");
+    }
   }, [endSession, router]);
 
   return (
