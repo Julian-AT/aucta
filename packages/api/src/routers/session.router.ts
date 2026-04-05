@@ -17,8 +17,13 @@ import {
   dispatchToolCalls,
   lookupErrorCodeTool,
   logFindingTool,
+  createSearchKnowledgeBaseTool,
 } from "@aucta/ai";
-import type { ToolContext } from "@aucta/ai";
+import type { ToolContext, AnyToolDef } from "@aucta/ai";
+import {
+  createQdrantClient,
+  GeminiEmbeddingService,
+} from "@aucta/ai/knowledge";
 import { SessionRepository } from "@aucta/db/repositories/session.repository";
 import { SessionFindingRepository } from "@aucta/db/repositories/session-finding.repository";
 import { SessionToolCallRepository } from "@aucta/db/repositories/session-tool-call.repository";
@@ -33,6 +38,33 @@ const GEMINI_LIVE_MODEL =
 const sessionRepo = new SessionRepository(db);
 const findingRepo = new SessionFindingRepository(db);
 const toolCallRepo = new SessionToolCallRepository(db);
+
+// Lazy-initialized: returns null when Qdrant is not configured (e.g., dev without vector DB)
+function getSearchKnowledgeBaseTool(): AnyToolDef | null {
+  const qdrantUrl = process.env.QDRANT_URL;
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+
+  if (!qdrantUrl || !geminiApiKey) {
+    return null;
+  }
+
+  const qdrantClient = createQdrantClient({
+    url: qdrantUrl,
+    apiKey: process.env.QDRANT_API_KEY,
+  });
+  const embeddingService = new GeminiEmbeddingService({
+    apiKey: geminiApiKey,
+  });
+
+  return createSearchKnowledgeBaseTool({ qdrantClient, embeddingService });
+}
+
+function buildToolList(): AnyToolDef[] {
+  const tools: AnyToolDef[] = [lookupErrorCodeTool, logFindingTool];
+  const searchKBTool = getSearchKnowledgeBaseTool();
+  if (searchKBTool) tools.push(searchKBTool);
+  return tools;
+}
 
 export const sessionRouter = router({
   createToken: orgProcedure
@@ -50,7 +82,7 @@ export const sessionRouter = router({
         safetyRulesPrompt,
       ]);
 
-      const pool = assembleToolPool([lookupErrorCodeTool, logFindingTool]);
+      const pool = assembleToolPool(buildToolList());
 
       // Ephemeral tokens require v1alpha API version
       const client = new GoogleGenAI({
@@ -99,7 +131,7 @@ export const sessionRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const pool = assembleToolPool([lookupErrorCodeTool, logFindingTool]);
+      const pool = assembleToolPool(buildToolList());
       const context: ToolContext = {
         orgId: ctx.orgId,
         userId: ctx.userId,

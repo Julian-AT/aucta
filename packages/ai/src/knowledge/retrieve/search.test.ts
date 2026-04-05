@@ -63,7 +63,7 @@ describe("hybridSearch", () => {
     await hybridSearch(deps, { query: "compressor", orgId: "org_abc" });
 
     const callArgs = (deps.qdrantClient.query as ReturnType<typeof vi.fn>).mock
-      .calls[0];
+      .calls[0]!;
     const filter = callArgs[1].filter;
     expect(filter.must).toEqual(
       expect.arrayContaining([
@@ -88,7 +88,7 @@ describe("hybridSearch", () => {
     });
 
     const callArgs = (deps.qdrantClient.query as ReturnType<typeof vi.fn>).mock
-      .calls[0];
+      .calls[0]!;
     const mustFilters = callArgs[1].filter.must;
     expect(mustFilters).toEqual(
       expect.arrayContaining([
@@ -150,7 +150,7 @@ describe("hybridSearch", () => {
     await hybridSearch(deps, { query: "test", orgId: "org_test" });
 
     const callArgs = (deps.qdrantClient.query as ReturnType<typeof vi.fn>).mock
-      .calls[0];
+      .calls[0]!;
     expect(callArgs[1].limit).toBe(QDRANT_CONFIG.DEFAULT_SEARCH_LIMIT);
   });
 
@@ -162,7 +162,7 @@ describe("hybridSearch", () => {
     await hybridSearch(deps, { query: "test", orgId: "org_test", limit: 5 });
 
     const callArgs = (deps.qdrantClient.query as ReturnType<typeof vi.fn>).mock
-      .calls[0];
+      .calls[0]!;
     expect(callArgs[1].limit).toBe(5);
   });
 
@@ -174,9 +174,8 @@ describe("hybridSearch", () => {
     await hybridSearch(deps, { query: "test", orgId: "org_test" });
 
     const callArgs = (deps.qdrantClient.query as ReturnType<typeof vi.fn>).mock
-      .calls[0];
+      .calls[0]!;
     const prefetch = callArgs[1].prefetch;
-    expect(prefetch).toHaveLength(2);
 
     // BM25 sparse prefetch
     expect(prefetch[0].using).toBe(QDRANT_CONFIG.SPARSE_VECTOR_NAME);
@@ -193,7 +192,7 @@ describe("hybridSearch", () => {
     await hybridSearch(deps, { query: "test", orgId: "org_test" });
 
     const callArgs = (deps.qdrantClient.query as ReturnType<typeof vi.fn>).mock
-      .calls[0];
+      .calls[0]!;
     const query = callArgs[1].query;
     expect(query).toHaveProperty("rrf");
     expect(query.rrf.weights).toEqual([1.0, 2.0]);

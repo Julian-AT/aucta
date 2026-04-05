@@ -13,3 +13,9 @@ export type {
   KnowledgeSearchOptions,
   HealthCheckResult,
 } from "./core/types.js";
+export { hybridSearch } from "./retrieve/search.js";
+export type { HybridSearchDeps } from "./retrieve/search.js";
+export {
+  getAttributionPhrase,
+  buildKnowledgeContext,
+} from "./retrieve/context-builder.js";

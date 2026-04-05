@@ -20,3 +20,8 @@ export { hvacExpertisePrompt } from "./prompts/hvac-expertise.js";
 export { safetyRulesPrompt } from "./prompts/safety.js";
 export { lookupErrorCodeTool } from "./tools/lookupErrorCode/index.js";
 export { logFindingTool } from "./tools/logFinding/index.js";
+export { createSearchKnowledgeBaseTool } from "./tools/searchKnowledgeBase/index.js";
+export type {
+  SearchKBInputType,
+  SearchKBOutputType,
+} from "./tools/searchKnowledgeBase/types.js";
