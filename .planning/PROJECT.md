@@ -24,6 +24,10 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 - [x] Session UI: non-dismissible AI indicator, connection status, audio indicator, stop button, end session dialog, connection lost overlay — Validated in Phase 3
 - [x] Voice command session end via Gemini endSession tool call — Validated in Phase 3
 - [x] EU AI Act Art. 50 compliance: non-dismissible AI indicator during sessions — Validated in Phase 3
+- [x] Session lifecycle: DB persistence (ai_sessions, session_findings, session_tool_calls), incremental tool call/finding persistence, feedback collection (1-5 stars) — Validated in Phase 4
+- [x] Post-session Inngest summary pipeline with Gemini 2.5 Pro, AI-generated content labeling (COMP-07) — Validated in Phase 4
+- [x] MMKV offline cache for recent session summaries (20-session LRU), feedback screen with star rating — Validated in Phase 4
+- [x] No emotion recognition or sentiment analysis in any schema (COMP-08) — Validated in Phase 4
 
 ### Active
 
@@ -32,14 +36,11 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 - [ ] Neon Postgres (EU Frankfurt) with Drizzle ORM, repository pattern, DTO boundaries
 - [ ] Full knowledge base backend: ingest (session, manual, feedback), compile (wiki articles), verify (confidence levels, review queue), retrieve (hybrid BM25 + vector via Qdrant), health (coverage gaps, consistency)
 - [ ] Knowledge article schema with 4-tier confidence levels (unverified, technician_reviewed, expert_approved, manufacturer_sourced)
-- [ ] Inngest background jobs for post-session summary, knowledge ingestion, knowledge compilation
-- [ ] tRPC API with org-scoped middleware, rate limiting via Upstash Redis
-- [ ] Upstash Redis for ephemeral token caching and rate limiting
+- [ ] Inngest background jobs for knowledge ingestion, knowledge compilation
 - [ ] Qdrant vector DB (EU) for knowledge base embeddings and hybrid retrieval
 - [ ] Glove-friendly touch targets (56x56dp), high-contrast UI, audio-first interaction
 - [ ] i18n foundation with react-i18next (en, de, tr, sr, hr, pl, ro)
 - [ ] Sentry error tracking + PostHog analytics integration
-- [ ] CI pipeline: Biome lint, TypeScript typecheck, Vitest tests, Turborepo build
 
 ### Out of Scope
 
@@ -69,7 +70,7 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 
 **Regulatory landscape:** GDPR (Austria-based, EU data residency), EU AI Act transparency (deadline August 2, 2026), F-Gas EU 2024/573, Product Liability Directive 2024/2853 (transposition by December 9, 2026). Privacy-by-design: audio/video streamed directly to Gemini, never stored on our servers.
 
-**Existing codebase:** Phase 3 complete. Monorepo with full auth system, AI tool pipeline, ephemeral Gemini tokens, system prompt assembly, live streaming session (WebSocket lifecycle, audio/video pipelines, session UI, voice commands). Next: session lifecycle management (Phase 4).
+**Existing codebase:** Phase 4 complete. Monorepo with full auth system, AI tool pipeline, ephemeral Gemini tokens, system prompt assembly, live streaming session (WebSocket lifecycle, audio/video pipelines, session UI, voice commands), session lifecycle management (DB persistence, incremental tool/finding persistence, feedback collection, Inngest summary pipeline, MMKV offline cache). Next: knowledge base (Phase 5).
 
 ## Constraints
 
@@ -109,4 +110,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-04 after Phase 3 completion*
+*Last updated: 2026-04-05 after Phase 4 completion*
