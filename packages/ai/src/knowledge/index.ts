@@ -19,3 +19,15 @@ export {
   getAttributionPhrase,
   buildKnowledgeContext,
 } from "./retrieve/context-builder.js";
+export { extractLearnings } from "./ingest/session-ingester.js";
+export type {
+  SessionIngestionInput,
+  CandidateArticle,
+} from "./ingest/session-ingester.js";
+export { compileArticle } from "./compile/article-compiler.js";
+export type {
+  ArticleForCompilation,
+  CompiledArticle,
+} from "./compile/article-compiler.js";
+export { generateLinks } from "./compile/linker.js";
+export type { LinkerDeps } from "./compile/linker.js";
