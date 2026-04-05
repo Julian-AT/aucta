@@ -113,7 +113,7 @@ Plans:
 Plans:
 - [x] 05-01: TBD
 - [x] 05-02: TBD
-- [ ] 05-03: TBD
+- [x] 05-03: TBD
 
 ## Progress
 

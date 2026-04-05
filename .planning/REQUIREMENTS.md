@@ -35,7 +35,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **TOOL-02**: Tool registry (assembleToolPool) that registers all tools and exports Gemini function declarations
 - [x] **TOOL-03**: Tool dispatcher that resolves Gemini toolCall events to matching tools, validates input, returns toolResponse
 - [x] **TOOL-04**: lookupErrorCode tool: given manufacturer + error code, returns meaning, repair steps, severity
-- [ ] **TOOL-05**: searchKnowledgeBase tool: hybrid search (BM25 + vector) with confidence-weighted retrieval and source attribution
+- [x] **TOOL-05**: searchKnowledgeBase tool: hybrid search (BM25 + vector) with confidence-weighted retrieval and source attribution
 - [x] **TOOL-06**: logFinding tool: logs structured observations (category, description, severity) to session metadata
 - [x] **TOOL-07**: Ephemeral token endpoint: authenticates user, builds layered system prompt, registers tool declarations, issues short-lived Gemini token with locked constraints
 - [x] **TOOL-08**: Layered system prompt assembly: core role, HVAC expertise, safety rules, org overlay, knowledge base context, session history, AI Act transparency
@@ -58,14 +58,14 @@ Requirements for the first milestone. Each maps to roadmap phases.
 ### Knowledge Base
 
 - [x] **KB-01**: Knowledge article schema with 4-tier confidence levels (unverified, technician_reviewed, expert_approved, manufacturer_sourced)
-- [ ] **KB-02**: Hybrid search via Qdrant: BM25-like sparse vectors + dense semantic vectors + metadata filters (org_id, equipment_model), combined with Reciprocal Rank Fusion
-- [ ] **KB-03**: Retrieval weights confidence level: verified articles rank above unverified by default
+- [x] **KB-02**: Hybrid search via Qdrant: BM25-like sparse vectors + dense semantic vectors + metadata filters (org_id, equipment_model), combined with Reciprocal Rank Fusion
+- [x] **KB-03**: Retrieval weights confidence level: verified articles rank above unverified by default
 - [ ] **KB-04**: Session ingestion pipeline: extract learnings from completed sessions, generate candidate articles (Inngest job)
 - [ ] **KB-05**: Article compilation: LLM generates/updates structured wiki articles (markdown + metadata) from raw session data
 - [x] **KB-06**: Article categorization: organize by equipment brand → model → procedure type with auto-generated backlinks
 - [x] **KB-07**: Verification queue: pending articles await review, status transitions (pending → approved/rejected/needs_revision)
 - [ ] **KB-08**: Health monitoring: coverage gap detection (which equipment models lack documentation), stale article detection, consistency checking
-- [ ] **KB-09**: Source attribution in AI responses: "Based on unverified observation..." vs "Per manufacturer documentation..." depending on confidence level
+- [x] **KB-09**: Source attribution in AI responses: "Based on unverified observation..." vs "Per manufacturer documentation..." depending on confidence level
 - [ ] **KB-10**: Manual text knowledge input: org owners can add custom procedures/tips as structured articles via API
 
 ### Mobile UX
@@ -169,7 +169,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TOOL-02 | Phase 2 | Complete |
 | TOOL-03 | Phase 2 | Complete |
 | TOOL-04 | Phase 2 | Complete |
-| TOOL-05 | Phase 5 | Pending |
+| TOOL-05 | Phase 5 | Complete |
 | TOOL-06 | Phase 2 | Complete |
 | TOOL-07 | Phase 2 | Complete |
 | TOOL-08 | Phase 2 | Complete |
@@ -186,14 +186,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SESS-11 | Phase 4 | Complete |
 | SESS-12 | Phase 4 | Complete |
 | KB-01 | Phase 5 | Complete |
-| KB-02 | Phase 5 | Pending |
-| KB-03 | Phase 5 | Pending |
+| KB-02 | Phase 5 | Complete |
+| KB-03 | Phase 5 | Complete |
 | KB-04 | Phase 5 | Pending |
 | KB-05 | Phase 5 | Pending |
 | KB-06 | Phase 5 | Complete |
 | KB-07 | Phase 5 | Complete |
 | KB-08 | Phase 5 | Pending |
-| KB-09 | Phase 5 | Pending |
+| KB-09 | Phase 5 | Complete |
 | KB-10 | Phase 5 | Pending |
 | UX-01 | Phase 3 | Complete |
 | UX-02 | Phase 3 | Complete |
