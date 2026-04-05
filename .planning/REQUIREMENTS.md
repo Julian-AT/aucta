@@ -51,7 +51,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **SESS-07**: Context window compression (SlidingWindow) configured in setup message to support sessions >10 minutes
 - [x] **SESS-08**: Reconnection with exponential backoff (1s → 2s → 4s → max 30s) using Gemini sessionResumption handle
 - [x] **SESS-09**: Technician can end session by tapping stop button or saying "end session"
-- [ ] **SESS-10**: Post-session feedback prompt: 1-5 stars + optional text note
+- [x] **SESS-10**: Post-session feedback prompt: 1-5 stars + optional text note
 - [x] **SESS-11**: Session data persisted: start/end time, duration, language detected, tools used, feedback, token count
 - [x] **SESS-12**: Post-session summary generated via Inngest background job (AI summarizes session events)
 
@@ -75,7 +75,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **UX-03**: Audio-first interaction: no typing required during active session
 - [x] **UX-04**: Works in portrait and landscape orientation
 - [x] **UX-05**: Screen stays awake during active session (expo-keep-awake)
-- [ ] **UX-06**: Offline cached references: recent session summaries and frequently used KB articles cached via MMKV
+- [x] **UX-06**: Offline cached references: recent session summaries and frequently used KB articles cached via MMKV
 - [x] **UX-07**: Clear connection status indicator: "Connected", "Reconnecting...", "Connection lost" with last AI response visible
 - [x] **UX-08**: Visual feedback during AI processing (animated indicator showing AI is thinking/speaking)
 
@@ -182,7 +182,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SESS-07 | Phase 3 | Complete |
 | SESS-08 | Phase 3 | Complete |
 | SESS-09 | Phase 3 | Complete |
-| SESS-10 | Phase 4 | Pending |
+| SESS-10 | Phase 4 | Complete |
 | SESS-11 | Phase 4 | Complete |
 | SESS-12 | Phase 4 | Complete |
 | KB-01 | Phase 5 | Pending |
@@ -200,7 +200,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-03 | Phase 3 | Complete |
 | UX-04 | Phase 3 | Complete |
 | UX-05 | Phase 3 | Complete |
-| UX-06 | Phase 4 | Pending |
+| UX-06 | Phase 4 | Complete |
 | UX-07 | Phase 3 | Complete |
 | UX-08 | Phase 3 | Complete |
 | COMP-01 | Phase 3 | Complete |
