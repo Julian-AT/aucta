@@ -57,13 +57,13 @@ Requirements for the first milestone. Each maps to roadmap phases.
 
 ### Knowledge Base
 
-- [ ] **KB-01**: Knowledge article schema with 4-tier confidence levels (unverified, technician_reviewed, expert_approved, manufacturer_sourced)
+- [x] **KB-01**: Knowledge article schema with 4-tier confidence levels (unverified, technician_reviewed, expert_approved, manufacturer_sourced)
 - [ ] **KB-02**: Hybrid search via Qdrant: BM25-like sparse vectors + dense semantic vectors + metadata filters (org_id, equipment_model), combined with Reciprocal Rank Fusion
 - [ ] **KB-03**: Retrieval weights confidence level: verified articles rank above unverified by default
 - [ ] **KB-04**: Session ingestion pipeline: extract learnings from completed sessions, generate candidate articles (Inngest job)
 - [ ] **KB-05**: Article compilation: LLM generates/updates structured wiki articles (markdown + metadata) from raw session data
-- [ ] **KB-06**: Article categorization: organize by equipment brand → model → procedure type with auto-generated backlinks
-- [ ] **KB-07**: Verification queue: pending articles await review, status transitions (pending → approved/rejected/needs_revision)
+- [x] **KB-06**: Article categorization: organize by equipment brand → model → procedure type with auto-generated backlinks
+- [x] **KB-07**: Verification queue: pending articles await review, status transitions (pending → approved/rejected/needs_revision)
 - [ ] **KB-08**: Health monitoring: coverage gap detection (which equipment models lack documentation), stale article detection, consistency checking
 - [ ] **KB-09**: Source attribution in AI responses: "Based on unverified observation..." vs "Per manufacturer documentation..." depending on confidence level
 - [ ] **KB-10**: Manual text knowledge input: org owners can add custom procedures/tips as structured articles via API
@@ -185,13 +185,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SESS-10 | Phase 4 | Complete |
 | SESS-11 | Phase 4 | Complete |
 | SESS-12 | Phase 4 | Complete |
-| KB-01 | Phase 5 | Pending |
+| KB-01 | Phase 5 | Complete |
 | KB-02 | Phase 5 | Pending |
 | KB-03 | Phase 5 | Pending |
 | KB-04 | Phase 5 | Pending |
 | KB-05 | Phase 5 | Pending |
-| KB-06 | Phase 5 | Pending |
-| KB-07 | Phase 5 | Pending |
+| KB-06 | Phase 5 | Complete |
+| KB-07 | Phase 5 | Complete |
 | KB-08 | Phase 5 | Pending |
 | KB-09 | Phase 5 | Pending |
 | KB-10 | Phase 5 | Pending |
