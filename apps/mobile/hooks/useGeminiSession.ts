@@ -57,6 +57,18 @@ export function useGeminiSession(
     trpc.session.dispatchToolCalls.mutationOptions(),
   );
 
+  const createSessionMutation = useMutation(
+    trpc.session.createSession.mutationOptions(),
+  );
+
+  const endSessionMutation = useMutation(
+    trpc.session.endSession.mutationOptions(),
+  );
+
+  const addToolCallMutation = useMutation(
+    trpc.session.addToolCall.mutationOptions(),
+  );
+
   const cleanupResources = useCallback(() => {
     if (isCleaningUp.current) return;
     isCleaningUp.current = true;
@@ -130,12 +142,42 @@ export function useGeminiSession(
 
         // Relay all other tool calls to server
         if (!toolRelayRef.current || !connectionRef.current) return;
+
+        const callStart = Date.now();
         const result = await toolRelayRef.current.relay(toolCall);
+        const callDurationMs = Date.now() - callStart;
         connectionRef.current.sendToolResponse(result.functionResponses);
+
+        // Persist each tool call incrementally (D-07)
+        const serverSessionId = store.getState().serverSessionId;
+        if (serverSessionId) {
+          for (const fc of toolCall.functionCalls) {
+            const response = result.functionResponses.find(
+              (r) => r.id === fc.id,
+            );
+            const success = !response?.response?.error;
+
+            addToolCallMutation.mutate({
+              sessionId: serverSessionId,
+              toolName: fc.name,
+              input: fc.args,
+              output: response?.response,
+              durationMs: callDurationMs,
+              success,
+              errorMessage: success
+                ? undefined
+                : String(response?.response?.error ?? "Unknown error"),
+            });
+
+            store.getState().addToolName(fc.name);
+            store.getState().incrementToolCallsCount();
+          }
+        }
       },
 
       onTurnComplete: () => {
         store.getState().setAISpeaking(false);
+        store.getState().incrementTokenCountOutput();
       },
 
       onResumptionUpdate: (handle: string) => {
@@ -214,6 +256,7 @@ export function useGeminiSession(
     startPipelines,
     stopPipelines,
     createTokenMutation,
+    addToolCallMutation,
   ]);
 
   const startSession = useCallback(async () => {
@@ -227,6 +270,22 @@ export function useGeminiSession(
       await activateKeepAwakeAsync();
     } catch {
       // Non-critical -- continue even if keep-awake fails
+    }
+
+    // Create DB session record BEFORE WebSocket connection (D-04)
+    try {
+      const { sessionId: serverSessionId } =
+        await createSessionMutation.mutateAsync({});
+      store.getState().setServerSessionId(serverSessionId);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to create session record";
+      store.getState().setError(message);
+      store.getState().setStatus("failed");
+      deactivateKeepAwake();
+      return;
     }
 
     // Acquire ephemeral token via tRPC
@@ -267,6 +326,7 @@ export function useGeminiSession(
     captureRef.current = new AudioCapture({
       onChunk: (pcmBase64: string) => {
         connectionRef.current?.sendAudio(pcmBase64);
+        store.getState().incrementTokenCountInput();
       },
     });
 
@@ -298,6 +358,7 @@ export function useGeminiSession(
     });
   }, [
     createTokenMutation,
+    createSessionMutation,
     dispatchMutation,
     cameraRef,
     store,
@@ -306,13 +367,30 @@ export function useGeminiSession(
 
   const endSession = useCallback(() => {
     cleanupResources();
-    store.getState().setStatus("completed");
 
-    // Small delay then reset so UI can observe "completed" before returning to idle
-    setTimeout(() => {
-      store.getState().reset();
-    }, 100);
-  }, [cleanupResources, store]);
+    const state = store.getState();
+    const durationMs = state.sessionStartTime
+      ? Date.now() - state.sessionStartTime
+      : 0;
+
+    // Persist session end data to server
+    if (state.serverSessionId) {
+      endSessionMutation.mutate({
+        sessionId: state.serverSessionId,
+        status: "completed",
+        durationMs,
+        languageDetected: state.languageDetected ?? undefined,
+        tokenCountInput: state.tokenCountInput,
+        tokenCountOutput: state.tokenCountOutput,
+        toolsUsed: state.toolNames,
+      });
+    }
+
+    // Set status to completed but do NOT reset the store yet --
+    // the feedback screen needs the session recap data (Pitfall 4).
+    // Store reset happens after feedback screen captures the recap.
+    store.getState().setStatus("completed");
+  }, [cleanupResources, store, endSessionMutation]);
 
   // Ref avoids stale closure in onToolCall callback from buildConnectionDeps
   endSessionRef.current = endSession;
