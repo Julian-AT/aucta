@@ -6,14 +6,18 @@
   "exports": {
     ".": "./src/index.ts",
     "./tools/*": "./src/tools/*.ts",
-    "./prompts/*": "./src/prompts/*.ts"
+    "./prompts/*": "./src/prompts/*.ts",
+    "./knowledge": "./src/knowledge/index.ts",
+    "./knowledge/*": "./src/knowledge/*.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
-    "zod": "^4.3.0",
-    "@aucta/shared": "workspace:*"
+    "@aucta/shared": "workspace:*",
+    "@google/genai": "^1.48.0",
+    "@qdrant/js-client-rest": "^1.17.0",
+    "zod": "^4.3.0"
   }
 }

@@ -74,6 +74,8 @@ describe("KnowledgeArticleRepository", () => {
         sourceType: "session",
         equipmentBrand: "Daikin",
         equipmentModel: "FTXM25",
+        confidenceLevel: "unverified",
+        isAiGenerated: true,
       });
 
       expect(db.insert).toHaveBeenCalled();
@@ -89,6 +91,8 @@ describe("KnowledgeArticleRepository", () => {
         contentMd: "content",
         category: "troubleshooting",
         sourceType: "session",
+        confidenceLevel: "unverified",
+        isAiGenerated: true,
       });
 
       expect(db.insert).toHaveBeenCalled();
