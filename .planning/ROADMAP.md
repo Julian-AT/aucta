@@ -12,11 +12,13 @@ This roadmap takes Aucta from an empty monorepo to a working real-time AI copilo
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation and Auth** - Monorepo, database, auth with orgs/roles/invites, CI pipeline, EAS dev builds
-- [ ] **Phase 2: AI Pipeline and Tool System** - Ephemeral tokens, system prompt assembly, tool factory/registry/dispatcher, initial tools
+- [x] **Phase 1: Foundation and Auth** - Monorepo, database, auth with orgs/roles/invites, CI pipeline, EAS dev builds
+- [x] **Phase 2: AI Pipeline and Tool System** - Ephemeral tokens, system prompt assembly, tool factory/registry/dispatcher, initial tools
 - [x] **Phase 3: Live Streaming Session** - Camera + audio streaming to Gemini Live, spoken guidance, tool calls, reconnection, session UI (completed 2026-04-04)
-- [ ] **Phase 4: Session Lifecycle** - Post-session feedback, data persistence, automated summaries, offline caching, content labels
-- [ ] **Phase 5: Knowledge Base** - Hybrid search, session ingestion, article compilation, verification queue, health monitoring
+- [x] **Phase 4: Session Lifecycle** - Post-session feedback, data persistence, automated summaries, offline caching, content labels
+- [x] **Phase 5: Knowledge Base** - Hybrid search, session ingestion, article compilation, verification queue, health monitoring
+- [ ] **Phase 6: Wire Knowledge Pipeline** - Register Inngest functions, wire logFinding persistence, close integration gaps
+- [ ] **Phase 7: Integration Hardening and Tech Debt** - Ephemeral token constraints, hardcoded UI values, dead code cleanup
 
 ## Phase Details
 
@@ -119,6 +121,32 @@ Plans:
 - [x] 05-06-PLAN.md — Gap closure: fix TypeScript typecheck failures + confidence-weighted ranking (KB-03)
 - [x] 05-07-PLAN.md — Gap closure: wire verification queue with tRPC endpoints and auto-creation in ingestion (KB-07)
 
+### Phase 6: Wire Knowledge Pipeline
+**Goal**: The self-learning knowledge base pipeline runs end-to-end at runtime — session ingestion, article compilation, health monitoring, and verification queue all functional
+**Depends on**: Phase 5
+**Requirements**: KB-04, KB-05, KB-07, KB-08
+**Gap Closure**: Closes BLOCKER integration gap (Inngest registration), MEDIUM integration gap (logFinding persistence), and 2 broken E2E flows from milestone audit
+**Success Criteria** (what must be TRUE):
+  1. knowledgeIngest, knowledgeCompile, and knowledgeHealth Inngest functions are registered in apps/server/src/index.ts inngestServe() and appear in Inngest dev UI
+  2. session/ended event triggers knowledge ingestion pipeline end-to-end (ingest → compile → backlinks)
+  3. logFinding tool findings persist to session_findings table via addFinding tRPC mutation from mobile
+  4. Verification records are auto-created during ingestion for new articles
+  5. Health monitoring cron is scheduled and detectable in Inngest dashboard
+**Plans**: TBD
+
+### Phase 7: Integration Hardening and Tech Debt
+**Goal**: Close remaining low-severity integration gaps and resolve accumulated tech debt from Phases 1 and 4
+**Depends on**: Phase 6
+**Requirements**: TOOL-07 (strengthen)
+**Gap Closure**: Closes LOW integration gap (ephemeral token constraints) + 6 tech debt items
+**Success Criteria** (what must be TRUE):
+  1. Ephemeral token liveConnectConstraints include tool declarations, enforcing tool set at the token level
+  2. Home screen displays actual organization name from org.getCurrent instead of hardcoded "Your Organization"
+  3. Settings screen displays actual user role instead of hardcoded "Technician" badge
+  4. incrementFindingsCount Zustand action is wired to findings updates or removed if redundant
+  5. No InMemoryFindingStore references remain — all findings flow through persistent storage
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
@@ -126,8 +154,10 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation and Auth | 6/6 | Executing | - |
-| 2. AI Pipeline and Tool System | 3/4 | Gap closure | - |
-| 3. Live Streaming Session | 5/7 | Gap closure | - |
-| 4. Session Lifecycle | 0/3 | Planning complete | - |
-| 5. Knowledge Base | 5/7 | Gap closure | - |
+| 1. Foundation and Auth | 6/6 | Complete | 2026-04-03 |
+| 2. AI Pipeline and Tool System | 4/4 | Complete | 2026-04-03 |
+| 3. Live Streaming Session | 7/7 | Complete | 2026-04-04 |
+| 4. Session Lifecycle | 3/3 | Complete | 2026-04-05 |
+| 5. Knowledge Base | 7/7 | Complete | 2026-04-06 |
+| 6. Wire Knowledge Pipeline | 0/0 | Not started | - |
+| 7. Integration Hardening and Tech Debt | 0/0 | Not started | - |

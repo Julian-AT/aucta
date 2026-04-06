@@ -60,11 +60,11 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **KB-01**: Knowledge article schema with 4-tier confidence levels (unverified, technician_reviewed, expert_approved, manufacturer_sourced)
 - [x] **KB-02**: Hybrid search via Qdrant: BM25-like sparse vectors + dense semantic vectors + metadata filters (org_id, equipment_model), combined with Reciprocal Rank Fusion
 - [x] **KB-03**: Retrieval weights confidence level: verified articles rank above unverified by default
-- [x] **KB-04**: Session ingestion pipeline: extract learnings from completed sessions, generate candidate articles (Inngest job)
-- [x] **KB-05**: Article compilation: LLM generates/updates structured wiki articles (markdown + metadata) from raw session data
+- [ ] **KB-04**: Session ingestion pipeline: extract learnings from completed sessions, generate candidate articles (Inngest job)
+- [ ] **KB-05**: Article compilation: LLM generates/updates structured wiki articles (markdown + metadata) from raw session data
 - [x] **KB-06**: Article categorization: organize by equipment brand → model → procedure type with auto-generated backlinks
-- [x] **KB-07**: Verification queue: pending articles await review, status transitions (pending → approved/rejected/needs_revision)
-- [x] **KB-08**: Health monitoring: coverage gap detection (which equipment models lack documentation), stale article detection, consistency checking
+- [ ] **KB-07**: Verification queue: pending articles await review, status transitions (pending → approved/rejected/needs_revision)
+- [ ] **KB-08**: Health monitoring: coverage gap detection (which equipment models lack documentation), stale article detection, consistency checking
 - [x] **KB-09**: Source attribution in AI responses: "Based on unverified observation..." vs "Per manufacturer documentation..." depending on confidence level
 - [x] **KB-10**: Manual text knowledge input: org owners can add custom procedures/tips as structured articles via API
 
@@ -188,11 +188,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KB-01 | Phase 5 | Complete |
 | KB-02 | Phase 5 | Complete |
 | KB-03 | Phase 5 | Complete |
-| KB-04 | Phase 5 | Complete |
-| KB-05 | Phase 5 | Complete |
+| KB-04 | Phase 6 | Pending |
+| KB-05 | Phase 6 | Pending |
 | KB-06 | Phase 5 | Complete |
-| KB-07 | Phase 5 | Complete |
-| KB-08 | Phase 5 | Complete |
+| KB-07 | Phase 6 | Pending |
+| KB-08 | Phase 6 | Pending |
 | KB-09 | Phase 5 | Complete |
 | KB-10 | Phase 5 | Complete |
 | UX-01 | Phase 3 | Complete |
@@ -219,4 +219,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after roadmap creation*
+*Last updated: 2026-04-06 after gap closure phase creation*
