@@ -31,3 +31,5 @@ export type {
 } from "./compile/article-compiler.js";
 export { generateLinks } from "./compile/linker.js";
 export type { LinkerDeps } from "./compile/linker.js";
+export { runHealthCheck } from "./health/health-check.js";
+export type { HealthCheckDeps } from "./health/health-check.js";
