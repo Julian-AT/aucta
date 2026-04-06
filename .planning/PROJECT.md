@@ -32,6 +32,7 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 - [x] Knowledge article schema with 4-tier confidence levels and confidence-weighted search ranking — Validated in Phase 5
 - [x] searchKnowledgeBase tool with hybrid search, source attribution, context builder — Validated in Phase 5
 - [x] Inngest background jobs for knowledge ingestion, compilation, and health monitoring — Validated in Phase 5
+- [x] Knowledge pipeline fully wired end-to-end: all 4 Inngest functions registered, logFinding persistence from mobile, findingsCount in session recap — Validated in Phase 6
 - [x] Qdrant vector DB with named dense+sparse vectors for hybrid retrieval — Validated in Phase 5
 - [x] Verification queue: tRPC endpoints for review submission, auto-creation on ingestion, confidence promotion on approval — Validated in Phase 5
 
@@ -71,7 +72,7 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 
 **Regulatory landscape:** GDPR (Austria-based, EU data residency), EU AI Act transparency (deadline August 2, 2026), F-Gas EU 2024/573, Product Liability Directive 2024/2853 (transposition by December 9, 2026). Privacy-by-design: audio/video streamed directly to Gemini, never stored on our servers.
 
-**Existing codebase:** Phase 5 complete. Monorepo with full auth system, AI tool pipeline, ephemeral Gemini tokens, system prompt assembly, live streaming session (WebSocket lifecycle, audio/video pipelines, session UI, voice commands), session lifecycle management (DB persistence, incremental tool/finding persistence, feedback collection, Inngest summary pipeline, MMKV offline cache), and self-learning knowledge base (hybrid search, ingestion/compilation pipelines, verification queue, health monitoring). All 5 milestone phases complete.
+**Existing codebase:** Phase 6 complete. Monorepo with full auth system, AI tool pipeline, ephemeral Gemini tokens, system prompt assembly, live streaming session (WebSocket lifecycle, audio/video pipelines, session UI, voice commands), session lifecycle management (DB persistence, incremental tool/finding persistence, feedback collection, Inngest summary pipeline, MMKV offline cache), and self-learning knowledge base fully wired end-to-end (hybrid search, ingestion/compilation pipelines, verification queue, health monitoring, all Inngest functions registered, logFinding persistence from mobile). 6 of 7 milestone phases complete.
 
 ## Constraints
 
@@ -111,4 +112,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-06 after Phase 5 completion*
+*Last updated: 2026-04-06 after Phase 6 completion*
