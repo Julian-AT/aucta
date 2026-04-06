@@ -356,6 +356,127 @@ describe("useGeminiSession orchestration", () => {
       expect(useSessionStore.getState().error).toBe("Connection refused");
     });
 
+    it("logFinding tool call triggers finding persistence and increments count", async () => {
+      const mockDispatch = vi.fn().mockResolvedValue({
+        functionResponses: [
+          {
+            id: "find-1",
+            name: "logFinding",
+            response: { success: true, findingId: "fnd_abc" },
+          },
+        ],
+      });
+
+      const relay = new ToolRelay({ dispatchToolCalls: mockDispatch });
+      let connectionInstance: GeminiConnection;
+
+      // Track finding persistence calls
+      const addFindingMock = vi.fn();
+
+      const deps: GeminiConnectionDeps = {
+        onAudioData: vi.fn(),
+        onToolCall: async (toolCall) => {
+          const endSessionCall = toolCall.functionCalls.find(
+            (fc) => fc.name === "endSession",
+          );
+          if (endSessionCall) return;
+
+          const result = await relay.relay(toolCall);
+          connectionInstance.sendToolResponse(result.functionResponses);
+
+          // Simulate the finding persistence wiring from useGeminiSession
+          const serverSessionId = useSessionStore.getState().serverSessionId;
+          if (serverSessionId) {
+            for (const fc of toolCall.functionCalls) {
+              const response = result.functionResponses.find(
+                (r) => r.id === fc.id,
+              );
+              const success = !response?.response?.error;
+
+              // Simulate addToolCallMutation (existing behavior)
+              useSessionStore.getState().addToolName(fc.name);
+              useSessionStore.getState().incrementToolCallsCount();
+            }
+
+            // Persist findings (KB-07 wiring)
+            for (const fc of toolCall.functionCalls) {
+              if (fc.name === "logFinding" && serverSessionId) {
+                const response = result.functionResponses.find(
+                  (r) => r.id === fc.id,
+                );
+                if (response?.response && !response.response.error) {
+                  addFindingMock({
+                    sessionId: serverSessionId,
+                    category: String(fc.args.category),
+                    description: String(fc.args.description),
+                    severity: String(fc.args.severity),
+                    equipmentModel: fc.args.equipmentModel
+                      ? String(fc.args.equipmentModel)
+                      : undefined,
+                    manufacturer: fc.args.manufacturer
+                      ? String(fc.args.manufacturer)
+                      : undefined,
+                  });
+                  useSessionStore.getState().incrementFindingsCount();
+                }
+              }
+            }
+          }
+        },
+        onTurnComplete: vi.fn(),
+        onResumptionUpdate: vi.fn(),
+        onGoAway: vi.fn(),
+        onSetupComplete: vi.fn(),
+        onDisconnect: vi.fn(),
+        onError: vi.fn(),
+      };
+
+      connectionInstance = new GeminiConnection(deps);
+      connectionInstance.connect({
+        token: "test-token",
+        model: "gemini-2.5-flash-live-preview",
+      });
+      lastCreatedWs.simulateOpen();
+
+      // Set serverSessionId so persistence runs
+      useSessionStore.getState().setServerSessionId("ses_test123");
+
+      // Gemini sends a logFinding tool call
+      lastCreatedWs.simulateMessage({
+        toolCall: {
+          functionCalls: [
+            {
+              id: "find-1",
+              name: "logFinding",
+              args: {
+                category: "maintenance",
+                description: "Compressor shows signs of wear",
+                severity: "medium",
+              },
+            },
+          ],
+        },
+      });
+
+      // Wait for async relay to complete
+      await vi.waitFor(() => {
+        expect(addFindingMock).toHaveBeenCalledWith({
+          sessionId: "ses_test123",
+          category: "maintenance",
+          description: "Compressor shows signs of wear",
+          severity: "medium",
+          equipmentModel: undefined,
+          manufacturer: undefined,
+        });
+      });
+
+      // Verify findingsCount was incremented
+      expect(useSessionStore.getState().findingsCount).toBe(1);
+
+      // Verify tool name was also tracked
+      expect(useSessionStore.getState().toolNames).toContain("logFinding");
+    });
+
     it("endSession tool call is handled client-side without server relay", async () => {
       const mockDispatch = vi.fn();
       const relay = new ToolRelay({ dispatchToolCalls: mockDispatch });

@@ -69,6 +69,10 @@ export function useGeminiSession(
     trpc.session.addToolCall.mutationOptions(),
   );
 
+  const addFindingMutation = useMutation(
+    trpc.session.addFinding.mutationOptions(),
+  );
+
   const cleanupResources = useCallback(() => {
     if (isCleaningUp.current) return;
     isCleaningUp.current = true;
@@ -172,6 +176,30 @@ export function useGeminiSession(
             store.getState().addToolName(fc.name);
             store.getState().incrementToolCallsCount();
           }
+
+          // Persist findings to database via tRPC (KB-07)
+          for (const fc of toolCall.functionCalls) {
+            if (fc.name === "logFinding" && serverSessionId) {
+              const response = result.functionResponses.find(
+                (r) => r.id === fc.id,
+              );
+              if (response?.response && !response.response.error) {
+                addFindingMutation.mutate({
+                  sessionId: serverSessionId,
+                  category: String(fc.args.category),
+                  description: String(fc.args.description),
+                  severity: String(fc.args.severity),
+                  equipmentModel: fc.args.equipmentModel
+                    ? String(fc.args.equipmentModel)
+                    : undefined,
+                  manufacturer: fc.args.manufacturer
+                    ? String(fc.args.manufacturer)
+                    : undefined,
+                });
+                store.getState().incrementFindingsCount();
+              }
+            }
+          }
         }
       },
 
@@ -257,6 +285,7 @@ export function useGeminiSession(
     stopPipelines,
     createTokenMutation,
     addToolCallMutation,
+    addFindingMutation,
   ]);
 
   const startSession = useCallback(async () => {
