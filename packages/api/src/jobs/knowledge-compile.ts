@@ -159,7 +159,7 @@ export const knowledgeCompile = inngest.createFunction(
           points: [
             {
               id: article.id,
-              vectors: {
+              vector: {
                 [QDRANT_CONFIG.DENSE_VECTOR_NAME]: denseVector,
               },
               payload: {

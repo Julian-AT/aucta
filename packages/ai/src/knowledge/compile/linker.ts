@@ -1,9 +1,15 @@
-import type { KnowledgeArticleRepository } from "@aucta/db/repositories/knowledge-article.repository";
-import type { KnowledgeLinkRepository } from "@aucta/db/repositories/knowledge-link.repository";
+import type { KnowledgeArticleDTO } from "@aucta/shared/schemas/knowledge-article.schema";
+import type { CreateKnowledgeLinkDTO } from "@aucta/shared/schemas/knowledge-link.schema";
 
 export interface LinkerDeps {
-  articleRepo: KnowledgeArticleRepository;
-  linkRepo: KnowledgeLinkRepository;
+  articleRepo: {
+    findById: (id: string) => Promise<KnowledgeArticleDTO | null>;
+    findByEquipment: (orgId: string, brand: string, model?: string) => Promise<KnowledgeArticleDTO[]>;
+  };
+  linkRepo: {
+    deleteByArticleId: (articleId: string) => Promise<void>;
+    create: (input: CreateKnowledgeLinkDTO) => Promise<unknown>;
+  };
 }
 
 /**

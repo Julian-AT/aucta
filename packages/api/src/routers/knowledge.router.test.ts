@@ -118,10 +118,6 @@ vi.mock("@aucta/ai/knowledge/compile/linker", () => ({
   generateLinks: mockGenerateLinks,
 }));
 
-import { runHealthCheck } from "@aucta/ai/knowledge";
-
-const mockRunHealthCheck = vi.mocked(runHealthCheck);
-
 describe("knowledgeRouter", () => {
   beforeEach(() => {
     vi.clearAllMocks();

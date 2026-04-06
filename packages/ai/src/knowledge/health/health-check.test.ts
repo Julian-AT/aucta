@@ -39,8 +39,8 @@ describe("runHealthCheck", () => {
     const result = await runHealthCheck(deps, "org-1", 90);
 
     expect(result.staleArticles).toHaveLength(1);
-    expect(result.staleArticles[0].articleId).toBe("art-1");
-    expect(result.staleArticles[0].daysSinceUpdate).toBeGreaterThanOrEqual(99);
+    expect(result.staleArticles[0]!.articleId).toBe("art-1");
+    expect(result.staleArticles[0]!.daysSinceUpdate).toBeGreaterThanOrEqual(99);
   });
 
   it("detects coverage gaps via deps", async () => {
@@ -55,9 +55,9 @@ describe("runHealthCheck", () => {
     const result = await runHealthCheck(deps, "org-1");
 
     expect(result.coverageGaps).toHaveLength(1);
-    expect(result.coverageGaps[0].equipmentBrand).toBe("Daikin");
-    expect(result.coverageGaps[0].equipmentModel).toBe("FTXM25");
-    expect(result.coverageGaps[0].sessionCount).toBe(5);
+    expect(result.coverageGaps[0]!.equipmentBrand).toBe("Daikin");
+    expect(result.coverageGaps[0]!.equipmentModel).toBe("FTXM25");
+    expect(result.coverageGaps[0]!.sessionCount).toBe(5);
   });
 
   it("detects conflicting articles via deps", async () => {
@@ -71,10 +71,10 @@ describe("runHealthCheck", () => {
     const result = await runHealthCheck(deps, "org-1");
 
     expect(result.conflictingArticles).toHaveLength(1);
-    expect(result.conflictingArticles[0].procedureKey).toBe(
+    expect(result.conflictingArticles[0]!.procedureKey).toBe(
       "Daikin/FTXM25/error_diagnosis",
     );
-    expect(result.conflictingArticles[0].articleIds).toEqual(["a1", "a2"]);
+    expect(result.conflictingArticles[0]!.articleIds).toEqual(["a1", "a2"]);
   });
 
   it("uses default staleDays of 90 when not specified", async () => {

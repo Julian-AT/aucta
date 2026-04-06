@@ -65,6 +65,7 @@ export const knowledgeIngest = inngest.createFunction(
           title: candidate.title,
           contentMd: candidate.contentMd,
           category: candidate.category,
+          confidenceLevel: "unverified" as const,
           equipmentBrand: candidate.equipmentBrand ?? undefined,
           equipmentModel: candidate.equipmentModel ?? undefined,
           procedureType: candidate.procedureType ?? undefined,
@@ -87,7 +88,7 @@ export const knowledgeIngest = inngest.createFunction(
               points: [
                 {
                   id: article.id,
-                  vectors: {
+                  vector: {
                     [QDRANT_CONFIG.DENSE_VECTOR_NAME]: denseVector,
                   },
                   payload: {

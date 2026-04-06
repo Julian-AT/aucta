@@ -136,17 +136,14 @@ export const knowledgeRouter = router({
         .optional(),
     )
     .query(async ({ ctx, input }) => {
-      const opts = input ?? {};
-      const articles = await articleRepo.findByOrgId(
-        ctx.orgId,
-        opts.limit ?? 20,
-      );
+      const limit = input?.limit ?? 20;
+      const articles = await articleRepo.findByOrgId(ctx.orgId, limit);
 
       return articles.filter((a) => {
-        if (opts.equipmentBrand && a.equipmentBrand !== opts.equipmentBrand)
+        if (input?.equipmentBrand && a.equipmentBrand !== input.equipmentBrand)
           return false;
-        if (opts.category && a.category !== opts.category) return false;
-        if (opts.confidenceLevel && a.confidenceLevel !== opts.confidenceLevel)
+        if (input?.category && a.category !== input.category) return false;
+        if (input?.confidenceLevel && a.confidenceLevel !== input.confidenceLevel)
           return false;
         return true;
       });
@@ -213,7 +210,7 @@ async function embedAndUpsert(article: KnowledgeArticleDTO): Promise<void> {
       points: [
         {
           id: article.id,
-          vectors: {
+          vector: {
             [QDRANT_CONFIG.DENSE_VECTOR_NAME]: denseVector,
           },
           payload: {

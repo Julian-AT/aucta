@@ -17,6 +17,7 @@
     "@aucta/auth": "workspace:*",
     "@aucta/db": "workspace:*",
     "@aucta/shared": "workspace:*",
+    "drizzle-orm": "^0.45.0",
     "@google/genai": "^1.48.0",
     "@trpc/server": "^11.16.0",
     "@upstash/ratelimit": "^2.0.0",
