@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { hybridSearch, type HybridSearchDeps } from "./search.js";
-import { QDRANT_CONFIG } from "../core/constants.js";
+import { QDRANT_CONFIG, CONFIDENCE_SCORE_BOOST } from "../core/constants.js";
 
 function createMockDeps(): HybridSearchDeps {
   return {
@@ -208,5 +208,110 @@ describe("hybridSearch", () => {
     expect(deps.embeddingService.embedQuery).toHaveBeenCalledWith(
       "compressor issue",
     );
+  });
+
+  it("ranks verified articles above unverified when RRF scores are equal", async () => {
+    const equalScorePoints = [
+      {
+        id: "unverified-art",
+        score: 0.80,
+        version: 1,
+        payload: {
+          title: "Unverified Article",
+          summary: null,
+          content_md: "Some content",
+          confidence_level: "unverified",
+          equipment_brand: "Daikin",
+          equipment_model: "FTXM25",
+          procedure_type: null,
+          category: "equipment",
+          org_id: "org_test",
+        },
+      },
+      {
+        id: "verified-art",
+        score: 0.80,
+        version: 1,
+        payload: {
+          title: "Expert Approved Article",
+          summary: null,
+          content_md: "Some content",
+          confidence_level: "expert_approved",
+          equipment_brand: "Daikin",
+          equipment_model: "FTXM25",
+          procedure_type: null,
+          category: "equipment",
+          org_id: "org_test",
+        },
+      },
+    ];
+
+    (deps.qdrantClient.query as ReturnType<typeof vi.fn>).mockResolvedValue({
+      points: equalScorePoints,
+    });
+
+    const results = await hybridSearch(deps, {
+      query: "compressor",
+      orgId: "org_test",
+    });
+
+    expect(results[0]!.confidenceLevel).toBe("expert_approved");
+    expect(results[1]!.confidenceLevel).toBe("unverified");
+  });
+
+  it("preserves relevance-dominated ranking when RRF score gap is large", async () => {
+    const gappedPoints = [
+      {
+        id: "high-score-unverified",
+        score: 0.95,
+        version: 1,
+        payload: {
+          title: "Highly Relevant Unverified",
+          summary: null,
+          content_md: "Very relevant content",
+          confidence_level: "unverified",
+          equipment_brand: "Daikin",
+          equipment_model: "FTXM25",
+          procedure_type: null,
+          category: "equipment",
+          org_id: "org_test",
+        },
+      },
+      {
+        id: "low-score-verified",
+        score: 0.60,
+        version: 1,
+        payload: {
+          title: "Less Relevant Verified",
+          summary: null,
+          content_md: "Less relevant content",
+          confidence_level: "expert_approved",
+          equipment_brand: "Daikin",
+          equipment_model: "FTXM25",
+          procedure_type: null,
+          category: "equipment",
+          org_id: "org_test",
+        },
+      },
+    ];
+
+    (deps.qdrantClient.query as ReturnType<typeof vi.fn>).mockResolvedValue({
+      points: gappedPoints,
+    });
+
+    const results = await hybridSearch(deps, {
+      query: "compressor",
+      orgId: "org_test",
+    });
+
+    expect(results[0]!.confidenceLevel).toBe("unverified");
+    expect(results[1]!.confidenceLevel).toBe("expert_approved");
+  });
+
+  it("applies correct boost values from CONFIDENCE_SCORE_BOOST", () => {
+    expect(CONFIDENCE_SCORE_BOOST.manufacturer_sourced).toBe(0.20);
+    expect(CONFIDENCE_SCORE_BOOST.expert_approved).toBe(0.15);
+    expect(CONFIDENCE_SCORE_BOOST.technician_reviewed).toBe(0.10);
+    expect(CONFIDENCE_SCORE_BOOST.unverified).toBe(0.00);
   });
 });
