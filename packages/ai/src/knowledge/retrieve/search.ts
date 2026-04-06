@@ -4,7 +4,7 @@ import type {
   KnowledgeSearchResult,
   KnowledgeSearchOptions,
 } from "../core/types.js";
-import { QDRANT_CONFIG } from "../core/constants.js";
+import { QDRANT_CONFIG, CONFIDENCE_SCORE_BOOST } from "../core/constants.js";
 import { getAttributionPhrase } from "./context-builder.js";
 
 export interface HybridSearchDeps {
@@ -62,7 +62,7 @@ export async function hybridSearch(
     limit,
   });
 
-  return results.points.map((point) => {
+  const mapped = results.points.map((point) => {
     const payload = (point.payload ?? {}) as Record<string, unknown>;
     const confidenceLevel =
       (payload.confidence_level as string) ?? "unverified";
@@ -88,4 +88,14 @@ export async function hybridSearch(
       attribution: getAttributionPhrase(confidenceLevel),
     };
   });
+
+  // KB-03: Confidence-weighted ranking -- verified articles boost above unverified
+  const boosted = mapped.map((result) => ({
+    ...result,
+    score: result.score * (1 + (CONFIDENCE_SCORE_BOOST[result.confidenceLevel] ?? 0)),
+  }));
+
+  boosted.sort((a, b) => b.score - a.score);
+
+  return boosted;
 }

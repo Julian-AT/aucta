@@ -4,6 +4,7 @@ export { createQdrantClient, ensureCollection } from "./retrieve/qdrant-client.j
 export type { QdrantClientConfig } from "./retrieve/qdrant-client.js";
 export {
   CONFIDENCE_ATTRIBUTION,
+  CONFIDENCE_SCORE_BOOST,
   EMBEDDING_CONFIG,
   QDRANT_CONFIG,
   HEALTH_THRESHOLDS,

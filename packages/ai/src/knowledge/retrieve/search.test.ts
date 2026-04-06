@@ -120,7 +120,7 @@ describe("hybridSearch", () => {
       title: "Daikin FTXM25 Compressor Replacement",
       confidenceLevel: "expert_approved",
       attribution: "Based on verified procedure",
-      score: 0.95,
+      score: 0.95 * (1 + 0.15), // boosted by CONFIDENCE_SCORE_BOOST
     });
     expect(results[1]).toMatchObject({
       id: "article-2",

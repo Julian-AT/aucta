@@ -7,6 +7,19 @@ export const CONFIDENCE_ATTRIBUTION = {
 
 export type ConfidenceLevelKey = keyof typeof CONFIDENCE_ATTRIBUTION;
 
+/**
+ * Score multiplier boost applied to Qdrant RRF results based on article confidence tier.
+ * Applied as: boostedScore = score * (1 + boost).
+ * Verified articles rank above unverified when semantic relevance is similar,
+ * but a highly relevant unverified article can still outrank a less relevant verified one.
+ */
+export const CONFIDENCE_SCORE_BOOST: Record<string, number> = {
+  manufacturer_sourced: 0.20,
+  expert_approved: 0.15,
+  technician_reviewed: 0.10,
+  unverified: 0.00,
+} as const;
+
 export const HEALTH_THRESHOLDS = {
   STALE_DAYS: 90,
   MIN_ARTICLES_PER_MODEL: 1,
