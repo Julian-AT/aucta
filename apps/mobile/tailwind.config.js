@@ -1,0 +1,50 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./providers/**/*.{ts,tsx}",
+    "./stores/**/*.{ts,tsx}",
+    "./hooks/**/*.{ts,tsx}",
+    "./lib/**/*.{ts,tsx}",
+  ],
+  presets: [require("nativewind/preset")],
+  theme: {
+    extend: {
+      colors: {
+        background: "var(--color-background)",
+        surface: "var(--color-surface)",
+        accent: "var(--color-accent)",
+        destructive: "var(--color-destructive)",
+        "text-primary": "var(--color-text-primary)",
+        "text-secondary": "var(--color-text-secondary)",
+        "border-default": "var(--color-border-default)",
+        "border-focus": "var(--color-border-focus)",
+        "overlay-bg": "rgba(0, 0, 0, 0.6)",
+        "overlay-bg-light": "rgba(0, 0, 0, 0.4)",
+        "overlay-text": "#FFFFFF",
+        "overlay-text-muted": "rgba(255, 255, 255, 0.7)",
+        "status-connected": "#22C55E",
+        "status-reconnecting": "#F59E0B",
+        "status-lost": "#EF4444",
+        "ai-indicator-bg": "rgba(0, 0, 0, 0.7)",
+      },
+      fontSize: {
+        body: ["16px", { lineHeight: "24px", fontWeight: "400" }],
+        label: ["14px", { lineHeight: "20px", fontWeight: "600" }],
+        heading: ["20px", { lineHeight: "24px", fontWeight: "600" }],
+        display: ["28px", { lineHeight: "32px", fontWeight: "600" }],
+      },
+      spacing: {
+        xs: "4px",
+        sm: "8px",
+        md: "16px",
+        lg: "24px",
+        xl: "32px",
+        "2xl": "48px",
+        "3xl": "64px",
+      },
+    },
+  },
+  plugins: [],
+};

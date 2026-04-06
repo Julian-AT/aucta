@@ -215,3 +215,14 @@ For detailed information, see the `agents/` directory:
 - **[agents/rules/](agents/rules/)** — Modular engineering rules with impact ratings
 - **[agents/commands.md](agents/commands.md)** — Complete command reference
 - **[agents/knowledge-base.md](agents/knowledge-base.md)** — Domain knowledge and business rules
+
+## Learned User Preferences
+
+- Prefer development-facing artifacts with deep technical detail (especially AI pipeline and infrastructure); keep investor- or legal-heavy narrative in separate documents or sections so engineering work stays focused.
+- Treat **TECH-SPEC.md** as the engineering baseline and **LEGAL-ADMIN.md** as business, regulatory, and stakeholder material — do not merge those audiences in a single doc.
+
+## Learned Workspace Facts
+
+- In `apps/mobile`, when Expo reports packages newer than versions tested with the installed SDK, align pins with **`bunx expo install --fix`** (semver can otherwise pull newer React/React Native than Expo supports).
+- The mobile app may use **TypeScript ~5.9.x** to satisfy Expo SDK while other workspace packages use **TypeScript 6.x**.
+- Mobile **`TRPCProvider`** accepts the tRPC client via the **`trpcClient`** prop (not `client`).

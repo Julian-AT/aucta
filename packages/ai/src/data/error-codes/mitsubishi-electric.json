@@ -1,0 +1,285 @@
+{
+  "manufacturer": "Mitsubishi Electric",
+  "codes": [
+    {
+      "code": "E0",
+      "meaning": "Remote controller signal receiving error",
+      "severity": "low",
+      "repairSteps": [
+        "Check remote controller batteries",
+        "Verify no obstruction between remote and indoor unit receiver",
+        "Check indoor unit signal receiver",
+        "Try replacement remote controller",
+        "Check for interference from fluorescent lighting"
+      ],
+      "possibleCauses": ["Dead batteries", "Signal receiver fault", "Interference", "Remote malfunction"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "E1",
+      "meaning": "Remote controller PCB error",
+      "severity": "medium",
+      "repairSteps": [
+        "Reset remote controller by removing batteries",
+        "Check for moisture damage on remote PCB",
+        "Replace remote controller",
+        "Verify wall-mounted controller wiring if applicable",
+        "Check compatibility of remote with indoor unit model"
+      ],
+      "possibleCauses": ["Remote PCB failure", "Moisture damage", "Component failure"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "E3",
+      "meaning": "Indoor/outdoor unit communication error",
+      "severity": "high",
+      "repairSteps": [
+        "Check S1-S2-S3 wiring between indoor and outdoor units",
+        "Verify correct wiring polarity",
+        "Measure voltage between S1-S2 terminals",
+        "Check for damaged or water-ingressed cables",
+        "Inspect PCB connectors at both units"
+      ],
+      "possibleCauses": ["Incorrect wiring", "Damaged cable", "PCB communication circuit fault", "Loose terminal"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "E6",
+      "meaning": "Indoor unit coil temperature sensor error",
+      "severity": "medium",
+      "repairSteps": [
+        "Measure sensor resistance and compare to resistance-temperature chart",
+        "Check sensor connector on indoor PCB",
+        "Inspect sensor wire for damage",
+        "Replace sensor if resistance is out of specification",
+        "Check PCB sensor input circuit"
+      ],
+      "possibleCauses": ["Sensor open/short circuit", "Connector issue", "Wire damage", "PCB fault"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "E9",
+      "meaning": "Indoor/outdoor unit communication error during startup",
+      "severity": "high",
+      "repairSteps": [
+        "Verify power is supplied to outdoor unit",
+        "Check communication wiring for correct connections",
+        "Verify DIP switch settings on indoor and outdoor PCBs",
+        "Check for address conflicts in multi-system",
+        "Reset both units by powering off for 60 seconds"
+      ],
+      "possibleCauses": ["No power to outdoor unit", "Address conflict", "Wiring error", "DIP switch misconfiguration"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "U1",
+      "meaning": "High pressure trip activated",
+      "severity": "critical",
+      "repairSteps": [
+        "Check condenser coil for blockage or dirt",
+        "Verify outdoor fan motor is running",
+        "Check refrigerant charge (possible overcharge)",
+        "Inspect for non-condensable gases",
+        "Verify high-pressure switch operation and reset"
+      ],
+      "possibleCauses": ["Dirty condenser", "Fan motor failure", "Refrigerant overcharge", "Blocked airflow"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "U2",
+      "meaning": "Abnormal high discharge temperature or low superheat",
+      "severity": "high",
+      "repairSteps": [
+        "Check refrigerant charge level",
+        "Inspect for refrigerant leaks",
+        "Check electronic expansion valve operation",
+        "Verify discharge thermistor is functioning",
+        "Check indoor coil airflow"
+      ],
+      "possibleCauses": ["Low charge", "EEV fault", "Restricted airflow", "Thermistor error"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "U3",
+      "meaning": "Short circuit detected in outdoor unit",
+      "severity": "critical",
+      "repairSteps": [
+        "Disconnect and inspect compressor winding insulation",
+        "Check inverter circuit on outdoor PCB",
+        "Inspect all wiring for damage or water ingress",
+        "Measure insulation resistance of compressor",
+        "Replace IPM or PCB if shorted"
+      ],
+      "possibleCauses": ["Compressor winding short", "IPM failure", "Water damage", "Cable damage"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "U4",
+      "meaning": "Thermistor error on outdoor unit",
+      "severity": "medium",
+      "repairSteps": [
+        "Identify which thermistor is faulty using sub-error code",
+        "Measure thermistor resistance",
+        "Check connector at outdoor PCB",
+        "Replace thermistor if out of specification",
+        "Verify wiring to thermistor"
+      ],
+      "possibleCauses": ["Thermistor failure", "Connector corrosion", "Wire break", "PCB input fault"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "U5",
+      "meaning": "Indoor unit heat exchanger freeze protection activated",
+      "severity": "medium",
+      "repairSteps": [
+        "Check indoor air filter for blockage",
+        "Verify indoor fan motor is running at correct speed",
+        "Check indoor coil thermistor",
+        "Inspect indoor coil for ice formation",
+        "Check refrigerant charge level"
+      ],
+      "possibleCauses": ["Blocked filter", "Fan motor issue", "Low charge", "Thermistor error"],
+      "equipmentTypes": ["split", "multi-split"]
+    },
+    {
+      "code": "P1",
+      "meaning": "Power supply voltage error or phase detection fault",
+      "severity": "high",
+      "repairSteps": [
+        "Measure incoming supply voltage at all phases",
+        "Check for phase loss or rotation",
+        "Verify cable connections at circuit breaker",
+        "Check for voltage drop under load",
+        "Verify phase sequence for 3-phase units"
+      ],
+      "possibleCauses": ["Low voltage", "Phase loss", "Phase reversal", "Loose power connection"],
+      "equipmentTypes": ["city-multi", "multi-split"]
+    },
+    {
+      "code": "P2",
+      "meaning": "Compressor overcurrent at startup",
+      "severity": "critical",
+      "repairSteps": [
+        "Check supply voltage under load",
+        "Measure compressor winding resistance",
+        "Check for liquid refrigerant in crankcase",
+        "Verify correct compressor oil level",
+        "Inspect inverter/IPM on outdoor PCB"
+      ],
+      "possibleCauses": ["Compressor seizure", "Low voltage", "Liquid slugging", "IPM failure"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "P4",
+      "meaning": "Inverter heat sink temperature too high",
+      "severity": "high",
+      "repairSteps": [
+        "Check outdoor unit installation clearances",
+        "Clean heat sink fins if accessible",
+        "Verify outdoor fan is operating",
+        "Check heat sink thermistor accuracy",
+        "Inspect for recirculation of hot discharge air"
+      ],
+      "possibleCauses": ["Poor ventilation", "Dirty heat sink", "Fan failure", "High ambient"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "P5",
+      "meaning": "Compressor overcurrent during operation",
+      "severity": "critical",
+      "repairSteps": [
+        "Check system operating pressures",
+        "Verify refrigerant charge",
+        "Check condenser coil condition",
+        "Measure supply voltage under load",
+        "Inspect compressor electrical connections"
+      ],
+      "possibleCauses": ["Mechanical compressor issue", "High head pressure", "Low voltage", "Refrigerant overcharge"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "P6",
+      "meaning": "Outdoor unit freeze or overheat protection activated",
+      "severity": "medium",
+      "repairSteps": [
+        "Check defrost cycle operation",
+        "Inspect outdoor coil for excessive ice",
+        "Check 4-way valve operation in heat mode",
+        "Verify refrigerant charge level",
+        "Check outdoor thermistors"
+      ],
+      "possibleCauses": ["Defrost failure", "4-way valve stuck", "Low charge", "Thermistor fault"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "P8",
+      "meaning": "Outdoor unit pipe temperature abnormality",
+      "severity": "medium",
+      "repairSteps": [
+        "Check pipe thermistor readings",
+        "Verify refrigerant charge and subcooling/superheat",
+        "Inspect for pipe restrictions",
+        "Check thermistor wiring",
+        "Verify EEV operation"
+      ],
+      "possibleCauses": ["Thermistor fault", "Charge issue", "Pipe restriction", "EEV malfunction"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "P9",
+      "meaning": "Compressor motor position detection error",
+      "severity": "high",
+      "repairSteps": [
+        "Check compressor wiring connections",
+        "Inspect inverter circuit on outdoor PCB",
+        "Verify compressor windings are balanced",
+        "Check for mechanical seizure",
+        "Replace outdoor PCB if inverter is faulty"
+      ],
+      "possibleCauses": ["Inverter fault", "Compressor winding issue", "PCB malfunction", "Mechanical lock"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    },
+    {
+      "code": "1102",
+      "meaning": "Communication error to indoor unit (City Multi/VRF)",
+      "severity": "high",
+      "repairSteps": [
+        "Check M-NET communication wiring",
+        "Verify indoor unit address settings",
+        "Check for address duplication",
+        "Inspect TB7 terminal block connections",
+        "Test communication signal with M-NET checker"
+      ],
+      "possibleCauses": ["Wiring fault", "Address conflict", "Terminal block issue", "PCB communication fault"],
+      "equipmentTypes": ["city-multi"]
+    },
+    {
+      "code": "1302",
+      "meaning": "High pressure protection activated (City Multi/VRF)",
+      "severity": "critical",
+      "repairSteps": [
+        "Check condenser coil cleanliness",
+        "Verify all outdoor fans are operating",
+        "Check refrigerant charge and pressures",
+        "Inspect for non-condensable gases",
+        "Verify installation clearances are maintained"
+      ],
+      "possibleCauses": ["Dirty condenser", "Fan failure", "Overcharge", "Installation clearance violation"],
+      "equipmentTypes": ["city-multi"]
+    },
+    {
+      "code": "2502",
+      "meaning": "Drain sensor activated - condensate overflow detected",
+      "severity": "medium",
+      "repairSteps": [
+        "Check condensate drain pipe for blockage",
+        "Clean drain pan",
+        "Verify drain pump operation if fitted",
+        "Check drain sensor and float switch",
+        "Flush drain line with water or approved cleaner"
+      ],
+      "possibleCauses": ["Blocked drain line", "Drain pump failure", "Dirty drain pan", "Float switch stuck"],
+      "equipmentTypes": ["split", "multi-split", "city-multi"]
+    }
+  ]
+}
