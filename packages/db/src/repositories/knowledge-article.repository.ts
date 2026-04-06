@@ -190,4 +190,71 @@ export class KnowledgeArticleRepository {
 
     return KnowledgeArticleDTOSchema.parse(row);
   }
+
+  /**
+   * Equipment models that appear in session findings but have no matching knowledge article.
+   * Cross-joins session_findings -> ai_sessions -> knowledge_articles via NOT EXISTS.
+   */
+  async findCoverageGaps(
+    orgId: string,
+  ): Promise<
+    Array<{
+      equipmentBrand: string;
+      equipmentModel: string;
+      sessionCount: number;
+    }>
+  > {
+    const result = await this.db.execute(sql`
+      SELECT
+        f.manufacturer AS equipment_brand,
+        f.equipment_model AS equipment_model,
+        COUNT(DISTINCT s.id)::int AS session_count
+      FROM session_findings f
+      JOIN ai_sessions s ON s.id = f.session_id
+      WHERE s.org_id = ${orgId}
+        AND f.equipment_model IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM knowledge_articles ka
+          WHERE ka.org_id = ${orgId}
+            AND ka.equipment_model = f.equipment_model
+            AND (ka.equipment_brand = f.manufacturer OR f.manufacturer IS NULL)
+        )
+      GROUP BY f.manufacturer, f.equipment_model
+      ORDER BY session_count DESC
+    `);
+
+    return (result.rows ?? []).map((row: Record<string, unknown>) => ({
+      equipmentBrand: String(row.equipment_brand ?? ""),
+      equipmentModel: String(row.equipment_model ?? ""),
+      sessionCount: Number(row.session_count ?? 0),
+    }));
+  }
+
+  /**
+   * Articles that cover the same (brand, model, procedureType) -- potential conflicts.
+   * Returns groups where count > 1.
+   */
+  async findConflictingArticles(
+    orgId: string,
+  ): Promise<Array<{ procedureKey: string; articleIds: string[] }>> {
+    const result = await this.db.execute(sql`
+      SELECT
+        CONCAT(equipment_brand, '/', equipment_model, '/', procedure_type) AS procedure_key,
+        ARRAY_AGG(id) AS article_ids
+      FROM knowledge_articles
+      WHERE org_id = ${orgId}
+        AND procedure_type IS NOT NULL
+        AND equipment_brand IS NOT NULL
+      GROUP BY equipment_brand, equipment_model, procedure_type
+      HAVING COUNT(*) > 1
+      ORDER BY COUNT(*) DESC
+    `);
+
+    return (result.rows ?? []).map((row: Record<string, unknown>) => ({
+      procedureKey: String(row.procedure_key ?? ""),
+      articleIds: Array.isArray(row.article_ids)
+        ? row.article_ids.map(String)
+        : [],
+    }));
+  }
 }
