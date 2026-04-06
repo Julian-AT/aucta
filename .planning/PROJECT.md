@@ -28,16 +28,17 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 - [x] Post-session Inngest summary pipeline with Gemini 2.5 Pro, AI-generated content labeling (COMP-07) — Validated in Phase 4
 - [x] MMKV offline cache for recent session summaries (20-session LRU), feedback screen with star rating — Validated in Phase 4
 - [x] No emotion recognition or sentiment analysis in any schema (COMP-08) — Validated in Phase 4
+- [x] Full knowledge base backend: ingest (session → article), compile (LLM wiki articles), verify (4-tier confidence, review queue), retrieve (hybrid BM25 + dense vector via Qdrant), health (coverage gaps, stale content) — Validated in Phase 5
+- [x] Knowledge article schema with 4-tier confidence levels and confidence-weighted search ranking — Validated in Phase 5
+- [x] searchKnowledgeBase tool with hybrid search, source attribution, context builder — Validated in Phase 5
+- [x] Inngest background jobs for knowledge ingestion, compilation, and health monitoring — Validated in Phase 5
+- [x] Qdrant vector DB with named dense+sparse vectors for hybrid retrieval — Validated in Phase 5
+- [x] Verification queue: tRPC endpoints for review submission, auto-creation on ingestion, confidence promotion on approval — Validated in Phase 5
 
 ### Active
 
 - [ ] Expo SDK 55 mobile app with Expo Router, NativeWind v5, camera + audio capture
-- [ ] 2-3 initial tools: lookupErrorCode, searchKnowledgeBase, logFinding
 - [ ] Neon Postgres (EU Frankfurt) with Drizzle ORM, repository pattern, DTO boundaries
-- [ ] Full knowledge base backend: ingest (session, manual, feedback), compile (wiki articles), verify (confidence levels, review queue), retrieve (hybrid BM25 + vector via Qdrant), health (coverage gaps, consistency)
-- [ ] Knowledge article schema with 4-tier confidence levels (unverified, technician_reviewed, expert_approved, manufacturer_sourced)
-- [ ] Inngest background jobs for knowledge ingestion, knowledge compilation
-- [ ] Qdrant vector DB (EU) for knowledge base embeddings and hybrid retrieval
 - [ ] Glove-friendly touch targets (56x56dp), high-contrast UI, audio-first interaction
 - [ ] i18n foundation with react-i18next (en, de, tr, sr, hr, pl, ro)
 - [ ] Sentry error tracking + PostHog analytics integration
@@ -70,7 +71,7 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 
 **Regulatory landscape:** GDPR (Austria-based, EU data residency), EU AI Act transparency (deadline August 2, 2026), F-Gas EU 2024/573, Product Liability Directive 2024/2853 (transposition by December 9, 2026). Privacy-by-design: audio/video streamed directly to Gemini, never stored on our servers.
 
-**Existing codebase:** Phase 4 complete. Monorepo with full auth system, AI tool pipeline, ephemeral Gemini tokens, system prompt assembly, live streaming session (WebSocket lifecycle, audio/video pipelines, session UI, voice commands), session lifecycle management (DB persistence, incremental tool/finding persistence, feedback collection, Inngest summary pipeline, MMKV offline cache). Next: knowledge base (Phase 5).
+**Existing codebase:** Phase 5 complete. Monorepo with full auth system, AI tool pipeline, ephemeral Gemini tokens, system prompt assembly, live streaming session (WebSocket lifecycle, audio/video pipelines, session UI, voice commands), session lifecycle management (DB persistence, incremental tool/finding persistence, feedback collection, Inngest summary pipeline, MMKV offline cache), and self-learning knowledge base (hybrid search, ingestion/compilation pipelines, verification queue, health monitoring). All 5 milestone phases complete.
 
 ## Constraints
 
@@ -110,4 +111,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-05 after Phase 4 completion*
+*Last updated: 2026-04-06 after Phase 5 completion*
