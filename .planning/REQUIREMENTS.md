@@ -64,7 +64,7 @@ Requirements for the first milestone. Each maps to roadmap phases.
 - [x] **KB-05**: Article compilation: LLM generates/updates structured wiki articles (markdown + metadata) from raw session data
 - [x] **KB-06**: Article categorization: organize by equipment brand → model → procedure type with auto-generated backlinks
 - [x] **KB-07**: Verification queue: pending articles await review, status transitions (pending → approved/rejected/needs_revision)
-- [ ] **KB-08**: Health monitoring: coverage gap detection (which equipment models lack documentation), stale article detection, consistency checking
+- [x] **KB-08**: Health monitoring: coverage gap detection (which equipment models lack documentation), stale article detection, consistency checking
 - [x] **KB-09**: Source attribution in AI responses: "Based on unverified observation..." vs "Per manufacturer documentation..." depending on confidence level
 - [ ] **KB-10**: Manual text knowledge input: org owners can add custom procedures/tips as structured articles via API
 
@@ -192,7 +192,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KB-05 | Phase 5 | Complete |
 | KB-06 | Phase 5 | Complete |
 | KB-07 | Phase 5 | Complete |
-| KB-08 | Phase 5 | Pending |
+| KB-08 | Phase 5 | Complete |
 | KB-09 | Phase 5 | Complete |
 | KB-10 | Phase 5 | Pending |
 | UX-01 | Phase 3 | Complete |
