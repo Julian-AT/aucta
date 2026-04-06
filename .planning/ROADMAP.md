@@ -132,7 +132,10 @@ Plans:
   3. logFinding tool findings persist to session_findings table via addFinding tRPC mutation from mobile
   4. Verification records are auto-created during ingestion for new articles
   5. Health monitoring cron is scheduled and detectable in Inngest dashboard
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 06-01-PLAN.md — Register Inngest knowledge functions + wire logFinding mobile persistence
 
 ### Phase 7: Integration Hardening and Tech Debt
 **Goal**: Close remaining low-severity integration gaps and resolve accumulated tech debt from Phases 1 and 4
@@ -159,5 +162,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. Live Streaming Session | 7/7 | Complete | 2026-04-04 |
 | 4. Session Lifecycle | 3/3 | Complete | 2026-04-05 |
 | 5. Knowledge Base | 7/7 | Complete | 2026-04-06 |
-| 6. Wire Knowledge Pipeline | 0/0 | Not started | - |
+| 6. Wire Knowledge Pipeline | 0/1 | Not started | - |
 | 7. Integration Hardening and Tech Debt | 0/0 | Not started | - |
