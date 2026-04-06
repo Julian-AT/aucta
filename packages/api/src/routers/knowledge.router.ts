@@ -5,6 +5,7 @@ import { orgProcedure } from "../middleware/org-scope.js";
 import { errorConverter } from "../middleware/error-converter.js";
 import { KnowledgeArticleRepository } from "@aucta/db/repositories/knowledge-article.repository";
 import { KnowledgeLinkRepository } from "@aucta/db/repositories/knowledge-link.repository";
+import { KnowledgeVerificationRepository } from "@aucta/db/repositories/knowledge-verification.repository";
 import { db } from "@aucta/db/client";
 import {
   GeminiEmbeddingService,
@@ -18,6 +19,7 @@ import type { KnowledgeArticleDTO } from "@aucta/shared/schemas/knowledge-articl
 
 const articleRepo = new KnowledgeArticleRepository(db);
 const linkRepo = new KnowledgeLinkRepository(db);
+const verificationRepo = new KnowledgeVerificationRepository(db);
 
 export const knowledgeRouter = router({
   create: orgProcedure
@@ -183,6 +185,85 @@ export const knowledgeRouter = router({
         },
         ctx.orgId,
       );
+    }),
+
+  submitReview: orgProcedure
+    .use(errorConverter)
+    .input(
+      z.object({
+        articleId: z.string(),
+        status: z.enum(["approved", "rejected", "needs_revision"]),
+        reviewerNotes: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const article = await articleRepo.findById(input.articleId);
+      if (!article) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Article ${input.articleId} not found`,
+        });
+      }
+      if (article.orgId !== ctx.orgId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Cross-org access denied",
+        });
+      }
+
+      const verification = await verificationRepo.create({
+        articleId: input.articleId,
+        orgId: ctx.orgId,
+        reviewerId: ctx.userId,
+        status: input.status,
+        reviewerNotes: input.reviewerNotes,
+      });
+
+      // Promote confidence level on approval (ladder: unverified -> technician_reviewed -> expert_approved)
+      // manufacturer_sourced is never auto-promoted -- only set manually
+      if (input.status === "approved") {
+        const newLevel =
+          article.confidenceLevel === "unverified"
+            ? "technician_reviewed"
+            : article.confidenceLevel === "technician_reviewed"
+              ? "expert_approved"
+              : article.confidenceLevel;
+
+        if (newLevel !== article.confidenceLevel) {
+          const updated = await articleRepo.update(article.id, {
+            confidenceLevel: newLevel,
+          });
+          await embedAndUpsert(updated);
+        }
+      }
+
+      return verification;
+    }),
+
+  getPendingReviews: orgProcedure
+    .use(errorConverter)
+    .query(async ({ ctx }) => {
+      return verificationRepo.findPendingByOrg(ctx.orgId);
+    }),
+
+  getReviewsByArticle: orgProcedure
+    .use(errorConverter)
+    .input(z.object({ articleId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const article = await articleRepo.findById(input.articleId);
+      if (!article) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Article ${input.articleId} not found`,
+        });
+      }
+      if (article.orgId !== ctx.orgId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Cross-org access denied",
+        });
+      }
+      return verificationRepo.findByArticleId(input.articleId);
     }),
 });
 

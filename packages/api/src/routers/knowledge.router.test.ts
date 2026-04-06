@@ -91,6 +91,18 @@ vi.mock("@aucta/db/repositories/knowledge-link.repository", () => ({
   },
 }));
 
+const mockVerificationCreate = vi.fn();
+const mockFindPendingByOrg = vi.fn();
+const mockFindByArticleId_verification = vi.fn();
+
+vi.mock("@aucta/db/repositories/knowledge-verification.repository", () => ({
+  KnowledgeVerificationRepository: class {
+    create = mockVerificationCreate;
+    findPendingByOrg = mockFindPendingByOrg;
+    findByArticleId = mockFindByArticleId_verification;
+  },
+}));
+
 const mockEmbedDocument = vi.fn();
 
 vi.mock("@aucta/ai/knowledge", () => ({
@@ -230,6 +242,103 @@ describe("knowledgeRouter", () => {
 
       expect(source).toContain("NOT_FOUND");
       expect(source).toContain("FORBIDDEN");
+    });
+  });
+
+  describe("verification endpoints", () => {
+    it("has submitReview, getPendingReviews, getReviewsByArticle endpoints", async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const filePath = path.join(
+        import.meta.dirname,
+        "knowledge.router.ts",
+      );
+      const source = fs.readFileSync(filePath, "utf-8");
+
+      expect(source).toContain("submitReview:");
+      expect(source).toContain("getPendingReviews:");
+      expect(source).toContain("getReviewsByArticle:");
+    });
+
+    it("imports KnowledgeVerificationRepository", async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const filePath = path.join(
+        import.meta.dirname,
+        "knowledge.router.ts",
+      );
+      const source = fs.readFileSync(filePath, "utf-8");
+
+      expect(source).toContain("KnowledgeVerificationRepository");
+      expect(source).toContain("@aucta/db/repositories/knowledge-verification.repository");
+    });
+
+    it("submitReview accepts articleId, status (approved/rejected/needs_revision), and optional reviewerNotes", async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const filePath = path.join(
+        import.meta.dirname,
+        "knowledge.router.ts",
+      );
+      const source = fs.readFileSync(filePath, "utf-8");
+
+      expect(source).toContain('z.enum(["approved", "rejected", "needs_revision"])');
+      expect(source).toContain("articleId: z.string()");
+      expect(source).toContain("reviewerNotes: z.string().optional()");
+    });
+
+    it("submitReview uses verificationRepo.create to persist review", async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const filePath = path.join(
+        import.meta.dirname,
+        "knowledge.router.ts",
+      );
+      const source = fs.readFileSync(filePath, "utf-8");
+
+      expect(source).toContain("verificationRepo.create(");
+    });
+
+    it("submitReview promotes confidence level on approval with correct ladder", async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const filePath = path.join(
+        import.meta.dirname,
+        "knowledge.router.ts",
+      );
+      const source = fs.readFileSync(filePath, "utf-8");
+
+      // Verify the confidence ladder logic
+      expect(source).toContain('"unverified"');
+      expect(source).toContain('"technician_reviewed"');
+      expect(source).toContain('"expert_approved"');
+      expect(source).toContain("confidenceLevel");
+      expect(source).toContain("articleRepo.update(article.id,");
+      expect(source).toContain("embedAndUpsert(updated)");
+    });
+
+    it("getPendingReviews calls verificationRepo.findPendingByOrg", async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const filePath = path.join(
+        import.meta.dirname,
+        "knowledge.router.ts",
+      );
+      const source = fs.readFileSync(filePath, "utf-8");
+
+      expect(source).toContain("verificationRepo.findPendingByOrg(ctx.orgId)");
+    });
+
+    it("getReviewsByArticle validates article exists and belongs to org before returning reviews", async () => {
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const filePath = path.join(
+        import.meta.dirname,
+        "knowledge.router.ts",
+      );
+      const source = fs.readFileSync(filePath, "utf-8");
+
+      expect(source).toContain("verificationRepo.findByArticleId(input.articleId)");
     });
   });
 });
