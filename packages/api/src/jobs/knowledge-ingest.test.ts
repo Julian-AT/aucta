@@ -8,6 +8,7 @@ const {
   mockEmbedDocument,
   mockQdrantUpsert,
   mockInngestSend,
+  mockVerificationCreate,
 } = vi.hoisted(() => ({
   mockFindWithDetails: vi.fn(),
   mockArticleCreate: vi.fn(),
@@ -16,6 +17,7 @@ const {
   mockEmbedDocument: vi.fn(),
   mockQdrantUpsert: vi.fn(),
   mockInngestSend: vi.fn(),
+  mockVerificationCreate: vi.fn(),
 }));
 
 vi.mock("@aucta/db/repositories/session.repository", () => ({
@@ -28,6 +30,12 @@ vi.mock("@aucta/db/repositories/knowledge-article.repository", () => ({
   KnowledgeArticleRepository: class {
     create = mockArticleCreate;
     updateEmbedding = mockArticleUpdateEmbedding;
+  },
+}));
+
+vi.mock("@aucta/db/repositories/knowledge-verification.repository", () => ({
+  KnowledgeVerificationRepository: class {
+    create = mockVerificationCreate;
   },
 }));
 
@@ -64,6 +72,16 @@ describe("knowledge-ingest", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.GEMINI_API_KEY = "test-api-key";
+    mockVerificationCreate.mockResolvedValue({
+      id: "ver_test",
+      articleId: "art_test",
+      orgId: "org_test",
+      reviewerId: "system",
+      status: "pending",
+      reviewerNotes: null,
+      reviewedAt: null,
+      createdAt: new Date(),
+    });
   });
 
   const mockEvent = {
@@ -226,5 +244,80 @@ describe("knowledge-ingest", () => {
         sessionId: "ses_abc123",
       },
     });
+  });
+
+  it("creates pending verification record for each ingested article", async () => {
+    mockFindWithDetails.mockResolvedValue({
+      session: {
+        id: "ses_abc123",
+        orgId: "org_1",
+        languageDetected: "en",
+        summary: "Test summary",
+      },
+      findings: [
+        {
+          category: "troubleshooting",
+          description: "E3 error",
+          severity: "medium",
+          equipmentModel: "FTXM25",
+          manufacturer: "Daikin",
+        },
+      ],
+      toolCalls: [{ toolName: "lookupErrorCode", success: true }],
+    });
+
+    mockExtractLearnings.mockResolvedValue([
+      {
+        title: "Daikin E3 Fix",
+        contentMd: "## Fix\nReset the outdoor unit",
+        category: "troubleshooting",
+        equipmentBrand: "Daikin",
+        equipmentModel: "FTXM25",
+        procedureType: "error_diagnosis",
+        tags: ["E3"],
+      },
+    ]);
+
+    mockArticleCreate.mockResolvedValue({
+      id: "art_ver_001",
+      orgId: "org_1",
+      title: "Daikin E3 Fix",
+      contentMd: "## Fix\nReset the outdoor unit",
+      summary: null,
+      equipmentBrand: "Daikin",
+      equipmentModel: "FTXM25",
+      category: "troubleshooting",
+      confidenceLevel: "unverified",
+      tags: ["E3"],
+    });
+
+    mockEmbedDocument.mockResolvedValue(new Array(3072).fill(0.1));
+    mockQdrantUpsert.mockResolvedValue({});
+    mockInngestSend.mockResolvedValue({});
+    const step = createStep();
+
+    await handler({ event: mockEvent, step });
+
+    expect(mockVerificationCreate).toHaveBeenCalledWith({
+      articleId: "art_ver_001",
+      orgId: "org_1",
+      reviewerId: "system",
+      status: "pending",
+    });
+  });
+
+  it("auto-creates verification records visible in source code", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const filePath = path.join(
+      import.meta.dirname,
+      "knowledge-ingest.ts",
+    );
+    const source = fs.readFileSync(filePath, "utf-8");
+
+    expect(source).toContain("KnowledgeVerificationRepository");
+    expect(source).toContain("verificationRepo.create(");
+    expect(source).toContain('status: "pending"');
+    expect(source).toContain('reviewerId: "system"');
   });
 });

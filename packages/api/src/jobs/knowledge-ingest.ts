@@ -1,4 +1,5 @@
 import { KnowledgeArticleRepository } from "@aucta/db/repositories/knowledge-article.repository";
+import { KnowledgeVerificationRepository } from "@aucta/db/repositories/knowledge-verification.repository";
 import { SessionRepository } from "@aucta/db/repositories/session.repository";
 import { GeminiEmbeddingService } from "@aucta/ai/knowledge";
 import { createQdrantClient } from "@aucta/ai/knowledge";
@@ -54,6 +55,7 @@ export const knowledgeIngest = inngest.createFunction(
 
     const articleIds = await step.run("create-articles", async () => {
       const articleRepo = new KnowledgeArticleRepository(db);
+      const verificationRepo = new KnowledgeVerificationRepository(db);
       const apiKey = process.env.GEMINI_API_KEY!;
       const qdrantUrl = process.env.QDRANT_URL;
       const qdrantApiKey = process.env.QDRANT_API_KEY;
@@ -73,6 +75,14 @@ export const knowledgeIngest = inngest.createFunction(
           sourceSessionIds: [event.data.sessionId],
           tags: candidate.tags,
           isAiGenerated: true,
+        });
+
+        // KB-07: Auto-create pending verification record so the article enters the review queue
+        await verificationRepo.create({
+          articleId: article.id,
+          orgId: sessionData.session.orgId,
+          reviewerId: "system",
+          status: "pending",
         });
 
         // Embed and upsert to Qdrant if configured
