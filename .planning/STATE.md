@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-04-PLAN.md
-last_updated: "2026-04-06T07:05:27.758Z"
-last_activity: 2026-04-06 -- Phase 05 execution started
+stopped_at: Completed 05-06-PLAN.md
+last_updated: "2026-04-06T07:56:59.014Z"
+last_activity: 2026-04-06
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 25
-  completed_plans: 24
+  total_plans: 27
+  completed_plans: 26
   percent: 84
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 05 (knowledge-base) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 05
-Last activity: 2026-04-06 -- Phase 05 execution started
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-04-06
 
 Progress: [████████░░] 84%
 
@@ -71,6 +71,7 @@ Progress: [████████░░] 84%
 | Phase 05 P02 | 8min | 2 tasks | 14 files |
 | Phase 05 P03 | 19min | 2 tasks | 10 files |
 | Phase 05 P04 | 7min | 2 tasks | 12 files |
+| Phase 05 P06 | 5min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,9 @@ Recent decisions affecting current work:
 - [Phase 05]: Dense-only Qdrant upsert at ingestion; BM25 server-side inference at query time
 - [Phase 05]: Inngest knowledge pipeline chain: session/ended -> knowledgeIngest -> knowledge/articles-ingested -> knowledgeCompile
 - [Phase 05]: Linker uses related for same brand+model, reference for same brand different model
+- [Phase 05]: Abstract LinkerDeps interface imports only from @aucta/shared, not @aucta/db -- maintains package boundary
+- [Phase 05]: Confidence boost formula: boostedScore = score * (1 + boost) -- preserves relevance dominance while favoring verified content
+- [Phase 05]: Qdrant SDK v1.17.0 uses vector (singular) not vectors (plural) in upsert point type
 
 ### Pending Todos
 
@@ -148,6 +152,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T11:20:35.340Z
-Stopped at: Completed 05-04-PLAN.md
+Last session: 2026-04-06T07:56:59.012Z
+Stopped at: Completed 05-06-PLAN.md
 Resume file: None

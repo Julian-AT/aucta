@@ -116,7 +116,7 @@ Plans:
 - [x] 05-03-PLAN.md — searchKnowledgeBase tool: buildTool integration, context builder, source attribution, tool registration
 - [x] 05-04-PLAN.md — Ingestion and compilation pipeline: Inngest jobs for session ingestion, LLM article compilation, backlink generation
 - [x] 05-05-PLAN.md — Health monitoring and knowledge router: tRPC CRUD endpoints, Inngest cron health check, manual article input
-- [ ] 05-06-PLAN.md — Gap closure: fix TypeScript typecheck failures + confidence-weighted ranking (KB-03)
+- [x] 05-06-PLAN.md — Gap closure: fix TypeScript typecheck failures + confidence-weighted ranking (KB-03)
 - [ ] 05-07-PLAN.md — Gap closure: wire verification queue with tRPC endpoints and auto-creation in ingestion (KB-07)
 
 ## Progress
