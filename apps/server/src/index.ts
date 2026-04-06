@@ -9,7 +9,7 @@ const { appRouter } = await import("@aucta/api");
 const { createTRPCContext } = await import("@aucta/api/trpc");
 const { auth } = await import("@aucta/auth");
 const { serve: inngestServe } = await import("inngest/bun");
-const { inngest, sessionSummarize, knowledgeIngest, knowledgeCompile } = await import("@aucta/api/jobs");
+const { inngest, sessionSummarize, knowledgeIngest, knowledgeCompile, knowledgeHealth } = await import("@aucta/api/jobs");
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -61,7 +61,7 @@ Bun.serve({
       } else if (url.pathname.startsWith("/api/inngest")) {
         const inngestHandler = inngestServe({
           client: inngest,
-          functions: [sessionSummarize, knowledgeIngest, knowledgeCompile],
+          functions: [sessionSummarize, knowledgeIngest, knowledgeCompile, knowledgeHealth],
         });
         response = await inngestHandler(req);
       } else {
