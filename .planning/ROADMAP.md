@@ -108,12 +108,16 @@ Plans:
   3. Articles have 4-tier confidence levels, flow through a verification queue, and are organized by equipment brand, model, and procedure type
   4. AI responses in live sessions attribute their source confidence level to the technician ("Based on unverified observation..." vs "Per manufacturer documentation...")
   5. Org owners can manually add knowledge articles via API, and health monitoring detects coverage gaps and stale content
-**Plans**: TBD
+**Plans**: 7 plans
 
 Plans:
-- [x] 05-01: TBD
-- [x] 05-02: TBD
-- [x] 05-03: TBD
+- [x] 05-01-PLAN.md — Schema, DTOs, and repositories: knowledge_articles, knowledge_verifications, knowledge_links tables, Zod schemas, repository classes
+- [x] 05-02-PLAN.md — Qdrant vector DB setup: collection with named dense+sparse vectors, embedding service, hybrid search engine
+- [x] 05-03-PLAN.md — searchKnowledgeBase tool: buildTool integration, context builder, source attribution, tool registration
+- [x] 05-04-PLAN.md — Ingestion and compilation pipeline: Inngest jobs for session ingestion, LLM article compilation, backlink generation
+- [x] 05-05-PLAN.md — Health monitoring and knowledge router: tRPC CRUD endpoints, Inngest cron health check, manual article input
+- [ ] 05-06-PLAN.md — Gap closure: fix TypeScript typecheck failures + confidence-weighted ranking (KB-03)
+- [ ] 05-07-PLAN.md — Gap closure: wire verification queue with tRPC endpoints and auto-creation in ingestion (KB-07)
 
 ## Progress
 
@@ -126,4 +130,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. AI Pipeline and Tool System | 3/4 | Gap closure | - |
 | 3. Live Streaming Session | 5/7 | Gap closure | - |
 | 4. Session Lifecycle | 0/3 | Planning complete | - |
-| 5. Knowledge Base | 0/0 | Not started | - |
+| 5. Knowledge Base | 5/7 | Gap closure | - |
