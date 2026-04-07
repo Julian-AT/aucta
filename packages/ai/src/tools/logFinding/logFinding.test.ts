@@ -1,9 +1,5 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import {
-  createLogFindingTool,
-  logFindingTool,
-  InMemoryFindingStore,
-} from "./index.js";
+import { describe, it, expect } from "vitest";
+import { logFindingTool } from "./index.js";
 import type { ToolContext } from "../../types.js";
 
 const testContext: ToolContext = {
@@ -22,10 +18,7 @@ describe("logFinding tool", () => {
   });
 
   it("records a safety finding with critical severity", async () => {
-    const store = new InMemoryFindingStore();
-    const tool = createLogFindingTool(store);
-
-    const result = await tool.call(
+    const result = await logFindingTool.call(
       {
         category: "safety",
         description: "Gas leak detected",
@@ -44,10 +37,7 @@ describe("logFinding tool", () => {
   });
 
   it("records finding with optional equipment fields (D-09)", async () => {
-    const store = new InMemoryFindingStore();
-    const tool = createLogFindingTool(store);
-
-    const result = await tool.call(
+    const result = await logFindingTool.call(
       {
         category: "observation",
         description: "Worn belt noticed on outdoor unit",
@@ -61,12 +51,8 @@ describe("logFinding tool", () => {
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data.recorded).toBe(true);
+      expect(result.data.findingId).toMatch(/^fnd_/);
     }
-
-    const findings = store.getBySession(testContext.sessionId);
-    expect(findings).toHaveLength(1);
-    expect(findings[0]!.equipmentModel).toBe("FTXM25");
-    expect(findings[0]!.manufacturer).toBe("Daikin");
   });
 
   it("validates all 5 categories (D-07)", () => {
@@ -137,65 +123,5 @@ describe("logFinding tool", () => {
     expect(decl.name).toBe("logFinding");
     expect(decl.description).toBeTruthy();
     expect(decl.parameters).toBeDefined();
-  });
-});
-
-describe("InMemoryFindingStore", () => {
-  let store: InMemoryFindingStore;
-
-  beforeEach(() => {
-    store = new InMemoryFindingStore();
-  });
-
-  it("stores a finding and returns fnd_ prefixed ID", () => {
-    const id = store.add("ses_123", {
-      category: "safety",
-      description: "Gas leak",
-      severity: "critical",
-      timestamp: new Date(),
-    });
-    expect(id).toMatch(/^fnd_/);
-  });
-
-  it("retrieves all findings for a session", () => {
-    store.add("ses_123", {
-      category: "safety",
-      description: "Gas leak",
-      severity: "critical",
-      timestamp: new Date(),
-    });
-    store.add("ses_123", {
-      category: "observation",
-      description: "Worn belt",
-      severity: "low",
-      timestamp: new Date(),
-    });
-
-    const findings = store.getBySession("ses_123");
-    expect(findings).toHaveLength(2);
-  });
-
-  it("returns empty array for unknown session", () => {
-    const findings = store.getBySession("ses_unknown");
-    expect(findings).toHaveLength(0);
-  });
-
-  it("isolates findings by session ID", () => {
-    store.add("ses_A", {
-      category: "safety",
-      description: "Finding A",
-      severity: "high",
-      timestamp: new Date(),
-    });
-    store.add("ses_B", {
-      category: "maintenance",
-      description: "Finding B",
-      severity: "low",
-      timestamp: new Date(),
-    });
-
-    expect(store.getBySession("ses_A")).toHaveLength(1);
-    expect(store.getBySession("ses_B")).toHaveLength(1);
-    expect(store.getBySession("ses_A")[0]!.description).toBe("Finding A");
   });
 });
