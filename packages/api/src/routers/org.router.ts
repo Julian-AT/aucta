@@ -74,6 +74,11 @@ export const orgRouter = router({
       });
     }
 
+    const currentMember = (org.members ?? []).find(
+      (m: { userId: string }) => m.userId === ctx.userId,
+    );
+    const currentUserRole = currentMember?.role ?? "member";
+
     const settings = await orgSettingsRepo.findByOrgId(ctx.orgId);
 
     return {
@@ -82,6 +87,7 @@ export const orgRouter = router({
       slug: org.slug,
       logo: org.logo,
       createdAt: org.createdAt,
+      currentUserRole,
       settings: settings
         ? {
             industryType: settings.industryType,
