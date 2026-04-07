@@ -281,6 +281,33 @@ describe("sessionRouter", () => {
     );
   });
 
+  it("includes tool declarations in liveConnectConstraints config", async () => {
+    process.env.GEMINI_API_KEY = "test-api-key";
+
+    const caller = sessionRouter.createCaller({
+      session: { userId: "user_1", activeOrganizationId: "org_1" },
+      headers: new Headers(),
+      ip: "127.0.0.1",
+    });
+
+    await caller.createToken();
+
+    const createCall = mockCreate.mock.calls[0]![0];
+    const config = createCall.config.liveConnectConstraints.config;
+
+    expect(config.tools).toBeDefined();
+    expect(config.tools).toBeInstanceOf(Array);
+    expect(config.tools).toHaveLength(1);
+    expect(config.tools[0].functionDeclarations).toBeInstanceOf(Array);
+    expect(config.tools[0].functionDeclarations.length).toBeGreaterThanOrEqual(2);
+
+    const toolNames = config.tools[0].functionDeclarations.map(
+      (d: { name: string }) => d.name,
+    );
+    expect(toolNames).toContain("lookupErrorCode");
+    expect(toolNames).toContain("logFinding");
+  });
+
   describe("dispatchToolCalls", () => {
     beforeEach(() => {
       mockDispatchToolCalls.mockReset();

@@ -104,6 +104,7 @@ export const sessionRouter = router({
             config: {
               systemInstruction: systemPrompt,
               responseModalities: [Modality.AUDIO],
+              tools: [{ functionDeclarations: pool.functionDeclarations }],
             },
           },
         },
