@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Aucta is a real-time AI copilot for HVAC technicians. The mobile app streams camera video and microphone audio directly to Google's Gemini 2.5 Flash Live API via WebSocket. Gemini reasons over the multimodal input, calls domain-specific tools (error code lookup, knowledge base search), and streams spoken guidance back in the technician's language. A self-learning knowledge base compounds organizational expertise with every session. A Next.js dashboard (later milestone) gives business owners visibility into team activity, session analytics, and knowledge base management.
+Aucta is a real-time AI copilot for HVAC technicians. The mobile app streams camera video and microphone audio directly to Google's Gemini 2.5 Flash Live API via WebSocket. Gemini reasons over the multimodal input, calls domain-specific tools (error code lookup, knowledge base search, finding logging), and streams spoken guidance back in the technician's language. A self-learning knowledge base compounds organizational expertise with every session. A Next.js dashboard (next milestone) gives business owners visibility into team activity, session analytics, and knowledge base management.
 
 ## Core Value
 
@@ -12,70 +12,84 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 
 ### Validated
 
-- [x] Ephemeral token system: API issues short-lived tokens so Gemini API key never reaches the client — Validated in Phase 2
-- [x] Layered system prompt assembly (core role, HVAC expertise, safety rules, org overlay, knowledge context) — Validated in Phase 2
-- [x] Tool system architecture: buildTool() factory, tool registry, tool dispatcher for Gemini function calling — Validated in Phase 2
-- [x] Turborepo monorepo with Bun, TypeScript strict, Biome, shared packages (ai, api, db, auth, shared, config) — Validated in Phase 1
-- [x] Better Auth with organization plugin, roles (owner/manager/technician), invite codes, RBAC permissions — Validated in Phase 1
-- [x] tRPC API with org-scoped middleware, rate limiting via Upstash Redis — Validated in Phase 1
-- [x] CI pipeline: Biome lint, TypeScript typecheck, Vitest tests, Turborepo build — Validated in Phase 1
-- [x] Live AI session: camera JPEG stream (1 FPS, 768px) + PCM audio (16kHz) → Gemini 2.5 Flash Live via WebSocket → spoken guidance — Validated in Phase 3
-- [x] Session orchestration engine: WebSocket lifecycle, reconnection with sessionResumption, audio/video pipelines — Validated in Phase 3
-- [x] Session UI: non-dismissible AI indicator, connection status, audio indicator, stop button, end session dialog, connection lost overlay — Validated in Phase 3
-- [x] Voice command session end via Gemini endSession tool call — Validated in Phase 3
-- [x] EU AI Act Art. 50 compliance: non-dismissible AI indicator during sessions — Validated in Phase 3
-- [x] Session lifecycle: DB persistence (ai_sessions, session_findings, session_tool_calls), incremental tool call/finding persistence, feedback collection (1-5 stars) — Validated in Phase 4
-- [x] Post-session Inngest summary pipeline with Gemini 2.5 Pro, AI-generated content labeling (COMP-07) — Validated in Phase 4
-- [x] MMKV offline cache for recent session summaries (20-session LRU), feedback screen with star rating — Validated in Phase 4
-- [x] No emotion recognition or sentiment analysis in any schema (COMP-08) — Validated in Phase 4
-- [x] Full knowledge base backend: ingest (session → article), compile (LLM wiki articles), verify (4-tier confidence, review queue), retrieve (hybrid BM25 + dense vector via Qdrant), health (coverage gaps, stale content) — Validated in Phase 5
-- [x] Knowledge article schema with 4-tier confidence levels and confidence-weighted search ranking — Validated in Phase 5
-- [x] searchKnowledgeBase tool with hybrid search, source attribution, context builder — Validated in Phase 5
-- [x] Inngest background jobs for knowledge ingestion, compilation, and health monitoring — Validated in Phase 5
-- [x] Knowledge pipeline fully wired end-to-end: all 4 Inngest functions registered, logFinding persistence from mobile, findingsCount in session recap — Validated in Phase 6
-- [x] Qdrant vector DB with named dense+sparse vectors for hybrid retrieval — Validated in Phase 5
-- [x] Verification queue: tRPC endpoints for review submission, auto-creation on ingestion, confidence promotion on approval — Validated in Phase 5
-- [x] Ephemeral token tool enforcement: tool declarations locked in liveConnectConstraints for security-in-depth — Validated in Phase 7
-- [x] Settings screen shows real org name and user role from API (no hardcoded placeholders) — Validated in Phase 7
-- [x] Dead code cleanup: InMemoryFindingStore removed, stateless logFindingTool via buildTool() — Validated in Phase 7
+- ✓ Turborepo monorepo with Bun, TypeScript strict, Biome, shared packages (ai, api, db, auth, shared, config) — v1.0
+- ✓ Better Auth with organization plugin, roles (owner/manager/technician), invite codes, RBAC permissions — v1.0
+- ✓ tRPC API with org-scoped middleware, rate limiting via Upstash Redis — v1.0
+- ✓ CI pipeline: Biome lint, TypeScript typecheck, Vitest tests, Turborepo build — v1.0
+- ✓ Ephemeral token system: API issues short-lived tokens so Gemini API key never reaches the client — v1.0
+- ✓ Layered system prompt assembly (core role, HVAC expertise, safety rules, org overlay, knowledge context) — v1.0
+- ✓ Tool system architecture: buildTool() factory, tool registry, tool dispatcher for Gemini function calling — v1.0
+- ✓ Ephemeral token tool enforcement: tool declarations locked in liveConnectConstraints — v1.0
+- ✓ Live AI session: camera JPEG stream (1 FPS, 768px) + PCM audio (16kHz) → Gemini 2.5 Flash Live → spoken guidance — v1.0
+- ✓ Session orchestration engine: WebSocket lifecycle, reconnection with sessionResumption, audio/video pipelines — v1.0
+- ✓ Session UI: non-dismissible AI indicator, connection status, audio indicator, stop button, end session dialog, connection lost overlay — v1.0
+- ✓ Voice command session end via Gemini endSession tool call — v1.0
+- ✓ EU AI Act Art. 50 compliance: non-dismissible AI indicator during sessions — v1.0
+- ✓ Glove-friendly touch targets (56x56dp), high-contrast UI (WCAG AAA), audio-first interaction — v1.0
+- ✓ Session lifecycle: DB persistence (ai_sessions, session_findings, session_tool_calls), incremental persistence, feedback (1-5 stars) — v1.0
+- ✓ Post-session Inngest summary pipeline with Gemini 2.5 Pro, AI-generated content labeling — v1.0
+- ✓ MMKV offline cache for recent session summaries (20-session LRU) — v1.0
+- ✓ No emotion recognition or sentiment analysis (COMP-08) — v1.0
+- ✓ Knowledge article schema with 4-tier confidence levels and confidence-weighted search ranking — v1.0
+- ✓ Hybrid BM25 + dense vector search via Qdrant with org-scoped filtering — v1.0
+- ✓ searchKnowledgeBase tool with source attribution and context builder — v1.0
+- ✓ Session ingestion → LLM article compilation → auto-backlinks pipeline — v1.0
+- ✓ Verification queue: review submission, auto-creation on ingestion, confidence promotion — v1.0
+- ✓ Knowledge health monitoring: coverage gaps, stale content, daily cron — v1.0
+- ✓ Knowledge pipeline fully wired end-to-end: all Inngest functions registered, logFinding persistence from mobile — v1.0
+- ✓ Settings screen shows real org name and user role from API — v1.0
+- ✓ Dead code cleanup: InMemoryFindingStore removed, stateless logFindingTool — v1.0
+- ✓ Stream-and-discard architecture: no audio/video stored on our servers — v1.0
+- ✓ Safety disclaimers, F-Gas EU 2024/573 references, AI scope limitations in system prompt — v1.0
 
 ### Active
 
-- [ ] Expo SDK 55 mobile app with Expo Router, NativeWind v5, camera + audio capture
-- [ ] Neon Postgres (EU Frankfurt) with Drizzle ORM, repository pattern, DTO boundaries
-- [ ] Glove-friendly touch targets (56x56dp), high-contrast UI, audio-first interaction
+- [ ] EAS development builds verified on physical devices (config exists, needs human testing)
 - [ ] i18n foundation with react-i18next (en, de, tr, sr, hr, pl, ro)
 - [ ] Sentry error tracking + PostHog analytics integration
+- [ ] Web dashboard: overview, session explorer, team management, analytics, KB management, org settings
+- [ ] Additional AI tools: getEquipmentSpecs, getWiringDiagram, calculateRefrigerantCharge, checkSafetyRecall, getOrgProcedure, identifyPart, escalateToExpert
+- [ ] Equipment identification via dataplate OCR from camera
+- [ ] Expert escalation with AI-packaged context handoff
+- [ ] Push notifications for escalation alerts and session summaries
 
 ### Out of Scope
 
-- Web dashboard UI — backend only for now; verification via scripts/CLI until dashboard milestone
-- Session history / session explorer UI — mobile and web, deferred
-- Analytics dashboard — deferred to dashboard milestone
-- Team management UI — deferred to dashboard milestone
-- Organization settings UI — deferred to dashboard milestone
-- Billing / payments (Stripe, RevenueCat) — deferred until post-validation
-- 7 remaining AI tools (getEquipmentSpecs, getWiringDiagram, calculateRefrigerantCharge, checkSafetyRecall, getOrgProcedure, identifyPart, escalateToExpert) — added incrementally
-- Multi-agent architecture (DiagnosticAgent, SafetyAuditAgent, SummaryAgent, KnowledgeAgent) — Phase 2
-- On-device fallback (Gemma 4 E2B via LiteRT) — Phase 2
-- Public REST API — Phase 2
-- Session recording & playback — Phase 2
-- AR annotation layer — Phase 2-3
-- FSM integrations (ServiceTitan, Housecall Pro) — Phase 3
+- On-device AI fallback (Gemma 4 E2B via LiteRT) — wait for Gemini Live to prove limitations
+- Public REST API — no external integrations needed yet
+- Session recording & playback — GDPR complexity, not core to copilot value
+- AR annotation layer — interesting but not needed for initial validation
+- FSM integrations (ServiceTitan, Housecall Pro) — complement, don't compete
+- Billing / payments (Stripe, RevenueCat) — free during validation phase
+- Multi-agent architecture — single Gemini session sufficient for v1 use cases
 - Landing page — separate Framer project, not in this codebase
-- Smart glasses support — future
+- Smart glasses support — smartphone-only eliminates adoption barriers
+- Pre-authored SOP/workflow builder — AI reasons in real time, no content investment needed
+- Gamification / leaderboards — creates perverse incentives, ruins trust
+- In-app per-session billing — discourages usage
+- Real-time chat between technicians — not core to copilot value
+- Video call / screen sharing — technicians can use existing tools
+- White-labeling — enterprise tier, future consideration
+- Emotion recognition / sentiment analysis — EU AI Act explicitly prohibits workplace emotion recognition
 
 ## Context
 
-**Market:** HVAC businesses in Vienna, Austria (7,650 WKO SHL member businesses). The workforce includes native speakers of Turkish, Serbian, Croatian, Polish, Romanian — multilingual real-time guidance is the core USP.
+**Shipped:** v1.0 MVP on 2026-04-07. 7 phases, 30 plans, 22,867 LOC TypeScript across 374 files.
+
+**Tech stack (production):** Turborepo + Bun monorepo, Expo SDK 55 (NativeWind v5, Expo Router), tRPC 11, Drizzle ORM 0.45.x, Neon Postgres (EU Frankfurt), Upstash Redis (EU), Qdrant (EU), Better Auth 1.5.x, Inngest 4.1.x, Gemini 2.5 Flash Live via @google/genai, Zustand 5, MMKV, Vitest 4, Biome 2.4.
+
+**Architecture:** 6 packages (ai, api, db, auth, shared, config) + 1 app (mobile). Repository pattern with Drizzle in repositories, Zod-validated DTOs at boundaries, constructor injection, vertical slices. Tools use buildTool() factory pattern. Sessions use stream-and-discard for privacy.
+
+**Market:** HVAC businesses in Vienna, Austria (7,650 WKO SHL member businesses). Multilingual workforce (Turkish, Serbian, Croatian, Polish, Romanian) — real-time guidance in native language is the core USP.
 
 **Business model:** B2B SaaS. Free during validation (3-6 months, target 50-200 active technicians), then EUR 29/tech/month Professional tier.
 
-**Architecture inspiration:** Tool system modeled on Claude Code's buildTool() + assembleToolPool() pattern. Session orchestration modeled on Claude Code's QueryEngine. Knowledge base inspired by Andrej Karpathy's "LLM Knowledge Bases" + Claude Code's memory system.
+**Regulatory landscape:** GDPR (Austria-based, EU data residency), EU AI Act transparency (deadline August 2, 2026), F-Gas EU 2024/573, Product Liability Directive 2024/2853 (transposition by December 9, 2026).
 
-**Regulatory landscape:** GDPR (Austria-based, EU data residency), EU AI Act transparency (deadline August 2, 2026), F-Gas EU 2024/573, Product Liability Directive 2024/2853 (transposition by December 9, 2026). Privacy-by-design: audio/video streamed directly to Gemini, never stored on our servers.
-
-**Existing codebase:** Phase 6 complete. Monorepo with full auth system, AI tool pipeline, ephemeral Gemini tokens, system prompt assembly, live streaming session (WebSocket lifecycle, audio/video pipelines, session UI, voice commands), session lifecycle management (DB persistence, incremental tool/finding persistence, feedback collection, Inngest summary pipeline, MMKV offline cache), and self-learning knowledge base fully wired end-to-end (hybrid search, ingestion/compilation pipelines, verification queue, health monitoring, all Inngest functions registered, logFinding persistence from mobile). 6 of 7 milestone phases complete.
+**Known risks:**
+- Gemini Live API is labeled "Preview" — may have breaking changes or pricing shifts
+- Session cost economics: $0.35-$0.50 per 15-min session may consume 50-75% of EUR 29/month revenue
+- NativeWind v5 is preview (v5.0.0-preview.3) — risk from pre-release package
 
 ## Constraints
 
@@ -90,12 +104,17 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Mobile + core AI first | Get the core magic working before building the business layer | -- Pending |
-| Full knowledge base backend, no dashboard UI | KB is the key differentiator; verification can run headless via CLI until dashboard milestone | -- Pending |
-| Start with 2-3 tools, not all 10 | Prove the tool architecture with essential tools, expand incrementally | -- Pending |
-| Full auth from day one | Better Auth with orgs/roles/invites is foundational — everything depends on org-scoped data | -- Pending |
-| Stream-and-discard for audio/video | Eliminates largest GDPR surface area; trades liability evidence for privacy compliance | -- Pending |
-| Gemini 2.5 Flash Live (not OpenAI Realtime) | Real-time multimodal via WebSocket, async function calling, auto language detection, 30 HD voices | -- Pending |
+| Mobile + core AI first | Get the core magic working before building the business layer | ✓ Good — shipped full mobile copilot in 5 days, dashboard deferred to v1.1 |
+| Full knowledge base backend, no dashboard UI | KB is the key differentiator; verification can run headless via CLI until dashboard milestone | ✓ Good — KB pipeline fully wired, verification queue works headless |
+| Start with 2-3 tools, not all 10 | Prove the tool architecture with essential tools, expand incrementally | ✓ Good — 3 tools (lookupErrorCode, logFinding, searchKnowledgeBase) cover core use case |
+| Full auth from day one | Better Auth with orgs/roles/invites is foundational — everything depends on org-scoped data | ✓ Good — org-scoped middleware catches all cross-tenant access |
+| Stream-and-discard for audio/video | Eliminates largest GDPR surface area; trades liability evidence for privacy compliance | ✓ Good — verified in Phase 3, no audio/video stored |
+| Gemini 2.5 Flash Live (not OpenAI Realtime) | Real-time multimodal via WebSocket, async function calling, auto language detection, 30 HD voices | ⚠️ Revisit — "Preview" label means API may change; cost economics need validation |
+| NativeWind v5 preview over v4 stable | User override of v4.2.3 stable recommendation — wants latest features | ⚠️ Revisit — pre-release dependency adds upgrade risk |
+| No FK constraints to Better Auth tables | Application-layer referential integrity to avoid coupling with Better Auth schema | ✓ Good — clean separation, no migration conflicts |
+| Inngest for background jobs (not BullMQ) | Serverless-native, runs on Vercel, no Redis infra needed for job queues | ✓ Good — session summary + knowledge pipeline both use Inngest |
+| Zustand over Redux | getState()/setState() outside React for WebSocket callbacks | ✓ Good — essential for audio/WebSocket callbacks outside render cycle |
+| Constructor injection throughout | Testability and decoupling without DI container overhead | ✓ Good — all services/repos testable with mock dependencies |
 
 ## Evolution
 
@@ -115,4 +134,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after Phase 7 completion — all v1.0 milestone phases complete*
+*Last updated: 2026-04-07 after v1.0 milestone completion*
