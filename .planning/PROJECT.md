@@ -35,6 +35,9 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 - [x] Knowledge pipeline fully wired end-to-end: all 4 Inngest functions registered, logFinding persistence from mobile, findingsCount in session recap — Validated in Phase 6
 - [x] Qdrant vector DB with named dense+sparse vectors for hybrid retrieval — Validated in Phase 5
 - [x] Verification queue: tRPC endpoints for review submission, auto-creation on ingestion, confidence promotion on approval — Validated in Phase 5
+- [x] Ephemeral token tool enforcement: tool declarations locked in liveConnectConstraints for security-in-depth — Validated in Phase 7
+- [x] Settings screen shows real org name and user role from API (no hardcoded placeholders) — Validated in Phase 7
+- [x] Dead code cleanup: InMemoryFindingStore removed, stateless logFindingTool via buildTool() — Validated in Phase 7
 
 ### Active
 
@@ -112,4 +115,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-06 after Phase 6 completion*
+*Last updated: 2026-04-07 after Phase 7 completion — all v1.0 milestone phases complete*
