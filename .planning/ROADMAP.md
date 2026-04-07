@@ -148,7 +148,11 @@ Plans:
   3. Settings screen displays actual user role instead of hardcoded "Technician" badge
   4. incrementFindingsCount Zustand action is wired to findings updates or removed if redundant
   5. No InMemoryFindingStore references remain — all findings flow through persistent storage
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Tool system hardening: remove InMemoryFindingStore dead code, add tool declarations to ephemeral token liveConnectConstraints
+- [ ] 07-02-PLAN.md — Settings screen real data: expand org.getCurrent with user role, wire settings screen to display actual org name and role
 
 ## Progress
 
@@ -163,4 +167,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 4. Session Lifecycle | 3/3 | Complete | 2026-04-05 |
 | 5. Knowledge Base | 7/7 | Complete | 2026-04-06 |
 | 6. Wire Knowledge Pipeline | 0/1 | Not started | - |
-| 7. Integration Hardening and Tech Debt | 0/0 | Not started | - |
+| 7. Integration Hardening and Tech Debt | 0/2 | Not started | - |
