@@ -10,6 +10,8 @@ import {
 import { ScreenContainer } from "@/components/common/ScreenContainer";
 import { useSession } from "@/providers/session-provider";
 import { authClient } from "@/lib/auth-client";
+import { useTRPC } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 import { LogOut, Moon, Sun, Smartphone } from "lucide-react-native";
 import type { ThemeMode } from "@/constants/theme";
 
@@ -24,6 +26,13 @@ export default function SettingsScreen() {
   const systemTheme = useColorScheme();
   const [selectedTheme, setSelectedTheme] = useState<ThemeMode>("system");
   const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const trpc = useTRPC();
+  const orgQuery = useQuery(
+    trpc.org.getCurrent.queryOptions(undefined, {
+      enabled: !!session?.activeOrganizationId,
+    }),
+  );
 
   const userName = session?.user.name ?? "User";
   const userEmail = session?.user.email ?? "";
@@ -83,11 +92,19 @@ export default function SettingsScreen() {
                 {userEmail}
               </Text>
             </View>
-            <View className="rounded-full bg-accent/10 px-sm py-xs">
-              <Text className="text-[12px] font-semibold text-accent">
-                Technician
-              </Text>
-            </View>
+            {session?.activeOrganizationId && (
+              <View className="rounded-full bg-accent/10 px-sm py-xs">
+                <Text
+                  className="text-[12px] font-semibold text-accent"
+                  accessibilityLabel={`${orgQuery.data?.currentUserRole ? orgQuery.data.currentUserRole.charAt(0).toUpperCase() + orgQuery.data.currentUserRole.slice(1) : "Member"} role`}
+                >
+                  {orgQuery.data?.currentUserRole
+                    ? orgQuery.data.currentUserRole.charAt(0).toUpperCase() +
+                      orgQuery.data.currentUserRole.slice(1)
+                    : "Member"}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -140,7 +157,7 @@ export default function SettingsScreen() {
           <View className="rounded-lg bg-surface p-lg gap-sm">
             <Text className="text-body text-text-primary">
               {session?.activeOrganizationId
-                ? "Your Organization"
+                ? orgQuery.data?.name ?? "Your Organization"
                 : "No organization"}
             </Text>
           </View>
