@@ -30,7 +30,9 @@ describe("AudioPlayback", () => {
     playback = new AudioPlayback(mockCtxFactory);
   });
 
-  it("creates AudioContext with 24000 sample rate", () => {
+  it("creates AudioContext with 24000 sample rate on first enqueueChunk", () => {
+    const base64 = pcm16ToBase64([100]);
+    playback.enqueueChunk(base64);
     const ctx = (playback as any).ctx as MockAudioContext;
     expect(ctx.sampleRate).toBe(24000);
   });
@@ -86,41 +88,39 @@ describe("AudioPlayback", () => {
     expect(secondStart).toBeCloseTo(firstStart + firstDuration, 10);
   });
 
-  it("interrupt() stops all scheduled playback and resets nextStartTime", () => {
+  it("interrupt() stops all scheduled playback and resets state", () => {
     const base64 = pcm16ToBase64([100, 200, 300, 400]);
     playback.enqueueChunk(base64);
 
     const oldCtx = (playback as any).ctx as MockAudioContext;
     playback.interrupt();
 
-    const newCtx = (playback as any).ctx as MockAudioContext;
-    expect(newCtx).not.toBe(oldCtx);
     expect(oldCtx.state).toBe("closed");
-    expect((playback as any).nextStartTime).toBe(newCtx.currentTime);
+    expect((playback as any).ctx).toBeNull();
+    expect((playback as any).nextStartTime).toBe(0);
   });
 
-  it("enqueueChunk after interrupt() resumes scheduling from current time", () => {
+  it("enqueueChunk after interrupt() creates fresh context and resumes", () => {
     const base64 = pcm16ToBase64([100, 200]);
 
     playback.enqueueChunk(base64);
     playback.interrupt();
 
-    // Simulate time advancing on the new context
-    const ctx = (playback as any).ctx as MockAudioContext;
-    ctx.currentTime = 5.0;
-    (playback as any).nextStartTime = ctx.currentTime;
-
+    // enqueueChunk should lazily create a new context
     playback.enqueueChunk(base64);
 
-    // The source scheduled on the new context should start at >= 5.0
+    const ctx = (playback as any).ctx as MockAudioContext;
+    expect(ctx).not.toBeNull();
     expect(ctx._sources).toHaveLength(1);
-    expect(ctx._sources[0].startTime).toBeGreaterThanOrEqual(5.0);
+    expect(ctx._sources[0].startTime).toBeGreaterThanOrEqual(0);
   });
 
   it("destroy() closes AudioContext", async () => {
+    playback.enqueueChunk(pcm16ToBase64([100]));
     const ctx = (playback as any).ctx as MockAudioContext;
     playback.destroy();
     expect(ctx.state).toBe("closed");
+    expect((playback as any).ctx).toBeNull();
   });
 
   it("uses lazy require for react-native-audio-api by default", () => {

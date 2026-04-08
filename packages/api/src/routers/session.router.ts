@@ -184,6 +184,11 @@ export const sessionRouter = router({
       await inngest.send({
         name: "session/ended",
         data: { sessionId: input.sessionId },
+      }).catch((err: unknown) => {
+        console.warn(
+          "[session.endSession] Inngest send failed (non-fatal):",
+          err instanceof Error ? err.message : err,
+        );
       });
 
       return updated;

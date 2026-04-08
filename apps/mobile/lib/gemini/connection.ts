@@ -52,6 +52,7 @@ export class GeminiConnection {
     this.ws = new WebSocket(url);
 
     this.ws.onopen = () => {
+      console.log("[GeminiWS] Connected, sending setup...");
       this.sendSetupMessage(config);
     };
 
@@ -60,6 +61,7 @@ export class GeminiConnection {
     };
 
     this.ws.onclose = (event: CloseEvent) => {
+      console.log(`[GeminiWS] Closed: code=${event.code} reason=${event.reason}`);
       if (this._intentionalClose) return;
       if (event.code !== 1000) {
         this.deps.onDisconnect(event.code, event.reason);
@@ -69,6 +71,7 @@ export class GeminiConnection {
     this.ws.onerror = (event: Event) => {
       const message =
         (event as { message?: string }).message ?? "WebSocket error";
+      console.error("[GeminiWS] Error:", message);
       this.deps.onError(message);
     };
   }
@@ -147,6 +150,7 @@ export class GeminiConnection {
     const msg: unknown = JSON.parse(event.data as string);
 
     if (isSetupComplete(msg)) {
+      console.log("[GeminiWS] Setup complete");
       this.deps.onSetupComplete();
       return;
     }
@@ -154,6 +158,12 @@ export class GeminiConnection {
     if (isServerContent(msg)) {
       const content = msg.serverContent;
       if (content.modelTurn?.parts) {
+        const audioChunks = content.modelTurn.parts.filter(
+          (p) => p.inlineData?.data,
+        );
+        if (audioChunks.length > 0) {
+          console.log(`[GeminiWS] Audio data: ${audioChunks.length} chunk(s)`);
+        }
         for (const part of content.modelTurn.parts) {
           if (part.inlineData?.data) {
             this.deps.onAudioData(part.inlineData.data);
@@ -161,6 +171,7 @@ export class GeminiConnection {
         }
       }
       if (content.turnComplete) {
+        console.log("[GeminiWS] Turn complete");
         this.deps.onTurnComplete();
       }
       return;

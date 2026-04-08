@@ -1,6 +1,30 @@
-import { createMMKV } from "react-native-mmkv";
+/**
+ * MMKV requires NitroModules which is only available in development builds.
+ * When running in Expo Go, fall back to an in-memory Map so the app still works
+ * (cache won't persist across reloads, but no crash).
+ */
+interface KVStorage {
+  getString(key: string): string | undefined;
+  set(key: string, value: string): void;
+  remove(key: string): void;
+}
 
-const storage = createMMKV({ id: "session-cache" });
+function createStorage(): KVStorage {
+  try {
+    const { createMMKV } = require("react-native-mmkv");
+    return createMMKV({ id: "session-cache" });
+  } catch {
+    console.warn("[session-cache] MMKV unavailable, using in-memory fallback");
+    const map = new Map<string, string>();
+    return {
+      getString: (key: string) => map.get(key),
+      set: (key: string, value: string) => { map.set(key, value); },
+      remove: (key: string) => { map.delete(key); },
+    };
+  }
+}
+
+const storage = createStorage();
 
 const KEYS = {
   sessionIds: "cache:sessionIds",

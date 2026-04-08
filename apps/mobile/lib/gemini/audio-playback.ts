@@ -58,14 +58,31 @@ function createNativeAudioContext(options: { sampleRate: number }) {
  */
 export class AudioPlayback {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private ctx: any;
-  private nextStartTime: number;
+  private ctx: any = null;
+  private nextStartTime = 0;
   private ctxFactory: AudioContextFactory;
 
   constructor(ctxFactory?: AudioContextFactory) {
     this.ctxFactory = ctxFactory ?? createNativeAudioContext;
-    this.ctx = this.ctxFactory({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
-    this.nextStartTime = this.ctx.currentTime;
+  }
+
+  /**
+   * Lazily create the AudioContext on first use.
+   * Avoids crash in Expo Go where native modules aren't available.
+   */
+  private ensureContext(): boolean {
+    if (this.ctx) return true;
+    try {
+      this.ctx = this.ctxFactory({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
+      this.nextStartTime = this.ctx.currentTime;
+      return true;
+    } catch {
+      console.warn(
+        "[AudioPlayback] react-native-audio-api not available. " +
+          "Audio playback requires a development build (not Expo Go).",
+      );
+      return false;
+    }
   }
 
   /**
@@ -73,6 +90,8 @@ export class AudioPlayback {
    * Decodes, converts to Float32, creates an AudioBuffer, schedules it.
    */
   enqueueChunk(pcmBase64: string): void {
+    if (!this.ensureContext()) return;
+
     const pcmBytes = base64ToUint8Array(pcmBase64);
     const float32 = pcm16ToFloat32(pcmBytes);
 
@@ -95,15 +114,18 @@ export class AudioPlayback {
    * all pre-scheduled AudioBufferSourceNode instances.
    */
   interrupt(): void {
+    if (!this.ctx) return;
     this.ctx.close();
-    this.ctx = this.ctxFactory({ sampleRate: AUDIO_OUTPUT_SAMPLE_RATE });
-    this.nextStartTime = this.ctx.currentTime;
+    this.ctx = null;
+    this.nextStartTime = 0;
   }
 
   /**
    * Close AudioContext. Called on session end.
    */
   destroy(): void {
+    if (!this.ctx) return;
     this.ctx.close();
+    this.ctx = null;
   }
 }

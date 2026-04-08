@@ -10,9 +10,16 @@ export const auth = betterAuth({
   emailAndPassword: { enabled: true },
   trustedOrigins: [
     "aucta://",
-    // Expo dev origins
     ...(process.env.NODE_ENV !== "production"
-      ? ["exp://", "exp://**", "exp://192.168.*.*:*/**"]
+      ? [
+          "exp://",
+          "exp://**",
+          "exp://192.168.*.*:*/**",
+          "http://localhost:*",
+          "http://127.0.0.1:*",
+          "http://192.168.*.*:*",
+          "http://10.0.2.2:*",
+        ]
       : []),
   ],
   plugins: [

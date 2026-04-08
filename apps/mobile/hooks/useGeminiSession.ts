@@ -96,8 +96,20 @@ export function useGeminiSession(
   }, []);
 
   const startPipelines = useCallback(() => {
-    captureRef.current?.start();
-    store.getState().setMicActive(true);
+    captureRef.current
+      ?.start()
+      .then(() => {
+        store.getState().setMicActive(true);
+      })
+      .catch((err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : "Audio capture failed";
+        console.warn("[AudioCapture] Start failed:", message);
+        store.getState().setMicActive(false);
+        store.getState().setError(
+          "Microphone unavailable — audio requires a development build (not Expo Go).",
+        );
+      });
     frameCaptureRef.current?.start();
   }, [store]);
 

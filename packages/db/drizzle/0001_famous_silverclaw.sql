@@ -1,0 +1,2 @@
+-- Better Auth extensions (managed by Better Auth, not Drizzle)
+-- This migration is intentionally empty; Better Auth creates its own schema.
