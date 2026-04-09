@@ -1,8 +1,20 @@
 # Aucta
 
+## Current Milestone: v1.1 Market-Ready
+
+**Goal:** A Vienna HVAC business owner can sign up, invite their multilingual team, technicians use the AI copilot in their language, and the owner monitors activity from a web dashboard — all GDPR and EU AI Act compliant.
+
+**Target features:**
+- i18n foundation (7 languages: en, de, tr, sr, hr, pl, ro) + language picker
+- Observability (Sentry + PostHog) + auth completeness (password reset, email verification, transactional email)
+- Legal/GDPR compliance (privacy policy, Impressum, TOS, GDPR data export/delete jobs, invite expiry, audit logging, data retention enforcement, EU AI Act risk classification)
+- Web dashboard foundation (Next.js 16, migrate server → API routes, Better Auth web, dashboard shell)
+- Dashboard core screens (overview with live sessions, session explorer with export, team management, org settings, email summaries)
+- Mobile polish (session history, knowledge feedback, tutorial, EAS verification)
+
 ## What This Is
 
-Aucta is a real-time AI copilot for HVAC technicians. The mobile app streams camera video and microphone audio directly to Google's Gemini 2.5 Flash Live API via WebSocket. Gemini reasons over the multimodal input, calls domain-specific tools (error code lookup, knowledge base search, finding logging), and streams spoken guidance back in the technician's language. A self-learning knowledge base compounds organizational expertise with every session. A Next.js dashboard (next milestone) gives business owners visibility into team activity, session analytics, and knowledge base management.
+Aucta is a real-time AI copilot for HVAC technicians. The mobile app streams camera video and microphone audio directly to Google's Gemini 2.5 Flash Live API via WebSocket. Gemini reasons over the multimodal input, calls domain-specific tools (error code lookup, knowledge base search, finding logging), and streams spoken guidance back in the technician's language. A self-learning knowledge base compounds organizational expertise with every session. A Next.js dashboard gives business owners visibility into team activity, session analytics, and knowledge base management.
 
 ## Core Value
 
@@ -42,16 +54,39 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 - ✓ Stream-and-discard architecture: no audio/video stored on our servers — v1.0
 - ✓ Safety disclaimers, F-Gas EU 2024/573 references, AI scope limitations in system prompt — v1.0
 
-### Active
+### Active (v1.1)
 
-- [ ] EAS development builds verified on physical devices (config exists, needs human testing)
-- [ ] i18n foundation with react-i18next (en, de, tr, sr, hr, pl, ro)
-- [ ] Sentry error tracking + PostHog analytics integration
-- [ ] Web dashboard: overview, session explorer, team management, analytics, KB management, org settings
+- [ ] i18n foundation with react-i18next + expo-localization (en, de, tr, sr, hr, pl, ro)
+- [ ] Language preference picker + theme persistence to MMKV
+- [ ] Sentry error tracking (mobile + server, source maps, error boundaries)
+- [ ] PostHog analytics (mobile events, server events, feature flags)
+- [ ] Password reset screen + email verification gating
+- [ ] Transactional email infrastructure (React Email + Resend in packages/email)
+- [ ] Datenschutzerklärung, Impressum, TOS (in-app + web-renderable)
+- [ ] GDPR Inngest jobs: gdpr.export, gdpr.delete, invite.expire
+- [ ] Audit logging infrastructure (audit_log table + middleware)
+- [ ] Data retention enforcement (scheduled cleanup per org_settings.data_retention_days)
+- [ ] EU AI Act risk classification document
+- [ ] Sub-processor register + Art. 30 processing records
+- [ ] Next.js 16 dashboard (apps/web), migrate apps/server → API routes
+- [ ] Dashboard: overview (live sessions via tRPC SSE, today's numbers, trends, alerts)
+- [ ] Dashboard: session explorer (search, filter, detail view, CSV/PDF export)
+- [ ] Dashboard: team management (roster, invite flow, roles)
+- [ ] Dashboard: org settings (profile, AI config, escalation contacts)
+- [ ] Email session summaries to managers (email.sessionSummary Inngest job)
+- [ ] Mobile session history screen
+- [ ] Mobile knowledge feedback prompt + tutorial overlay
+- [ ] EAS development builds verified on physical devices
+
+### Active (v1.2+)
+
 - [ ] Additional AI tools: getEquipmentSpecs, getWiringDiagram, calculateRefrigerantCharge, checkSafetyRecall, getOrgProcedure, identifyPart, escalateToExpert
+- [ ] Dashboard: analytics (usage trends, cost analysis, quality metrics)
+- [ ] Dashboard: KB management (article browser, verification queue, manual upload)
 - [ ] Equipment identification via dataplate OCR from camera
 - [ ] Expert escalation with AI-packaged context handoff
 - [ ] Push notifications for escalation alerts and session summaries
+- [ ] Mobile personal stats screen
 
 ### Out of Scope
 
@@ -78,7 +113,7 @@ A technician points their phone camera at HVAC equipment, speaks naturally in an
 
 **Tech stack (production):** Turborepo + Bun monorepo, Expo SDK 55 (NativeWind v5, Expo Router), tRPC 11, Drizzle ORM 0.45.x, Neon Postgres (EU Frankfurt), Upstash Redis (EU), Qdrant (EU), Better Auth 1.5.x, Inngest 4.1.x, Gemini 2.5 Flash Live via @google/genai, Zustand 5, MMKV, Vitest 4, Biome 2.4.
 
-**Architecture:** 6 packages (ai, api, db, auth, shared, config) + 1 app (mobile). Repository pattern with Drizzle in repositories, Zod-validated DTOs at boundaries, constructor injection, vertical slices. Tools use buildTool() factory pattern. Sessions use stream-and-discard for privacy.
+**Architecture:** 6 packages (ai, api, db, auth, shared, config) + 1 app (mobile, web planned for v1.1). Repository pattern with Drizzle in repositories, Zod-validated DTOs at boundaries, constructor injection, vertical slices. Tools use buildTool() factory pattern. Sessions use stream-and-discard for privacy.
 
 **Market:** HVAC businesses in Vienna, Austria (7,650 WKO SHL member businesses). Multilingual workforce (Turkish, Serbian, Croatian, Polish, Romanian) — real-time guidance in native language is the core USP.
 
@@ -134,4 +169,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after v1.0 milestone completion*
+*Last updated: 2026-04-09 after v1.1 milestone started*
