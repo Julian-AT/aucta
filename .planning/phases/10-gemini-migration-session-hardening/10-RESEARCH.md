@@ -55,7 +55,7 @@ None -- discussion stayed within phase scope.
 | SESS-04 | Replace z.any() with typed Zod schemas | `session.router.ts:41` identified. Tool input schemas exist in buildTool definitions; use `z.unknown()` for args field. |
 | COST-01 | Client-side VAD (Silero WASM) | ONNX Runtime for React Native required. Integration into AudioCapture pipeline documented. Layer 2. |
 | COST-02 | Scene-change detection (pixel diff) | expo-image-manipulator already in use. Extend FrameCapture with diff logic. Layer 2. |
-| PRICE-01 | Tiered pricing enforcement (4 tiers, block at cap) | New DB schema for org_usage_periods. Service-layer cap checking with atomic SQL increment. Layer 2. |
+| PRICE-01 | Tiered pricing enforcement (4 tiers, block at cap) | New DB schema for org_usage_periods. Service-layer cap checking with Drizzle atomic increment via `sql` template. Layer 2. |
 | PRICE-02 | Session usage tracking per org | Repository + service pattern. tRPC endpoint for usage query. Layer 2. |
 </phase_requirements>
 
@@ -277,8 +277,32 @@ async createSession(orgId: string, userId: string, modelVersion?: string) {
   if (usage.sessionCap !== null && usage.sessionCount >= usage.sessionCap) {
     throw ErrorWithCode.Forbidden("SESSION_CAP_EXCEEDED");
   }
-  await this.usageRepo.incrementSessionCount(orgId);
+  // Atomic increment via Drizzle in the repository — see Pitfall 7 code example
+  const updated = await this.usageRepo.incrementSessionCount(orgId);
+  if (!updated) {
+    throw ErrorWithCode.TooManyRequests("SESSION_CAP_EXCEEDED");
+  }
   // ... create session
+}
+```
+
+Atomic increment in the repository (Drizzle, NOT raw SQL):
+```typescript
+// In OrgUsageRepository.incrementSessionCount()
+async incrementSessionCount(orgId: string): Promise<boolean> {
+  const result = await this.db.update(orgUsagePeriods)
+    .set({ sessionCount: sql`${orgUsagePeriods.sessionCount} + 1` })
+    .where(
+      and(
+        eq(orgUsagePeriods.orgId, orgId),
+        or(
+          isNull(orgUsagePeriods.sessionCap),
+          lt(orgUsagePeriods.sessionCount, orgUsagePeriods.sessionCap),
+        ),
+      ),
+    )
+    .returning({ sessionCount: orgUsagePeriods.sessionCount });
+  return result.length > 0;
 }
 ```
 
@@ -372,7 +396,7 @@ Use `jpeg-js` (pure JS, ~15KB, no native deps) to decode the small 128x128 JPEG 
 | CORS in Next.js | Custom per-route CORS headers | `middleware.ts` with centralized CORS logic | One place to maintain, covers all routes including preflight |
 | VAD from scratch | Custom speech detection algorithm | Silero VAD model via onnxruntime-react-native | Silero is state-of-the-art, trained on millions of samples |
 | JPEG pixel decoding | Custom base64 -> pixel decoder | `jpeg-js` npm package | Battle-tested JPEG decoder, handles edge cases |
-| Session cap counting | Raw SQL increment with race conditions | Drizzle `sql` template with atomic UPDATE ... WHERE | Atomic increment prevents race conditions |
+| Session cap counting | Read-then-write with race conditions | Drizzle `sql` template with atomic conditional update | Atomic increment prevents race conditions |
 | Edge auth validation | Custom JWT parsing in Edge | Extract from cookie, validate via DB lookup | Auth must match the same session validation as tRPC routes |
 
 **Key insight:** The tool system (`buildTool`, `assembleToolPool`, `dispatchToolCalls`) is already well-engineered and does NOT need replacement. The migration is about WHERE it runs (Edge Function instead of Bun.serve), not HOW it works.
@@ -421,7 +445,23 @@ Use `jpeg-js` (pure JS, ~15KB, no native deps) to decode the small 128x128 JPEG 
 ### Pitfall 7: Session Count Race Condition
 **What goes wrong:** Two concurrent session starts for the same org both read the current count, both determine they're under the cap, and both succeed -- exceeding the cap by 1.
 **Why it happens:** Read-then-write pattern without atomic operation.
-**How to avoid:** Use atomic SQL increment: `UPDATE org_usage_periods SET session_count = session_count + 1 WHERE org_id = $1 AND session_count < session_cap RETURNING session_count`. If no rows updated, cap was hit.
+**How to avoid:** Use Drizzle's `sql` template for an atomic conditional update in the repository:
+```typescript
+// In OrgUsageRepository.incrementSessionCount()
+const result = await db.update(orgUsagePeriods)
+  .set({ sessionCount: sql`${orgUsagePeriods.sessionCount} + 1` })
+  .where(
+    and(
+      eq(orgUsagePeriods.orgId, orgId),
+      or(
+        isNull(orgUsagePeriods.sessionCap),
+        lt(orgUsagePeriods.sessionCount, orgUsagePeriods.sessionCap),
+      ),
+    ),
+  )
+  .returning({ sessionCount: orgUsagePeriods.sessionCount });
+// If result.length === 0, cap was hit
+```
 **Warning signs:** Org occasionally exceeds session cap by 1-2 sessions.
 
 ### Pitfall 8: Vercel Edge Runtime Recommendation Changed
@@ -652,7 +692,7 @@ When the technician asks a direct question, answer directly.`;
 
 | Pattern | STRIDE | Standard Mitigation |
 |---------|--------|---------------------|
-| Session cap bypass via race condition | Tampering | Atomic SQL increment (not read-then-write) |
+| Session cap bypass via race condition | Tampering | Drizzle atomic conditional update (not read-then-write) |
 | Unauthenticated tool dispatch via Edge endpoint | Spoofing | Auth validation in Edge Function before tool execution |
 | CORS misconfiguration after server migration | Information Disclosure | Explicit origin allowlist in middleware.ts |
 | Ephemeral token leakage in logs | Information Disclosure | STANDARDS.md: never log tokens. Verify new Edge Function follows this. |
