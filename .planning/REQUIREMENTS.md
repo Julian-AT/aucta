@@ -64,15 +64,15 @@ Items marked *(Layer 2)* are stretch goals — build if time permits after Layer
 
 - [ ] **DEVX-01**: Every PR triggers GitHub Actions CI pipeline: lint, type-check, unit tests, build (Turborepo-cached); failing test blocks merge; green badge on main
 - [ ] **DEVX-02**: Sentry captures errors from both web dashboard (Next.js SDK) and mobile app (React Native SDK) with request IDs, user context, release version, and source-mapped stack traces
-- [ ] **DEVX-03**: Maestro E2E test covers critical path: launch → login → start session → receive guidance → end session → view summary; runs in CI on EAS build
+- [ ] **DEVX-03**: Maestro E2E test covers critical path: launch -> login -> start session -> receive guidance -> end session -> view summary; runs in CI on EAS build
 - [ ] **DEVX-04**: Pre-deploy checklist script validates: no `console.log` in source, required env vars present, DB migrations applied, health endpoint responds, no `z.any()` in router schemas
-- [ ] **DEVX-05**: PostHog tracks session_started and session_ended events with org_id, user_id, session duration; feature flag for tiered pricing rollout; funnel: login → session → feedback *(Layer 2)*
+- [ ] **DEVX-05**: PostHog tracks session_started and session_ended events with org_id, user_id, session duration; feature flag for tiered pricing rollout; funnel: login -> session -> feedback *(Layer 2)*
 - [ ] **DEVX-06**: Post-session auto-generated email to business owner with findings, error codes, and AI-suggested follow-ups via React Email + Resend; delivered within 5 minutes of session end *(Layer 2)*
 
 ### Mobile UX
 
-- [ ] **UX-01**: Haptic feedback on session state transitions (idle → listening → processing → speaking) with 3 distinct vibration patterns; verified on both iOS and Android physical devices *(Layer 2)*
-- [ ] **UX-02**: Maestro E2E test: start session → kill network → verify connection-lost overlay appears within 3s → restore network → verify reconnection or clean restart *(Layer 2)*
+- [ ] **UX-01**: Haptic feedback on session state transitions (idle -> listening -> processing -> speaking) with 3 distinct vibration patterns; verified on both iOS and Android physical devices *(Layer 2)*
+- [ ] **UX-02**: Maestro E2E test: start session -> kill network -> verify connection-lost overlay appears within 3s -> restore network -> verify reconnection or clean restart *(Layer 2)*
 
 ## v1.2 Requirements
 
@@ -84,7 +84,7 @@ Deferred to v1.2 Competitive Edge milestone. Tracked but not in current roadmap.
 - **AK-02**: Fork & maintain expo-two-way-audio with 24kHz playback and AEC
 - **AK-03**: Replace imperative session state with typed state machine; all transitions testable
 - **AK-04**: Virtual filesystem over Qdrant (bash-tool: grep/cat/find for exact-match + vector similarity)
-- **AK-05**: Docling PDF ingestion: HVAC manufacturer PDFs → structured KB articles via Python sidecar
+- **AK-05**: Docling PDF ingestion: HVAC manufacturer PDFs -> structured KB articles via Python sidecar
 - **AK-06**: Source citation with page reference for PDF-sourced KB articles
 
 ### Sensor Integration
@@ -164,10 +164,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UX-02 | Phase 13 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 35 total (20 Layer 1, 15 Layer 2)
-- Mapped to phases: 35
+- v1.1 requirements: 37 total (21 Layer 1, 16 Layer 2)
+- Mapped to phases: 37
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-10*
-*Last updated: 2026-04-10 after milestone v1.1 initialization*
+*Last updated: 2026-04-10 after roadmap validation*
