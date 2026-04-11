@@ -39,7 +39,7 @@ function createMockDeps(): GeminiConnectionDeps {
 function createDefaultConfig(overrides?: Partial<GeminiConnectionConfig>): GeminiConnectionConfig {
   return {
     token: "test-ephemeral-token",
-    model: "gemini-3.1-flash-live-preview",
+    model: "gemini-2.5-flash-live-preview",
     ...overrides,
   };
 }
@@ -63,39 +63,23 @@ describe("GeminiConnection", () => {
       );
     });
 
-    it("sends setup message using 'setup' key (BidiGenerateContentConstrained)", () => {
-      connection.connect(createDefaultConfig());
+    it("sends setup message with model and responseModalities on open", () => {
+      const config = createDefaultConfig();
+      connection.connect(config);
       lastCreatedWs.simulateOpen();
 
       expect(lastCreatedWs.sentMessages).toHaveLength(1);
-      const msg = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(msg.setup).toBeDefined();
-      expect(msg.config).toBeUndefined();
-    });
-
-    it("does not include model, responseModalities, or tools in setup (locked in token)", () => {
-      const toolDeclarations = [
-        {
-          name: "lookupErrorCode",
-          description: "Look up HVAC error codes",
-          parameters: { type: "object", properties: {} },
-        },
-      ];
-      connection.connect(createDefaultConfig({ toolDeclarations }));
-      lastCreatedWs.simulateOpen();
-
-      const msg = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(msg.setup.model).toBeUndefined();
-      expect(msg.setup.responseModalities).toBeUndefined();
-      expect(msg.setup.tools).toBeUndefined();
+      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(setup.config.model).toBe(`models/${config.model}`);
+      expect(setup.config.responseModalities).toEqual(["AUDIO"]);
     });
 
     it("includes contextWindowCompression with slidingWindow in setup", () => {
       connection.connect(createDefaultConfig());
       lastCreatedWs.simulateOpen();
 
-      const msg = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(msg.setup.contextWindowCompression).toEqual({
+      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(setup.config.contextWindowCompression).toEqual({
         slidingWindow: {},
       });
     });
@@ -106,8 +90,8 @@ describe("GeminiConnection", () => {
       );
       lastCreatedWs.simulateOpen();
 
-      const msg = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(msg.setup.sessionResumption).toEqual({
+      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(setup.config.sessionResumption).toEqual({
         handle: "resume-handle-123",
       });
     });
@@ -116,8 +100,33 @@ describe("GeminiConnection", () => {
       connection.connect(createDefaultConfig());
       lastCreatedWs.simulateOpen();
 
-      const msg = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(msg.setup.sessionResumption).toEqual({});
+      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(setup.config.sessionResumption).toEqual({});
+    });
+
+    it("includes tools with functionDeclarations when provided", () => {
+      const toolDeclarations = [
+        {
+          name: "lookupErrorCode",
+          description: "Look up HVAC error codes",
+          parameters: { type: "object", properties: {} },
+        },
+      ];
+      connection.connect(createDefaultConfig({ toolDeclarations }));
+      lastCreatedWs.simulateOpen();
+
+      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(setup.config.tools).toEqual([
+        { functionDeclarations: toolDeclarations },
+      ]);
+    });
+
+    it("omits tools from setup when no declarations provided", () => {
+      connection.connect(createDefaultConfig());
+      lastCreatedWs.simulateOpen();
+
+      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(setup.config.tools).toBeUndefined();
     });
   });
 
@@ -209,18 +218,6 @@ describe("GeminiConnection", () => {
     it("calls onGoAway with undefined timeLeft", () => {
       lastCreatedWs.simulateMessage({ goAway: {} });
       expect(deps.onGoAway).toHaveBeenCalledWith(undefined);
-    });
-
-    it("accepts pre-parsed object as event.data (React Native WebSocket quirk)", () => {
-      lastCreatedWs.onmessage?.({ data: { setupComplete: {} } });
-      expect(deps.onSetupComplete).toHaveBeenCalledOnce();
-    });
-
-    it("parses ArrayBuffer UTF-8 JSON frames", () => {
-      const json = JSON.stringify({ setupComplete: {} });
-      const buf = new TextEncoder().encode(json).buffer;
-      lastCreatedWs.onmessage?.({ data: buf });
-      expect(deps.onSetupComplete).toHaveBeenCalledOnce();
     });
   });
 

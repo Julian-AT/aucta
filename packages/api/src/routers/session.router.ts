@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { router } from "../trpc.js";
 import { orgProcedure } from "../middleware/org-scope.js";
 import {
@@ -6,6 +6,24 @@ import {
   tokenLimiter,
 } from "../middleware/rate-limit.js";
 import { errorConverter } from "../middleware/error-converter.js";
+import { GoogleGenAI, Modality } from "@google/genai";
+import { z } from "zod";
+import {
+  buildEffectiveSystemPrompt,
+  coreRolePrompt,
+  hvacExpertisePrompt,
+  safetyRulesPrompt,
+  assembleToolPool,
+  dispatchToolCalls,
+  lookupErrorCodeTool,
+  logFindingTool,
+  createSearchKnowledgeBaseTool,
+} from "@aucta/ai";
+import type { ToolContext, AnyToolDef } from "@aucta/ai";
+import {
+  createQdrantClient,
+  GeminiEmbeddingService,
+} from "@aucta/ai/knowledge";
 import { SessionRepository } from "@aucta/db/repositories/session.repository";
 import { SessionFindingRepository } from "@aucta/db/repositories/session-finding.repository";
 import { SessionToolCallRepository } from "@aucta/db/repositories/session-tool-call.repository";
@@ -13,21 +31,91 @@ import { db } from "@aucta/db/client";
 import { CreateSessionFindingDTO } from "@aucta/shared/schemas/session-finding.schema";
 import { CreateSessionToolCallDTO } from "@aucta/shared/schemas/session-tool-call.schema";
 import { inngest } from "../jobs/inngest-client.js";
-import { SessionService } from "../services/session.service.js";
 
-const sessionService = new SessionService({
-  sessionRepo: new SessionRepository(db),
-  findingRepo: new SessionFindingRepository(db),
-  toolCallRepo: new SessionToolCallRepository(db),
-  inngest,
-});
+const GEMINI_LIVE_MODEL =
+  process.env.GEMINI_LIVE_MODEL ?? "gemini-2.5-flash-live-preview";
+
+const sessionRepo = new SessionRepository(db);
+const findingRepo = new SessionFindingRepository(db);
+const toolCallRepo = new SessionToolCallRepository(db);
+
+// Lazy-initialized: returns null when Qdrant is not configured (e.g., dev without vector DB)
+function getSearchKnowledgeBaseTool(): AnyToolDef | null {
+  const qdrantUrl = process.env.QDRANT_URL;
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+
+  if (!qdrantUrl || !geminiApiKey) {
+    return null;
+  }
+
+  const qdrantClient = createQdrantClient({
+    url: qdrantUrl,
+    apiKey: process.env.QDRANT_API_KEY,
+  });
+  const embeddingService = new GeminiEmbeddingService({
+    apiKey: geminiApiKey,
+  });
+
+  return createSearchKnowledgeBaseTool({ qdrantClient, embeddingService });
+}
+
+function buildToolList(): AnyToolDef[] {
+  const tools: AnyToolDef[] = [lookupErrorCodeTool, logFindingTool];
+  const searchKBTool = getSearchKnowledgeBaseTool();
+  if (searchKBTool) tools.push(searchKBTool);
+  return tools;
+}
 
 export const sessionRouter = router({
   createToken: orgProcedure
     .use(createRateLimitMiddleware(tokenLimiter))
     .use(errorConverter)
-    .mutation(async () => {
-      return sessionService.createEphemeralToken();
+    .mutation(async ({ ctx: _ctx }) => {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("GEMINI_API_KEY environment variable is not set");
+      }
+
+      const systemPrompt = buildEffectiveSystemPrompt([
+        coreRolePrompt,
+        hvacExpertisePrompt,
+        safetyRulesPrompt,
+      ]);
+
+      const pool = assembleToolPool(buildToolList());
+
+      // Ephemeral tokens require v1alpha API version
+      const client = new GoogleGenAI({
+        apiKey,
+        httpOptions: { apiVersion: "v1alpha" },
+      });
+
+      const tokenResponse = await client.authTokens.create({
+        config: {
+          uses: 1,
+          expireTime: new Date(
+            Date.now() + 30 * 60 * 1000,
+          ).toISOString(),
+          newSessionExpireTime: new Date(
+            Date.now() + 60 * 1000,
+          ).toISOString(),
+          liveConnectConstraints: {
+            model: GEMINI_LIVE_MODEL,
+            config: {
+              systemInstruction: systemPrompt,
+              responseModalities: [Modality.AUDIO],
+              tools: [{ functionDeclarations: pool.functionDeclarations }],
+            },
+          },
+        },
+      });
+
+      // Ephemeral tokens must never be logged (security requirement)
+      return {
+        token: tokenResponse.name,
+        model: GEMINI_LIVE_MODEL,
+        toolDeclarations: pool.functionDeclarations,
+      };
     }),
 
   dispatchToolCalls: orgProcedure
@@ -44,18 +132,29 @@ export const sessionRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      return sessionService.dispatchToolCalls(input.functionCalls, {
+      const pool = assembleToolPool(buildToolList());
+      const context: ToolContext = {
         orgId: ctx.orgId,
         userId: ctx.userId,
         sessionId: "live",
-      });
+      };
+      return dispatchToolCalls(
+        { functionCalls: input.functionCalls },
+        pool,
+        context,
+      );
     }),
 
   createSession: orgProcedure
     .use(errorConverter)
     .input(z.object({ modelVersion: z.string().optional() }).optional())
     .mutation(async ({ input, ctx }) => {
-      return sessionService.createSession(ctx.orgId, ctx.userId, input?.modelVersion);
+      const session = await sessionRepo.create({
+        orgId: ctx.orgId,
+        userId: ctx.userId,
+        modelVersion: input?.modelVersion,
+      });
+      return { sessionId: session.id };
     }),
 
   endSession: orgProcedure
@@ -72,21 +171,36 @@ export const sessionRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      return sessionService.endSession(input);
+      const updated = await sessionRepo.updateEnd(input.sessionId, {
+        status: input.status,
+        endedAt: new Date(),
+        durationMs: input.durationMs,
+        languageDetected: input.languageDetected,
+        tokenCountInput: input.tokenCountInput,
+        tokenCountOutput: input.tokenCountOutput,
+        toolsUsed: input.toolsUsed,
+      });
+
+      await inngest.send({
+        name: "session/ended",
+        data: { sessionId: input.sessionId },
+      });
+
+      return updated;
     }),
 
   addFinding: orgProcedure
     .use(errorConverter)
     .input(CreateSessionFindingDTO)
     .mutation(async ({ input }) => {
-      return sessionService.addFinding(input);
+      return findingRepo.create(input);
     }),
 
   addToolCall: orgProcedure
     .use(errorConverter)
     .input(CreateSessionToolCallDTO)
     .mutation(async ({ input }) => {
-      return sessionService.addToolCall(input);
+      return toolCallRepo.create(input);
     }),
 
   submitFeedback: orgProcedure
@@ -99,26 +213,46 @@ export const sessionRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      return sessionService.submitFeedback(input.sessionId, input.rating, input.note);
+      return sessionRepo.updateFeedback(input.sessionId, {
+        rating: input.rating,
+        note: input.note,
+      });
     }),
 
   getSession: orgProcedure
     .use(errorConverter)
     .input(z.object({ sessionId: z.string() }))
     .query(async ({ input }) => {
-      return sessionService.getSession(input.sessionId);
+      const session = await sessionRepo.findById(input.sessionId);
+      if (!session) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Session ${input.sessionId} not found`,
+        });
+      }
+      return session;
     }),
 
   getRecentSessions: orgProcedure
     .use(errorConverter)
     .query(async ({ ctx }) => {
-      return sessionService.getRecentSessions(ctx.orgId);
+      return sessionRepo.findRecentByOrg(ctx.orgId, 20);
     }),
 
   getSessionSummary: orgProcedure
     .use(errorConverter)
     .input(z.object({ sessionId: z.string() }))
     .query(async ({ input }) => {
-      return sessionService.getSessionSummary(input.sessionId);
+      const session = await sessionRepo.findById(input.sessionId);
+      if (!session) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Session ${input.sessionId} not found`,
+        });
+      }
+      return {
+        summary: session.summary,
+        isAiGenerated: session.isAiGenerated,
+      };
     }),
 });

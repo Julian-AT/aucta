@@ -5,35 +5,14 @@ import { expo } from "@better-auth/expo";
 import { db } from "@aucta/db/client";
 import { ac, manager, owner, technician } from "./permissions.js";
 
-/**
- * Must match the URL the mobile app uses (see EXPO_PUBLIC_API_URL). If this stays
- * localhost while the client calls http://172.x.x.x:3000, sign-in can fail (redirects /
- * cookies). Set BETTER_AUTH_URL to that LAN URL when testing on a device.
- * Also set explicitly so it does not rely only on inference.
- */
-const baseURL = process.env.BETTER_AUTH_URL;
-
 export const auth = betterAuth({
-  ...(baseURL ? { baseURL } : {}),
   database: drizzleAdapter(db, { provider: "pg" }),
   emailAndPassword: { enabled: true },
   trustedOrigins: [
     "aucta://",
-    "aucta://*",
+    // Expo dev origins
     ...(process.env.NODE_ENV !== "production"
-      ? [
-          "exp://",
-          "exp://**",
-          "exp://192.168.*.*:*/**",
-          "exp://172.*.*.*:*/**",
-          "exp://10.*.*.*:*/**",
-          "http://localhost:*",
-          "http://127.0.0.1:*",
-          "http://192.168.*.*:*",
-          "http://172.*.*.*:*",
-          "http://10.*.*.*:*",
-          "http://10.0.2.2:*",
-        ]
+      ? ["exp://", "exp://**", "exp://192.168.*.*:*/**"]
       : []),
   ],
   plugins: [

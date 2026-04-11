@@ -36,32 +36,6 @@ export interface GeminiConnectionConfig {
   resumptionHandle?: string | null;
 }
 
-/**
- * React Native WebSocket may deliver `data` as a string, ArrayBuffer, or — in some
- * builds — an already-parsed object. Parsing a non-string coerces to "[object Object]"
- * and breaks JSON.parse (error at character 'o').
- */
-function parseIncomingWsPayload(data: unknown): unknown {
-  if (typeof data === "string") {
-    return JSON.parse(data);
-  }
-  if (data instanceof ArrayBuffer) {
-    return JSON.parse(new TextDecoder().decode(data));
-  }
-  if (ArrayBuffer.isView(data)) {
-    const view = data as ArrayBufferView;
-    return JSON.parse(
-      new TextDecoder().decode(
-        view.buffer.slice(view.byteOffset, view.byteOffset + view.byteLength),
-      ),
-    );
-  }
-  if (data !== null && typeof data === "object") {
-    return data;
-  }
-  throw new TypeError(`Unsupported WebSocket message payload: ${typeof data}`);
-}
-
 export class GeminiConnection {
   private ws: WebSocket | null = null;
   private _intentionalClose = false;
@@ -78,7 +52,6 @@ export class GeminiConnection {
     this.ws = new WebSocket(url);
 
     this.ws.onopen = () => {
-      console.log("[GeminiWS] Connected, sending setup...");
       this.sendSetupMessage(config);
     };
 
@@ -87,7 +60,6 @@ export class GeminiConnection {
     };
 
     this.ws.onclose = (event: CloseEvent) => {
-      console.log(`[GeminiWS] Closed: code=${event.code} reason=${event.reason}`);
       if (this._intentionalClose) return;
       if (event.code !== 1000) {
         this.deps.onDisconnect(event.code, event.reason);
@@ -97,7 +69,6 @@ export class GeminiConnection {
     this.ws.onerror = (event: Event) => {
       const message =
         (event as { message?: string }).message ?? "WebSocket error";
-      console.error("[GeminiWS] Error:", message);
       this.deps.onError(message);
     };
   }
@@ -154,58 +125,28 @@ export class GeminiConnection {
   }
 
   private sendSetupMessage(config: GeminiConnectionConfig): void {
-    // The BidiGenerateContentConstrained endpoint (ephemeral tokens) uses
-    // "setup" as the top-level field, NOT "config" (which is for the regular
-    // BidiGenerateContent endpoint). Model, responseModalities, tools, and
-    // systemInstruction are already locked in the token's liveConnectConstraints
-    // — only session-level fields belong here.
-    const setup: Record<string, unknown> = {
+    const setupConfig: Record<string, unknown> = {
+      model: `models/${config.model}`,
+      responseModalities: ["AUDIO"],
       contextWindowCompression: { slidingWindow: {} },
       sessionResumption: config.resumptionHandle
         ? { handle: config.resumptionHandle }
         : {},
     };
 
-    this.ws?.send(JSON.stringify({ setup }));
+    if (config.toolDeclarations) {
+      setupConfig.tools = [
+        { functionDeclarations: config.toolDeclarations },
+      ];
+    }
+
+    this.ws?.send(JSON.stringify({ config: setupConfig }));
   }
 
   private handleMessage(event: MessageEvent): void {
-    const raw = event.data;
+    const msg: unknown = JSON.parse(event.data as string);
 
-    if (typeof Blob !== "undefined" && raw instanceof Blob) {
-      void raw.text().then(
-        (text) => {
-          try {
-            this.processGeminiMessage(JSON.parse(text));
-          } catch (err) {
-            const detail = err instanceof Error ? err.message : String(err);
-            console.warn("[GeminiWS] Failed to parse Blob frame:", detail);
-            this.deps.onError(`Invalid Gemini message: ${detail}`);
-          }
-        },
-        () => {
-          this.deps.onError("Failed to read WebSocket Blob frame");
-        },
-      );
-      return;
-    }
-
-    let msg: unknown;
-    try {
-      msg = parseIncomingWsPayload(raw);
-    } catch (err) {
-      const detail = err instanceof Error ? err.message : String(err);
-      console.warn("[GeminiWS] Failed to parse message:", detail);
-      this.deps.onError(`Invalid Gemini message: ${detail}`);
-      return;
-    }
-
-    this.processGeminiMessage(msg);
-  }
-
-  private processGeminiMessage(msg: unknown): void {
     if (isSetupComplete(msg)) {
-      console.log("[GeminiWS] Setup complete");
       this.deps.onSetupComplete();
       return;
     }
@@ -213,12 +154,6 @@ export class GeminiConnection {
     if (isServerContent(msg)) {
       const content = msg.serverContent;
       if (content.modelTurn?.parts) {
-        const audioChunks = content.modelTurn.parts.filter(
-          (p) => p.inlineData?.data,
-        );
-        if (audioChunks.length > 0) {
-          console.log(`[GeminiWS] Audio data: ${audioChunks.length} chunk(s)`);
-        }
         for (const part of content.modelTurn.parts) {
           if (part.inlineData?.data) {
             this.deps.onAudioData(part.inlineData.data);
@@ -226,7 +161,6 @@ export class GeminiConnection {
         }
       }
       if (content.turnComplete) {
-        console.log("[GeminiWS] Turn complete");
         this.deps.onTurnComplete();
       }
       return;

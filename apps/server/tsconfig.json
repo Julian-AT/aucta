@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2024",
-    "module": "ESNext",
+    "module": "ES2022",
     "moduleResolution": "bundler",
     "strict": true,
     "esModuleInterop": true,
@@ -11,8 +11,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "noUncheckedIndexedAccess": true,
-    "types": ["bun"]
+    "noUncheckedIndexedAccess": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

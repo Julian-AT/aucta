@@ -46,15 +46,8 @@ export class AudioCapture {
 
     // Lazy-load to avoid Expo Go crash at module evaluation time.
     // react-native-audio-api is a native module only available in development builds.
-    let AudioRecorder;
-    try {
-      const mod = await import("react-native-audio-api");
-      AudioRecorder = mod.AudioRecorder;
-    } catch {
-      throw new Error(
-        "react-native-audio-api not available. Audio capture requires a development build (not Expo Go).",
-      );
-    }
+    const mod = await import("react-native-audio-api");
+    const { AudioRecorder } = mod;
     this.recorder = new AudioRecorder();
 
     const result = this.recorder.onAudioReady(

@@ -15,10 +15,7 @@
       "bundleIdentifier": "com.aucta.app",
       "infoPlist": {
         "UIBackgroundModes": ["audio"],
-        "NSMicrophoneUsageDescription": "Aucta uses the microphone for voice communication during AI-assisted HVAC sessions",
-        "NSAppTransportSecurity": {
-          "NSAllowsLocalNetworking": true
-        }
+        "NSMicrophoneUsageDescription": "Aucta uses the microphone for voice communication during AI-assisted HVAC sessions"
       }
     },
     "android": {
