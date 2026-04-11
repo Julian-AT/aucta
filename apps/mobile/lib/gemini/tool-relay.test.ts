@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ToolRelay } from "./tool-relay";
-import type { ToolRelayDeps } from "./tool-relay";
 
 describe("ToolRelay", () => {
   let toolRelay: ToolRelay;
@@ -22,7 +21,7 @@ describe("ToolRelay", () => {
 
   beforeEach(() => {
     mockDispatch = vi.fn();
-    toolRelay = new ToolRelay({ dispatchToolCalls: mockDispatch as unknown as ToolRelayDeps["dispatchToolCalls"] });
+    toolRelay = new ToolRelay({ dispatchToolCalls: mockDispatch });
   });
 
   it("relay() sends functionCalls to tRPC endpoint and returns functionResponses", async () => {

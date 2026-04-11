@@ -25,17 +25,17 @@ export const RECONNECT_TIMEOUT_MS = 120_000;
 export const SESSION_WARN_MS = 25 * 60 * 1000;
 
 // --- Setup Message (Client -> Server, sent once on connect) ---
-// For the BidiGenerateContentConstrained endpoint (ephemeral tokens),
-// model, responseModalities, tools, and systemInstruction are locked
-// in the token's liveConnectConstraints. Only session-level fields
-// (sessionResumption, contextWindowCompression) go in the setup message.
 export interface GeminiSetupConfig {
+  model: string;
+  responseModalities: string[];
+  systemInstruction?: { parts: Array<{ text: string }> };
+  tools?: Array<{ functionDeclarations: GeminiFunctionDecl[] }>;
   sessionResumption?: { handle?: string };
   contextWindowCompression?: { slidingWindow: Record<string, never> };
 }
 
 export interface GeminiSetupMessage {
-  setup: GeminiSetupConfig;
+  config: GeminiSetupConfig;
 }
 
 export interface GeminiFunctionDecl {

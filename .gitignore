@@ -82,5 +82,12 @@ bun.lockb.bak
 # Claude Code worktrees
 .claude/worktrees/
 
+# MCP config (user-specific)
+.mcp.json
+
+# Planning artifacts (use V2-TECHSPEC.md instead)
+.planning/
+_v2-workspace/
+
 # Diagnostic reports
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

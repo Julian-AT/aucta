@@ -1,7 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTranslation } from "react-i18next";
 import { useTRPC } from "@/lib/api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSessionStore, type SessionRecap } from "@/stores/session-store";
@@ -35,7 +34,6 @@ export function FeedbackScreen({
   onSkip,
 }: FeedbackScreenProps) {
   const trpc = useTRPC();
-  const { t } = useTranslation();
 
   // Capture recap data from Zustand on mount so it survives store reset
   const [recap] = useState<SessionRecap | null>(() => {
@@ -125,22 +123,22 @@ export function FeedbackScreen({
         keyboardShouldPersistTaps="handled"
       >
         <Text className="text-display text-text-primary text-center mt-lg">
-          {t("session.completed")}
+          Session Complete
         </Text>
 
         {/* Session Recap */}
         <View className="bg-surface rounded-2xl p-lg mt-lg">
           <Text className="text-label text-text-secondary mb-sm">
-            {t("session.findings")}
+            Session Recap
           </Text>
 
           <View className="gap-xs">
             <RecapRow
-              label={t("session.duration")}
+              label="Duration"
               value={recap ? formatDuration(recap.durationMs) : "--"}
             />
             <RecapRow
-              label={t("session.toolCalls")}
+              label="Tools Used"
               value={
                 recap && recap.toolNames.length > 0
                   ? recap.toolNames.join(", ")
@@ -157,7 +155,7 @@ export function FeedbackScreen({
         {/* Star Rating */}
         <View className="mt-xl items-center">
           <Text className="text-heading text-text-primary mb-md">
-            {t("session.feedbackTitle")}
+            How was this session?
           </Text>
 
           <StarRating value={rating} onChange={setRating} />
@@ -166,13 +164,13 @@ export function FeedbackScreen({
         {/* Optional Note */}
         <TextInput
           className="bg-surface text-body text-text-primary rounded-xl p-md mt-lg min-h-[100px]"
-          placeholder={t("session.feedbackPlaceholder")}
+          placeholder="Any additional feedback? (optional)"
           placeholderTextColor="rgba(255,255,255,0.4)"
           multiline
           textAlignVertical="top"
           value={note}
           onChangeText={setNote}
-          accessibilityLabel={t("session.feedbackPlaceholder")}
+          accessibilityLabel="Feedback note"
         />
 
         {/* Submit Button */}
@@ -182,7 +180,7 @@ export function FeedbackScreen({
           className={`min-h-[56px] items-center justify-center rounded-lg mt-lg ${
             rating > 0 ? "bg-accent" : "bg-surface"
           }`}
-          accessibilityLabel={t("session.feedbackSubmit")}
+          accessibilityLabel="Submit feedback"
           accessibilityRole="button"
           accessibilityState={{ disabled: rating === 0 }}
         >
@@ -192,8 +190,8 @@ export function FeedbackScreen({
             }`}
           >
             {submitFeedbackMutation.isPending
-              ? t("common.loading")
-              : t("session.feedbackSubmit")}
+              ? "Submitting..."
+              : "Submit Feedback"}
           </Text>
         </Pressable>
 
@@ -201,10 +199,10 @@ export function FeedbackScreen({
         <Pressable
           onPress={handleSkip}
           className="min-h-[56px] items-center justify-center mt-sm"
-          accessibilityLabel={t("session.feedbackSkip")}
+          accessibilityLabel="Skip feedback"
           accessibilityRole="button"
         >
-          <Text className="text-body text-text-secondary">{t("session.feedbackSkip")}</Text>
+          <Text className="text-body text-text-secondary">Skip</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

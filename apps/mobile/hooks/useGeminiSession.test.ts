@@ -138,7 +138,7 @@ describe("useGeminiSession orchestration", () => {
       // 3. Connect
       connection.connect({
         token: "test-token",
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.5-flash-live-preview",
         toolDeclarations: [],
       });
       lastCreatedWs.simulateOpen();
@@ -146,8 +146,7 @@ describe("useGeminiSession orchestration", () => {
       // 4. Verify setup message sent
       expect(lastCreatedWs.sentMessages.length).toBeGreaterThan(0);
       const setupMsg = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(setupMsg.setup).toBeDefined();
-      expect(setupMsg.setup.contextWindowCompression).toEqual({ slidingWindow: {} });
+      expect(setupMsg.config.model).toBe("models/gemini-2.5-flash-live-preview");
 
       // 5. Simulate setupComplete
       lastCreatedWs.simulateMessage({ setupComplete: {} });
@@ -176,7 +175,7 @@ describe("useGeminiSession orchestration", () => {
       const connection = new GeminiConnection(deps);
       connection.connect({
         token: "test-token",
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.5-flash-live-preview",
       });
       lastCreatedWs.simulateOpen();
 
@@ -230,7 +229,7 @@ describe("useGeminiSession orchestration", () => {
       connectionInstance = new GeminiConnection(deps);
       connectionInstance.connect({
         token: "test-token",
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.5-flash-live-preview",
       });
       lastCreatedWs.simulateOpen();
 
@@ -279,7 +278,7 @@ describe("useGeminiSession orchestration", () => {
       const connection = new GeminiConnection(deps);
       connection.connect({
         token: "test-token",
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.5-flash-live-preview",
       });
       lastCreatedWs.simulateOpen();
 
@@ -322,7 +321,7 @@ describe("useGeminiSession orchestration", () => {
       const connection = new GeminiConnection(deps);
       connection.connect({
         token: "test-token",
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.5-flash-live-preview",
       });
       lastCreatedWs.simulateOpen();
 
@@ -350,7 +349,7 @@ describe("useGeminiSession orchestration", () => {
       const connection = new GeminiConnection(deps);
       connection.connect({
         token: "test-token",
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.5-flash-live-preview",
       });
       lastCreatedWs.simulateError("Connection refused");
 
@@ -435,7 +434,7 @@ describe("useGeminiSession orchestration", () => {
       connectionInstance = new GeminiConnection(deps);
       connectionInstance.connect({
         token: "test-token",
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.5-flash-live-preview",
       });
       lastCreatedWs.simulateOpen();
 
@@ -516,7 +515,7 @@ describe("useGeminiSession orchestration", () => {
       connectionInstance = new GeminiConnection(deps);
       connectionInstance.connect({
         token: "test-token",
-        model: "gemini-3.1-flash-live-preview",
+        model: "gemini-2.5-flash-live-preview",
       });
       lastCreatedWs.simulateOpen();
 

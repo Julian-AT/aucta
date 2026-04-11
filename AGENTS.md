@@ -126,7 +126,7 @@ specs/                           # Spec-driven development (design docs)
 - **Database:** Neon Postgres (EU Frankfurt)
 - **Cache:** Upstash Redis (EU)
 - **Auth:** Better Auth 1.5.x with org plugin + RBAC
-- **AI:** Gemini 3.1 Flash Live API via `@google/genai` 1.48.x
+- **AI:** Gemini 2.5 Flash Live API via `@google/genai` 1.48.x
 - **Vector DB:** Qdrant 1.17.x
 - **Background Jobs:** Inngest 4.1.x
 - **Testing:** Vitest 4.1.x, Playwright 1.59.x, Maestro 2.4.x, MSW 2.12.x
@@ -226,7 +226,3 @@ For detailed information, see the `agents/` directory:
 - In `apps/mobile`, when Expo reports packages newer than versions tested with the installed SDK, align pins with **`bunx expo install --fix`** (semver can otherwise pull newer React/React Native than Expo supports).
 - The mobile app may use **TypeScript ~5.9.x** to satisfy Expo SDK while other workspace packages use **TypeScript 6.x**.
 - Mobile **`TRPCProvider`** accepts the tRPC client via the **`trpcClient`** prop (not `client`).
-- On Windows, Bun uses **Junctions** (not POSIX symlinks) for `node_modules`; Metro requires **`resolver.unstable_enableSymlinks = true`** in `metro.config.js` to resolve through them.
-- In shared packages consumed by Metro (`packages/shared`, etc.), use **extensionless imports** (e.g. `"./locales/en"` not `"./locales/en.js"`) — Metro resolves `.js` literally and will not remap to `.ts`.
-- Do **not** run `expo start` through Turborepo (`bun turbo dev --filter=mobile`) for local dev — Turbo suppresses interactive terminal output (QR code, keyboard shortcuts). Run directly from `apps/mobile`.
-- The Gemini Live API model is **`gemini-3.1-flash-live-preview`** (the older `gemini-2.5-flash-live-preview` alias was retired and returns WS close code 1008).

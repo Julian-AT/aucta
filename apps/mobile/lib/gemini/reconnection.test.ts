@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { calculateBackoff, reconnectWithBackoff } from "./reconnection";
 import type { ReconnectDeps } from "./reconnection";
-import type { ConnectionQuality } from "@/stores/session-store";
 import {
   BACKOFF_BASE_MS,
   BACKOFF_MAX_MS,
@@ -51,11 +50,11 @@ describe("reconnectWithBackoff", () => {
 
   function createDeps(overrides?: Partial<ReconnectDeps>): ReconnectDeps {
     return {
-      connect: mockConnect as unknown as ReconnectDeps["connect"],
-      onSuccess: mockOnSuccess as unknown as ReconnectDeps["onSuccess"],
-      onGiveUp: mockOnGiveUp as unknown as ReconnectDeps["onGiveUp"],
+      connect: mockConnect,
+      onSuccess: mockOnSuccess,
+      onGiveUp: mockOnGiveUp,
       getSessionStore: () => ({
-        setConnectionQuality: mockSetConnectionQuality as unknown as (quality: ConnectionQuality) => void,
+        setConnectionQuality: mockSetConnectionQuality,
       }),
       ...overrides,
     };
