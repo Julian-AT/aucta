@@ -15,16 +15,17 @@
 4. [Refactoring Plan](#4-refactoring-plan)
 5. [UI Component Strategy](#5-ui-component-strategy)
 6. [Creation Plan](#6-creation-plan)
-7. [Milestone Task Plan](#7-milestone-task-plan)
-8. [CLAUDE.md Improvement Plan](#8-claudemd-improvement-plan)
-9. [AGENTS.md Improvement Plan](#9-agentsmd-improvement-plan)
-10. [Definition of Done](#10-definition-of-done)
-11. [GDPR & Security](#11-gdpr--security)
-12. [Observability](#12-observability)
-13. [Database Strategy](#13-database-strategy)
-14. [Offline Resilience](#14-offline-resilience)
-15. [CI/CD Pipeline](#15-cicd-pipeline)
-16. [Scalability](#16-scalability)
+7. [Dashboard Auth Architecture](#7-dashboard-auth-architecture)
+8. [Milestone Task Plan](#8-milestone-task-plan)
+9. [CLAUDE.md Improvement Plan](#9-claudemd-improvement-plan)
+10. [AGENTS.md Improvement Plan](#10-agentsmd-improvement-plan)
+11. [Definition of Done](#11-definition-of-done)
+12. [GDPR & Security](#12-gdpr--security)
+13. [Observability](#13-observability)
+14. [Database Strategy](#14-database-strategy)
+15. [Offline Resilience](#15-offline-resilience)
+16. [CI/CD Pipeline](#16-cicd-pipeline)
+17. [Scalability](#17-scalability)
 
 ---
 
@@ -179,7 +180,7 @@ Research source: analysis of `github.com/calcom/cal.com` main branch (April 2026
 |---|---------|---------|--------------|-----------|
 | 6 | **turbo.json env management** | 200+ env vars in `globalEnv`, per-task `env` arrays, `inputs` for cache keys. | Minimal turbo.json with no env configuration. Cache invalidation is unreliable. | Add `globalEnv` for DATABASE_URL, NODE_ENV, SENTRY_DSN. Add per-task env for build-affecting vars. |
 | 7 | **Dependency boundary enforcement** | Biome `noRestrictedImports` prevents circular deps between packages. | No import restrictions. `@aucta/api` imports from all packages without boundaries. | Add Biome overrides: `@aucta/shared` cannot import from other @aucta packages. `@aucta/db` cannot import from `@aucta/api`. |
-| 8 | **Constructor injection + DI** | `@evyweb/ioctopus` with token-based DI. Feature-level `di/` directories. | Repositories instantiated at module level in router files (`const repo = new SessionRepository(db)`). No DI container. | Adopt constructor injection. Services receive repository dependencies in constructor. Instantiate in DI setup per-request in tRPC context. Evaluate lightweight DI (manual factory or ioctopus). |
+| 8 | **Constructor injection + DI** | `@evyweb/ioctopus` with token-based DI. Feature-level `di/` directories. | Repositories instantiated at module level in router files (`const repo = new SessionRepository(db)`). No DI container. | Adopt constructor injection. Services receive repository dependencies in constructor. Use manual factory functions (`createServices()`) per-request in tRPC context. No DI container — manual factories are simpler and sufficient at this scale. |
 | 9 | **Shared tsconfig package** | `@calcom/tsconfig` with base, nextjs, react-library configs. | `@aucta/config` has base, library, app configs but is underutilized. No Expo-specific or Next.js-specific configs. | Add `tsconfig.expo.json` and `tsconfig.nextjs.json` to `@aucta/config`. |
 | 10 | **Pre-commit hooks** | Husky 9.x + lint-staged. Biome formatting on staged files. | No pre-commit hooks. Formatting relies on manual `bun run format`. | Set up Husky + lint-staged. Run Biome format on staged TS/TSX files. |
 
@@ -241,21 +242,61 @@ packages/db/src/repositories/
 Constructor signature: `constructor(db: DrizzleClient, ctx: TenantContext)`
 where `TenantContext = { organizationId: string; userId: string }`.
 
-#### 4.3 DI Wiring
+#### 4.3 DI Wiring — Manual Factory Functions
 
-Replace module-level repository instantiation with per-request construction in tRPC context:
+**Decision:** Manual factory functions. No DI container library.
+
+**Rationale:** Manual factories are simpler to read and debug, easier for LLMs to work with (no magic binding resolution), and appropriate for a codebase of this size (~20 services). A DI container adds indirection without proportional value here.
+
+Factory definition:
+
+```typescript
+// packages/api/src/factories.ts
+import type { DrizzleClient } from '@aucta/db/client';
+import type { TenantContext } from '@aucta/db/repositories/base-tenant.repository';
+
+export function createRepositories(db: DrizzleClient, ctx: TenantContext) {
+  return {
+    session: new SessionRepository(db, ctx),
+    knowledge: new KnowledgeArticleRepository(db, ctx),
+    invite: new InviteRepository(db, ctx),
+    org: new OrgRepository(db, ctx),
+  };
+}
+
+export function createServices(db: DrizzleClient, ctx: TenantContext) {
+  const repos = createRepositories(db, ctx);
+  return {
+    session: new SessionService(repos.session),
+    knowledge: new KnowledgeService(repos.knowledge),
+    invite: new InviteService(repos.invite),
+    org: new OrgService(repos.org),
+  };
+}
+```
+
+tRPC context wiring:
 
 ```typescript
 // packages/api/src/trpc.ts -- in createTRPCContext()
-const tenantCtx = { organizationId, userId };
+const tenantCtx = { organizationId: session.activeOrganizationId, userId: session.userId };
 return {
   session, headers, ip,
-  services: {
-    session: new SessionService(new SessionRepository(db, tenantCtx), ...),
-    knowledge: new KnowledgeService(new KnowledgeArticleRepository(db, tenantCtx), ...),
-    // ...
-  },
+  services: createServices(db, tenantCtx),
 };
+```
+
+Router usage (thin controller):
+
+```typescript
+// packages/api/src/routers/session.router.ts
+export const sessionRouter = router({
+  create: protectedProcedure
+    .input(createSessionSchema)
+    .mutation(({ ctx, input }) => ctx.services.session.create(input)),
+  list: protectedProcedure
+    .query(({ ctx }) => ctx.services.session.list()),
+});
 ```
 
 #### 4.4 Barrel File Removal
@@ -384,36 +425,236 @@ Monitor v5 development. If v5 reaches stable with Tailwind v4 support, evaluate 
 
 ---
 
-## 7. Milestone Task Plan
+## 7. Dashboard Auth Architecture
 
-### Milestone 1: Architecture & Polish (Foundation)
+### 7.1 Sign-Up Flow
 
-**Goal:** Refactor V1 code to match Cal.com patterns. Fix all build issues. Establish DX tooling. No new features.
+Business owner signs up on the web dashboard. Organization creation is a separate step after registration (better-auth's organization plugin does not bundle org creation into sign-up).
+
+**Sequence:**
+
+1. Owner visits `/signup` → enters email + password → `authClient.signUp.email()`
+2. After sign-up, redirected to `/onboarding/create-org`
+3. Owner enters org name + slug → `authClient.organization.create({ name, slug })`
+4. Owner gets `owner` role automatically (creator = owner)
+5. Redirected to `/dashboard` with active organization set
+
+```typescript
+// Step 1: Sign up
+const { data, error } = await authClient.signUp.email({
+  email: "owner@company.com",
+  password: "...",
+  name: "Jane Owner",
+});
+
+// Step 2: Create organization (after redirect to onboarding)
+const { data: org } = await authClient.organization.create({
+  name: "HVAC Solutions GmbH",
+  slug: "hvac-solutions",
+});
+// Creator automatically gets 'owner' role. Org is set as active.
+```
+
+### 7.2 Sign-In Flow
+
+Cookie-based sessions for web (not JWT). better-auth uses `httpOnly` cookies by default with Next.js.
+
+```typescript
+// Client-side sign in
+const { data, error } = await authClient.signIn.email({
+  email: "owner@company.com",
+  password: "...",
+});
+// Sets httpOnly session cookie automatically
+```
+
+Server-side session access (Next.js Server Component or Route Handler):
+
+```typescript
+// In a Server Component or Route Handler
+import { auth } from '@aucta/auth';
+import { headers } from 'next/headers';
+
+const session = await auth.api.getSession({
+  headers: await headers(),
+});
+// session.user, session.session, session.session.activeOrganizationId
+```
+
+### 7.3 Organization Switching
+
+If a user belongs to multiple organizations, the dashboard provides an org switcher. better-auth tracks the active organization on the session.
+
+```typescript
+// Client: list user's organizations
+const { data: orgs } = await authClient.organization.list();
+
+// Client: switch active organization
+const { data } = await authClient.organization.setActive({
+  organizationId: "org-id-2",
+});
+// Updates session cookie with new activeOrganizationId
+```
+
+All org-scoped API calls read `activeOrganizationId` from the session. The tRPC context factory (Section 4.3) uses this to construct the `TenantContext`.
+
+### 7.4 Invite Flow (Dashboard → Mobile)
+
+Owner generates invite on dashboard → technician enters code in mobile app.
+
+**Dashboard side (owner):**
+
+```typescript
+// Owner invites a technician by email
+const { data, error } = await authClient.organization.inviteMember({
+  email: "tech@example.com",
+  role: "technician",   // Aucta role: owner | manager | technician
+  organizationId: activeOrg.id,
+});
+// Returns invitation with ID. Email sent via @aucta/email.
+```
+
+**Mobile side (technician):**
+
+```typescript
+// Technician accepts invitation (after signing up/in on mobile)
+const { data, error } = await authClient.organization.acceptInvitation({
+  invitationId: "invitation-id",
+});
+// Technician joins org with 'technician' role. Org set as active.
+```
+
+**Alternative — invite code flow:** If using a short code (e.g., 6-char alphanumeric) instead of email-based invites, implement a custom tRPC endpoint that:
+1. Looks up invitation by code
+2. Calls `auth.api.addMember()` server-side to add the technician
+3. Returns success → mobile sets active organization
+
+### 7.5 Next.js Session Middleware
+
+Cookie-based middleware redirects unauthenticated users. This is an optimistic check — full session validation happens in server components/route handlers.
+
+```typescript
+// apps/web/src/middleware.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { getSessionCookie } from 'better-auth/cookies';
+
+export async function middleware(request: NextRequest) {
+  const sessionCookie = getSessionCookie(request);
+  const { pathname } = request.nextUrl;
+
+  // Redirect authenticated users away from auth pages
+  if (sessionCookie && ['/login', '/signup'].includes(pathname)) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // Redirect unauthenticated users to login
+  if (!sessionCookie && pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/login', '/signup', '/onboarding/:path*'],
+};
+```
+
+Org-scoped route protection (in server components, not middleware):
+
+```typescript
+// apps/web/src/app/dashboard/layout.tsx
+import { auth } from '@aucta/auth';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+
+export default async function DashboardLayout({ children }) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect('/login');
+  if (!session.session.activeOrganizationId) redirect('/onboarding/create-org');
+  return <>{children}</>;
+}
+```
+
+### 7.6 Expo / React Native Integration
+
+Mobile app uses `@better-auth/expo` with `expo-secure-store` for token storage.
+
+```typescript
+// apps/mobile/src/lib/auth.ts
+import { createAuthClient } from 'better-auth/react';
+import { expoClient } from '@better-auth/expo/client';
+import { organizationClient } from 'better-auth/client/plugins';
+import * as SecureStore from 'expo-secure-store';
+
+export const authClient = createAuthClient({
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  plugins: [
+    expoClient({
+      scheme: 'aucta',
+      storagePrefix: 'aucta',
+      storage: SecureStore,
+    }),
+    organizationClient(),
+  ],
+});
+```
+
+Session tokens stored in iOS Keychain / Android Keystore via `expo-secure-store`. No cookies on mobile — the Expo plugin handles token persistence automatically.
+
+---
+
+## 8. Milestone Task Plan
+
+### Milestone 1a: Architecture (Foundation Refactor)
+
+**Goal:** Refactor V1 code to match Cal.com patterns. Fix all build issues. No new features.
 
 | # | Task | Priority | Effort | Dependencies |
 |---|------|----------|--------|-------------|
-| 1.1 | Extract service layer from routers | CRITICAL | L | -- |
-| 1.2 | Create BaseTenantRepository | CRITICAL | M | -- |
-| 1.3 | Wire DI in tRPC context | CRITICAL | M | 1.1, 1.2 |
-| 1.4 | Remove barrel files, enforce direct imports | HIGH | S | -- |
-| 1.5 | Fix @aucta/server typecheck (add @types/bun) | HIGH | S | -- |
-| 1.6 | Add Husky + lint-staged | HIGH | S | -- |
-| 1.7 | Enhance turbo.json (globalEnv, per-task env) | HIGH | S | -- |
-| 1.8 | Add Biome rules (function length, import boundaries) | HIGH | S | 1.4 |
-| 1.9 | Create @aucta/testing package (factories, mocks) | MEDIUM | M | -- |
-| 1.10 | Create seed data scripts (dev + CI) | MEDIUM | M | 1.2 |
-| 1.11 | Add env validation (Zod schema at startup) | MEDIUM | S | -- |
-| 1.12 | Create @aucta/i18n package, wire into mobile | MEDIUM | M | -- |
-| 1.13 | Add Pino structured logging to server | MEDIUM | S | 1.5 |
-| 1.14 | Add health check endpoint | MEDIUM | S | 1.13 |
-| 1.15 | Generate initial Drizzle migration files | HIGH | S | 1.2 |
-| 1.16 | Add PR pipeline (`.github/workflows/pr.yml`) | HIGH | M | 1.7 |
-| 1.17 | Add security scanning (CodeQL + Semgrep) | MEDIUM | S | -- |
-| 1.18 | Add renovate.json + dependabot.yml | MEDIUM | S | -- |
-| 1.19 | Add dx command (DB push + seed + dev) | MEDIUM | S | 1.10 |
-| 1.20 | Add auth package typecheck + basic tests | MEDIUM | S | -- |
+| 1a.1 | Extract service layer from routers | CRITICAL | L | -- |
+| 1a.2 | Create BaseTenantRepository | CRITICAL | M | -- |
+| 1a.3 | Wire DI via manual factory functions | CRITICAL | M | 1a.1, 1a.2 |
+| 1a.4 | Remove barrel files, enforce direct imports | HIGH | S | -- |
+| 1a.5 | Fix @aucta/server typecheck (add @types/bun) | HIGH | S | -- |
+| 1a.6 | Add Husky + lint-staged | HIGH | S | -- |
+| 1a.7 | Enhance turbo.json (globalEnv, per-task env) | HIGH | S | -- |
+| 1a.8 | Add Biome rules (function length, import boundaries) | HIGH | S | 1a.4 |
 
-**Milestone 1 exit criteria:** All packages typecheck. All tests pass. Service-repository pattern enforced. Biome rules configured. CI pipeline handles PRs. Seed data works.
+**M1a exit criteria:**
+- All routers refactored to service-repository pattern (thin controllers, < 50 lines)
+- All packages typecheck
+- No Drizzle imports outside `@aucta/db`
+- No business logic in repository classes
+- Factory function (`createServices()`) creates all services in tRPC context
+- Biome import boundary rules enforced
+- Pre-commit hooks run on staged files
+
+### Milestone 1b: DX & Tooling (can be parallelized with M1a)
+
+**Goal:** Establish developer experience tooling, testing infrastructure, and CI. Can proceed independently of M1a.
+
+| # | Task | Priority | Effort | Dependencies |
+|---|------|----------|--------|-------------|
+| 1b.1 | Create @aucta/testing package (factories, mocks) | MEDIUM | M | -- |
+| 1b.2 | Create seed data scripts (dev + CI) | MEDIUM | M | -- |
+| 1b.3 | Add env validation (Zod schema at startup) | MEDIUM | S | -- |
+| 1b.4 | Create @aucta/i18n package, wire into mobile | MEDIUM | M | -- |
+| 1b.5 | Add Pino structured logging to server | MEDIUM | S | -- |
+| 1b.6 | Add health check endpoint | MEDIUM | S | 1b.5 |
+| 1b.7 | Generate initial Drizzle migration files | HIGH | S | -- |
+| 1b.8 | Add PR pipeline (`.github/workflows/pr.yml`) | HIGH | M | -- |
+| 1b.9 | Add security scanning (CodeQL + Semgrep) | MEDIUM | S | -- |
+| 1b.10 | Add renovate.json + dependabot.yml | MEDIUM | S | -- |
+| 1b.11 | Add dx command (DB push + seed + dev) | MEDIUM | S | 1b.2 |
+| 1b.12 | Add auth package typecheck + basic tests | MEDIUM | S | -- |
+
+**M1b exit criteria:**
+- CI pipeline runs on PRs (lint, typecheck, test, migration check)
+- Seed data works (`bun run db:seed:dev`)
+- Dev setup is one command (`bun run dx`)
+- Env validation fails fast on missing secrets
+- Structured logging in server
 
 ### Milestone 2: Dashboard & Infrastructure
 
@@ -466,7 +707,7 @@ Monitor v5 development. If v5 reaches stable with Tailwind v4 support, evaluate 
 
 ---
 
-## 8. CLAUDE.md Improvement Plan
+## 9. CLAUDE.md Improvement Plan
 
 ### Current State
 
@@ -495,7 +736,7 @@ Reduce CLAUDE.md from ~81KB to ~15-20KB. The agent context window benefits from 
 
 ---
 
-## 9. AGENTS.md Improvement Plan
+## 10. AGENTS.md Improvement Plan
 
 ### Current State
 
@@ -533,7 +774,7 @@ AGENTS.md (229 lines) is well-structured and already closely aligned with Cal.co
 
 ---
 
-## 10. Definition of Done
+## 11. Definition of Done
 
 ### Per-Task DoD
 
@@ -556,7 +797,8 @@ Every task is complete when ALL of the following are true:
 
 | Milestone | Additional Exit Criteria |
 |-----------|------------------------|
-| **M1** | All packages typecheck. Service-repository pattern enforced in all routers. Seed data works. CI runs on PRs. |
+| **M1a** | All routers refactored to service-repository. No Drizzle imports outside `@aucta/db`. No business logic in repository classes. All routers under 50 lines (thin controllers). Factory function creates all services in tRPC context. All packages typecheck. |
+| **M1b** | CI pipeline runs on PRs. Seed data works. Dev setup is one command (`bun run dx`). Env validation fails fast. Structured logging active. |
 | **M2** | Dashboard renders and is navigable. Sentry reports errors. Preview environments work. |
 | **M3** | All 10 AI tools functional. i18n covers all 7 languages. Offline queue syncs correctly. E2E tests pass. |
 | **M4** | Load test passes at 100 concurrent sessions. App Store submission accepted. GDPR deletion pipeline tested. |
@@ -574,9 +816,9 @@ Every task is complete when ALL of the following are true:
 
 ---
 
-## 11. GDPR & Security
+## 12. GDPR & Security
 
-### 11.1 Gemini API GDPR Compliance
+### 12.1 Gemini API GDPR Compliance
 
 **Key finding:** The Gemini API (ai.google.dev) does NOT support EU region restriction. Data may transit non-EU facilities for safety monitoring.
 
@@ -588,7 +830,7 @@ Every task is complete when ALL of the following are true:
 | EU AI Act compliance | Required | Non-dismissible AI indicator, "AI-generated content" labels, camera/audio disclosure. |
 | User consent | Required | Explicit consent before first session (GDPR Art. 6(1)(a)). Right to delete session data. |
 
-### 11.2 Multi-Tenancy & Row-Level Security
+### 12.2 Multi-Tenancy & Row-Level Security
 
 **Pattern:** Shared database with `organization_id` foreign key on all tenant-scoped tables.
 
@@ -599,13 +841,13 @@ Tenant-scoped tables: sessions, session_events, knowledge_articles, knowledge_em
 
 Global tables: error_codes, equipment_models, subscription_plans, system_config.
 
-### 11.3 Audit Logging
+### 12.3 Audit Logging
 
 Two layers:
 1. **Better Auth dash() plugin** -- automatic auth event logging (sign-in, sign-out, password changes, org/member events).
 2. **Custom audit_logs table** -- business events via tRPC `createAuditMiddleware()`. Logs all mutations with actor, resource, changes, IP, request ID.
 
-### 11.4 Data Retention & GDPR Deletion
+### 12.4 Data Retention & GDPR Deletion
 
 Retention policy:
 - Session metadata: 90 days
@@ -620,7 +862,7 @@ Deletion pipeline (Inngest step function):
 3. After grace period: cascade delete sessions, knowledge articles, Qdrant collection, members, anonymize audit logs, clear Redis cache, hard-delete org
 4. Send confirmation email
 
-### 11.5 Rate Limiting
+### 12.5 Rate Limiting
 
 | Endpoint | Algorithm | Limit | Window | Identifier |
 |----------|-----------|-------|--------|------------|
@@ -633,7 +875,7 @@ Deletion pipeline (Inngest step function):
 
 Implementation: `@upstash/ratelimit` with Upstash Redis (EU).
 
-### 11.6 Secret Management
+### 12.6 Secret Management
 
 | Environment | Method |
 |-------------|--------|
@@ -644,7 +886,7 @@ Implementation: `@upstash/ratelimit` with Upstash Redis (EU).
 
 Startup validation: Zod schema parse of `process.env` in `packages/shared/src/env.ts`. Fail-fast if required secrets are missing.
 
-### 11.7 CSP Headers
+### 12.7 CSP Headers
 
 For the Next.js dashboard (apps/web), use `proxy.ts` with nonces:
 - `connect-src`: include `wss://generativelanguage.googleapis.com` for Gemini WebSocket
@@ -654,9 +896,9 @@ For the Next.js dashboard (apps/web), use `proxy.ts` with nonces:
 
 ---
 
-## 12. Observability
+## 13. Observability
 
-### 12.1 Stack
+### 13.1 Stack
 
 | Tool | Purpose | Scope |
 |------|---------|-------|
@@ -666,7 +908,7 @@ For the Next.js dashboard (apps/web), use `proxy.ts` with nonces:
 | **Pino** | Structured logging | Server-side. JSON logs with request ID propagation. |
 | **@vercel/otel** | OpenTelemetry for Next.js | Dashboard. Auto-instrumented on Vercel. |
 
-### 12.2 Structured Logging
+### 13.2 Structured Logging
 
 Use Pino with:
 - Service-scoped loggers (`createLogger('aucta-api')`)
@@ -674,13 +916,13 @@ Use Pino with:
 - PII redaction: `authorization`, `cookie`, `password`, `token`, `apiKey`, `email`
 - JSON format in production, pretty-print in development
 
-### 12.3 Custom Spans
+### 13.3 Custom Spans
 
 Instrument the tRPC -> Service -> Repository chain with OpenTelemetry spans:
 - `withSpan('session.create', attributes, fn)` in services
 - `withSpan('db.session.insert', attributes, fn)` in repositories
 
-### 12.4 Gemini Session Monitoring
+### 13.4 Gemini Session Monitoring
 
 Track per-session:
 - Connection latency, reconnection count, disconnection count
@@ -691,7 +933,7 @@ Track per-session:
 
 Flush metrics to database at session end for analytics dashboard.
 
-### 12.5 Health Check
+### 13.5 Health Check
 
 `/api/health` endpoint checking:
 - Postgres (Neon) -- `SELECT 1`
@@ -701,7 +943,7 @@ Flush metrics to database at session end for analytics dashboard.
 
 Returns `{ status: 'healthy' | 'degraded' | 'unhealthy', checks: {...}, timestamp, version }`.
 
-### 12.6 Alerting Thresholds
+### 13.6 Alerting Thresholds
 
 | Metric | Warning | Critical |
 |--------|---------|----------|
@@ -714,9 +956,9 @@ Returns `{ status: 'healthy' | 'degraded' | 'unhealthy', checks: {...}, timestam
 
 ---
 
-## 13. Database Strategy
+## 14. Database Strategy
 
-### 13.1 Migration Workflow
+### 14.1 Migration Workflow
 
 **Approach:** Codebase-first with generated SQL migrations (Drizzle Kit).
 
@@ -733,7 +975,7 @@ Returns `{ status: 'healthy' | 'degraded' | 'unhealthy', checks: {...}, timestam
 - Apply migrations to Neon preview branch
 - Schema diff comment on PR (via `neondatabase/schema-diff-action`)
 
-### 13.2 Connection Strategy
+### 14.2 Connection Strategy
 
 | Context | Driver | Connection | Reason |
 |---------|--------|------------|--------|
@@ -742,7 +984,7 @@ Returns `{ status: 'healthy' | 'degraded' | 'unhealthy', checks: {...}, timestam
 | Inngest jobs | `neon-http` | Pooler endpoint | Serverless functions |
 | Development | `postgres-js` | Direct endpoint | Full TCP for Drizzle Studio |
 
-### 13.3 Seed Data
+### 14.3 Seed Data
 
 Three tiers:
 - `packages/db/src/seed/dev.ts` -- Rich fake data with faker (3 orgs, 15 users, 20 sessions, 50 articles)
@@ -751,14 +993,14 @@ Three tiers:
 
 Scripts: `db:seed:dev`, `db:seed:ci`, `db:reset` (push + seed).
 
-### 13.4 Database Branching
+### 14.4 Database Branching
 
 Neon branch-per-PR for preview deployments:
 - On PR open: Create Neon branch (instant, copy-on-write), run migrations, inject DATABASE_URL into Vercel preview
 - On PR close: Delete Neon branch
 - Alternative: Use Neon Vercel integration for automatic branch management
 
-### 13.5 Backup & Recovery
+### 14.5 Backup & Recovery
 
 - **Neon PITR:** Continuous WAL archiving. Free plan: 24h retention. Scale plan: 30 days.
 - **Weekly pg_dump:** To encrypted S3 EU Frankfurt bucket via GitHub Actions cron.
@@ -766,7 +1008,7 @@ Neon branch-per-PR for preview deployments:
 - **RPO:** Effectively zero within retention window. 1 week beyond.
 - **RTO:** ~2 minutes (create branch + switch connection string).
 
-### 13.6 Session Events Partitioning (at scale)
+### 14.6 Session Events Partitioning (at scale)
 
 When `session_events` table grows large (>10M rows), partition by month:
 - Use Postgres range partitioning on `created_at`
@@ -775,9 +1017,9 @@ When `session_events` table grows large (>10M rows), partition by month:
 
 ---
 
-## 14. Offline Resilience
+## 15. Offline Resilience
 
-### 14.1 Connectivity Detection
+### 15.1 Connectivity Detection
 
 Use `@react-native-community/netinfo` (already in mobile dependencies):
 - Event listener for real-time connection state changes
@@ -785,7 +1027,7 @@ Use `@react-native-community/netinfo` (already in mobile dependencies):
 - Configure reachability check against Aucta's own `/api/health` endpoint
 - `isOnline()` utility for pre-operation checks
 
-### 14.2 Gemini WebSocket Resilience
+### 15.2 Gemini WebSocket Resilience
 
 **Session Resumption:**
 - Server sends `SessionResumptionUpdate` with `newHandle` and `resumable` flag
@@ -794,9 +1036,10 @@ Use `@react-native-community/netinfo` (already in mobile dependencies):
 - If resumable + handle available: resume existing session
 - If not resumable: start fresh session, emit `contextLost` event
 
-**Session Chaining (CRITICAL):**
+**Session Chaining (CRITICAL — video mode only, see Section 17.1):**
 - Video+audio sessions limited to **2 minutes** by Gemini API
-- Must implement automatic session chaining before timeout
+- Audio-only sessions have a **15-minute** limit (no chaining needed)
+- Must implement automatic session chaining before timeout when video is active
 - Server sends `GoAway` notification 60 seconds before session end
 - On GoAway: request new ephemeral token, open new WebSocket with session resumption handle, swap connections
 
@@ -805,7 +1048,7 @@ Use `@react-native-community/netinfo` (already in mobile dependencies):
 - Stop playing current audio buffer
 - On reconnection: model resumes from last resumable point or client sends conversation summary
 
-### 14.3 Offline Queue
+### 15.3 Offline Queue
 
 MMKV-backed queue with idempotency keys:
 - Item types: `session_meta`, `feedback`, `log`, `knowledge_update`
@@ -814,7 +1057,7 @@ MMKV-backed queue with idempotency keys:
 - Server-side idempotency via `idempotencyKey` in mutation payloads
 - Prune items that exceed max retries (log to Sentry)
 
-### 14.4 What Works Offline
+### 15.4 What Works Offline
 
 | Feature | Offline | Implementation |
 |---------|---------|----------------|
@@ -824,7 +1067,7 @@ MMKV-backed queue with idempotency keys:
 | Equipment error codes | Yes | Pre-cached global DB in MMKV |
 | Submit feedback (past sessions) | Queued | Offline queue |
 
-### 14.5 What Requires Connectivity
+### 15.5 What Requires Connectivity
 
 | Feature | Reason |
 |---------|--------|
@@ -834,7 +1077,7 @@ MMKV-backed queue with idempotency keys:
 | Team management | Server auth verification |
 | Sign in / sign up | Auth flow |
 
-### 14.6 Background Handling
+### 15.6 Background Handling
 
 - **iOS:** `UIBackgroundModes: ["audio"]` for continued recording. WebSocket drops after ~30s in background. Reconnect on foreground.
 - **Android:** Foreground service via `@notifee/react-native` for sustained audio. WebSocket stays alive in foreground service.
@@ -842,16 +1085,16 @@ MMKV-backed queue with idempotency keys:
 
 ---
 
-## 15. CI/CD Pipeline
+## 16. CI/CD Pipeline
 
-### 15.1 Current State
+### 16.1 Current State
 
 Single `.github/workflows/ci.yml`:
 - Checkout -> Setup Bun 1.3 -> Install (frozen lockfile) -> Biome check -> Typecheck -> Test
 - Concurrency: cancel-in-progress per branch
 - Timeout: 15 minutes
 
-### 15.2 Target PR Pipeline
+### 16.2 Target PR Pipeline
 
 ```
 PR opened/updated
@@ -879,7 +1122,7 @@ Key additions vs current:
 - Separate jobs for parallel execution
 - `fetch-depth: 0` for `--affected` support
 
-### 15.3 Target Deploy Pipeline (Merge to Main)
+### 16.3 Target Deploy Pipeline (Merge to Main)
 
 ```
 Push to main
@@ -900,7 +1143,7 @@ Push to main
         |-- Vercel promote deployment
 ```
 
-### 15.4 Mobile Pipeline
+### 16.4 Mobile Pipeline
 
 Trigger: Push to main with changes in `apps/mobile/`, `packages/shared/`, `packages/ai/`.
 
@@ -908,21 +1151,21 @@ Trigger: Push to main with changes in `apps/mobile/`, `packages/shared/`, `packa
 - OTA Update: `eas update --branch preview` for JS-only changes
 - Channels: development (never auto-update), preview (on app open), production (background download)
 
-### 15.5 Remote Caching
+### 16.5 Remote Caching
 
 Turborepo remote cache via Vercel:
 - `TURBO_TOKEN` from vercel.com/account/tokens
 - `TURBO_TEAM` set to Vercel team slug
 - Both set as GitHub Actions secrets/variables
 
-### 15.6 Preview Environments
+### 16.6 Preview Environments
 
 Vercel preview deploys + Neon database branches:
 - Automatic via Neon Vercel integration
 - `DATABASE_URL` auto-injected into preview env
 - Branch deleted when PR is closed/merged
 
-### 15.7 Dependency Management
+### 16.7 Dependency Management
 
 **Renovate** for version updates:
 - Weekly schedule (Monday before 7am Vienna time)
@@ -936,7 +1179,7 @@ Vercel preview deploys + Neon database branches:
 - Weekly schedule, Monday 6am UTC
 - Separate from Renovate (Dependabot handles security alerts, Renovate handles version updates)
 
-### 15.8 Security Scanning
+### 16.8 Security Scanning
 
 - **GitHub CodeQL:** SAST for JavaScript/TypeScript (free for public repos, included with GitHub Advanced Security)
 - **Semgrep:** SAST with custom rules (free OSS)
@@ -945,36 +1188,61 @@ Vercel preview deploys + Neon database branches:
 
 ---
 
-## 16. Scalability
+## 17. Scalability
 
-### 16.1 Gemini API Cost Model
+### 17.1 Session Mode Architecture
 
-**Per-session cost (10-minute session, audio + 1 FPS video):**
+**Decision:** Sessions start audio-only by default. Video is activated on explicit technician request.
 
-| Model | Per-Session Cost | Notes |
-|-------|-----------------|-------|
-| Gemini 2.5 Flash Live (Native Audio) | ~$0.61 | Current pricing |
-| Gemini 3.1 Flash Live Preview | ~$0.16 | Newer model, ~4x cheaper |
+**Rationale:**
+- **Cost:** Audio-only is ~6x cheaper than audio+video ($0.03 vs $0.16-$0.61 per 10-min session)
+- **Session limits:** Audio-only sessions get a **15-minute** Gemini limit vs **2 minutes** for video+audio, eliminating the need for session chaining in most cases
+- **Simplicity:** No session chaining logic needed for the majority of field calls (many HVAC issues are diagnosable by audio description alone)
+
+**Implications:**
+
+| Concern | Audio-Only Default | Video Activated |
+|---------|-------------------|-----------------|
+| **Mobile UI** | Camera preview OFF, mic active | Camera preview ON via button or voice command ("show me") |
+| **Gemini setup** | `responseModalities: ["AUDIO"]`, no video input | Add video input stream, keep `responseModalities: ["AUDIO"]` |
+| **Session limit** | 15 minutes (no chaining needed) | 2 minutes (session chaining required) |
+| **Ephemeral token** | 1 token per session | 1 token per 2-min chain segment |
+| **Activation triggers** | — | Tap camera button, voice command ("look at this", "show me"), technician gesture |
+
+**Session chaining is only needed when video is active.** This dramatically simplifies M1-M2 implementation — audio-only sessions work end-to-end without chaining logic. Session chaining (M3, task 3.2) becomes a video-specific concern.
+
+### 17.2 Gemini API Cost Model
+
+**Per-session cost (10-minute session):**
+
+| Model | Mode | Per-Session Cost | Notes |
+|-------|------|-----------------|-------|
+| Gemini 2.5 Flash Live | Audio + Video (1 FPS) | ~$0.61 | 5 chained 2-min sessions |
+| Gemini 2.5 Flash Live | **Audio-only** | **~$0.10** | Single 10-min session, no chaining |
+| Gemini 3.1 Flash Live Preview | Audio + Video (1 FPS) | ~$0.16 | 5 chained 2-min sessions |
+| Gemini 3.1 Flash Live Preview | **Audio-only** | **~$0.03** | Single 10-min session, no chaining |
 
 **Video+audio sessions are limited to 2 minutes.** A 10-minute field session requires 5 chained sessions, each needing a new ephemeral token.
 
-**Monthly projections (10-min avg session):**
+**Monthly projections (10-min avg session, Gemini 2.5 Flash Live):**
 
-| Daily Sessions | Gemini 2.5 Flash Live | Gemini 3.1 Flash Live |
-|----------------|----------------------|----------------------|
-| 100 | ~$1,830/mo | ~$480/mo |
-| 1,000 | ~$18,300/mo | ~$4,800/mo |
-| 10,000 | ~$183,000/mo | ~$48,000/mo |
+| Daily Sessions | Audio-Only | Mixed (50% video) | Full Video |
+|----------------|-----------|-------------------|------------|
+| 100 | ~$300/mo | ~$1,065/mo | ~$1,830/mo |
+| 1,000 | ~$3,000/mo | ~$10,650/mo | ~$18,300/mo |
+| 10,000 | ~$30,000/mo | ~$106,500/mo | ~$183,000/mo |
 
-### 16.2 Cost Optimization
+With audio-only default and Gemini 3.1 Flash Live, costs drop further to ~$90/mo at 100 daily sessions.
+
+### 17.3 Cost Optimization
 
 1. **Use newest model:** Gemini 3.1 Flash Live Preview is ~4x cheaper. Monitor for GA.
-2. **Adaptive frame rate:** Default 0.5 FPS, increase to 1 FPS on voice command ("look at this").
-3. **Audio-only default:** Start sessions audio-only (15-min limit). Add video only when technician requests visual analysis.
+2. **Audio-only default:** Sessions start audio-only (15-min limit, no chaining). See Section 17.1. This is the single biggest cost lever.
+3. **Adaptive frame rate:** When video is active, default 0.5 FPS, increase to 1 FPS on voice command ("look at this").
 4. **Context window compression:** Use `ContextWindowCompressionConfig` with `SlidingWindow` to prevent token bloat.
 5. **Session duration caps:** 10-15 minute max. Most HVAC diagnostics resolve within this window.
 
-### 16.3 Backend Scaling
+### 17.4 Backend Scaling
 
 The ephemeral token model means mobile clients connect directly to Gemini. The backend handles:
 - Token exchange: ~0.06 RPS at 1,000 daily sessions
@@ -983,7 +1251,7 @@ The ephemeral token model means mobile clients connect directly to Gemini. The b
 
 Bottleneck will be Gemini API rate limits, not Aucta infrastructure.
 
-### 16.4 Database Scaling
+### 17.5 Database Scaling
 
 | Scale | Strategy |
 |-------|----------|
@@ -993,7 +1261,7 @@ Bottleneck will be Gemini API rate limits, not Aucta infrastructure.
 
 Connection limits are a non-issue with `neon-http` driver (stateless HTTP queries, no connection pool).
 
-### 16.5 Mobile Performance
+### 17.6 Mobile Performance
 
 **Bundle size targets:**
 | Target | Budget |
@@ -1011,7 +1279,7 @@ Connection limits are a non-issue with `neon-http` driver (stateless HTTP querie
 - Aggressive audio buffer cleanup during sessions (send immediately, don't accumulate)
 - Limit in-memory session events to 100 (older events flushed to MMKV)
 
-### 16.6 Load Testing Strategy
+### 17.7 Load Testing Strategy
 
 Use k6 to simulate:
 1. Concurrent ephemeral token requests (ramp to 100 VUs)
@@ -1032,4 +1300,3 @@ Target: P95 < 500ms for token exchange, P95 < 1s for knowledge search, zero 5xx 
 | 4 | Vertex AI migration for strict EU data residency | Compliance | If customer requires it |
 | 5 | expo-audio vs expo-av for PCM 16kHz recording | Mobile audio capture | M1 (test on dev build) |
 | 6 | NativeWind v5 timeline to stable | TW v4 unification | Monitor quarterly |
-| 7 | DI container library vs manual factories | Code complexity | M1 (refactoring) |
