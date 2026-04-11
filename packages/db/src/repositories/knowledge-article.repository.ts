@@ -84,6 +84,49 @@ export class KnowledgeArticleRepository {
     return rows.map((row) => KnowledgeArticleDTOSchema.parse(row));
   }
 
+  async findByOrgFiltered(
+    orgId: string,
+    filters: {
+      limit?: number;
+      offset?: number;
+      equipmentBrand?: string;
+      category?: string;
+      confidenceLevel?: string;
+    },
+  ): Promise<KnowledgeArticleDTO[]> {
+    const conditions = [eq(knowledgeArticles.orgId, orgId)];
+
+    if (filters.equipmentBrand) {
+      conditions.push(eq(knowledgeArticles.equipmentBrand, filters.equipmentBrand));
+    }
+    if (filters.category) {
+      conditions.push(
+        eq(
+          knowledgeArticles.category,
+          filters.category as (typeof knowledgeArticles.category)["enumValues"][number],
+        ),
+      );
+    }
+    if (filters.confidenceLevel) {
+      conditions.push(
+        eq(
+          knowledgeArticles.confidenceLevel,
+          filters.confidenceLevel as (typeof knowledgeArticles.confidenceLevel)["enumValues"][number],
+        ),
+      );
+    }
+
+    const rows = await this.db
+      .select()
+      .from(knowledgeArticles)
+      .where(and(...conditions))
+      .orderBy(desc(knowledgeArticles.updatedAt))
+      .limit(filters.limit ?? 20)
+      .offset(filters.offset ?? 0);
+
+    return rows.map((row) => KnowledgeArticleDTOSchema.parse(row));
+  }
+
   async findByEquipment(
     orgId: string,
     brand: string,

@@ -1,0 +1,37 @@
+{
+  "name": "@aucta/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check ."
+  },
+  "dependencies": {
+    "@aucta/api": "workspace:*",
+    "@aucta/auth": "workspace:*",
+    "@aucta/shared": "workspace:*",
+    "@tanstack/react-query": "^5.75.0",
+    "@trpc/client": "^11.16.0",
+    "@trpc/react-query": "^11.16.0",
+    "@trpc/server": "^11.16.0",
+    "clsx": "^2.1.0",
+    "i18next": "^25.2.0",
+    "lucide-react": "^0.510.0",
+    "next": "^16.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-i18next": "^17.0.2",
+    "tailwind-merge": "^3.2.0",
+    "tailwindcss": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^6.0.0"
+  }
+}

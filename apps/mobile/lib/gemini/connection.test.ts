@@ -39,7 +39,7 @@ function createMockDeps(): GeminiConnectionDeps {
 function createDefaultConfig(overrides?: Partial<GeminiConnectionConfig>): GeminiConnectionConfig {
   return {
     token: "test-ephemeral-token",
-    model: "gemini-2.5-flash-live-preview",
+    model: "gemini-3.1-flash-live-preview",
     ...overrides,
   };
 }
@@ -63,48 +63,17 @@ describe("GeminiConnection", () => {
       );
     });
 
-    it("sends setup message with model and responseModalities on open", () => {
-      const config = createDefaultConfig();
-      connection.connect(config);
+    it("sends setup message using 'setup' key (BidiGenerateContentConstrained)", () => {
+      connection.connect(createDefaultConfig());
       lastCreatedWs.simulateOpen();
 
       expect(lastCreatedWs.sentMessages).toHaveLength(1);
-      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(setup.config.model).toBe(`models/${config.model}`);
-      expect(setup.config.responseModalities).toEqual(["AUDIO"]);
+      const msg = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(msg.setup).toBeDefined();
+      expect(msg.config).toBeUndefined();
     });
 
-    it("includes contextWindowCompression with slidingWindow in setup", () => {
-      connection.connect(createDefaultConfig());
-      lastCreatedWs.simulateOpen();
-
-      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(setup.config.contextWindowCompression).toEqual({
-        slidingWindow: {},
-      });
-    });
-
-    it("includes sessionResumption with handle when provided", () => {
-      connection.connect(
-        createDefaultConfig({ resumptionHandle: "resume-handle-123" }),
-      );
-      lastCreatedWs.simulateOpen();
-
-      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(setup.config.sessionResumption).toEqual({
-        handle: "resume-handle-123",
-      });
-    });
-
-    it("includes empty sessionResumption on first connect (no handle)", () => {
-      connection.connect(createDefaultConfig());
-      lastCreatedWs.simulateOpen();
-
-      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(setup.config.sessionResumption).toEqual({});
-    });
-
-    it("includes tools with functionDeclarations when provided", () => {
+    it("does not include model, responseModalities, or tools in setup (locked in token)", () => {
       const toolDeclarations = [
         {
           name: "lookupErrorCode",
@@ -115,18 +84,40 @@ describe("GeminiConnection", () => {
       connection.connect(createDefaultConfig({ toolDeclarations }));
       lastCreatedWs.simulateOpen();
 
-      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(setup.config.tools).toEqual([
-        { functionDeclarations: toolDeclarations },
-      ]);
+      const msg = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(msg.setup.model).toBeUndefined();
+      expect(msg.setup.responseModalities).toBeUndefined();
+      expect(msg.setup.tools).toBeUndefined();
     });
 
-    it("omits tools from setup when no declarations provided", () => {
+    it("includes contextWindowCompression with slidingWindow in setup", () => {
       connection.connect(createDefaultConfig());
       lastCreatedWs.simulateOpen();
 
-      const setup = JSON.parse(lastCreatedWs.sentMessages[0]);
-      expect(setup.config.tools).toBeUndefined();
+      const msg = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(msg.setup.contextWindowCompression).toEqual({
+        slidingWindow: {},
+      });
+    });
+
+    it("includes sessionResumption with handle when provided", () => {
+      connection.connect(
+        createDefaultConfig({ resumptionHandle: "resume-handle-123" }),
+      );
+      lastCreatedWs.simulateOpen();
+
+      const msg = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(msg.setup.sessionResumption).toEqual({
+        handle: "resume-handle-123",
+      });
+    });
+
+    it("includes empty sessionResumption on first connect (no handle)", () => {
+      connection.connect(createDefaultConfig());
+      lastCreatedWs.simulateOpen();
+
+      const msg = JSON.parse(lastCreatedWs.sentMessages[0]);
+      expect(msg.setup.sessionResumption).toEqual({});
     });
   });
 
@@ -218,6 +209,18 @@ describe("GeminiConnection", () => {
     it("calls onGoAway with undefined timeLeft", () => {
       lastCreatedWs.simulateMessage({ goAway: {} });
       expect(deps.onGoAway).toHaveBeenCalledWith(undefined);
+    });
+
+    it("accepts pre-parsed object as event.data (React Native WebSocket quirk)", () => {
+      lastCreatedWs.onmessage?.({ data: { setupComplete: {} } });
+      expect(deps.onSetupComplete).toHaveBeenCalledOnce();
+    });
+
+    it("parses ArrayBuffer UTF-8 JSON frames", () => {
+      const json = JSON.stringify({ setupComplete: {} });
+      const buf = new TextEncoder().encode(json).buffer;
+      lastCreatedWs.onmessage?.({ data: buf });
+      expect(deps.onSetupComplete).toHaveBeenCalledOnce();
     });
   });
 

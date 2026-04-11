@@ -31,7 +31,7 @@ describe("FrameCapture", () => {
     cameraRef = { current: { takePictureAsync: mockTakePictureAsync } };
     frameCapture = new FrameCapture({
       cameraRef: cameraRef as any,
-      onFrame,
+      onFrame: onFrame as unknown as (jpegBase64: string) => void,
     });
     mockManipulateAsync.mockClear();
     mockManipulateAsync.mockResolvedValue({
@@ -69,6 +69,7 @@ describe("FrameCapture", () => {
     expect(mockTakePictureAsync).toHaveBeenCalledWith(
       expect.objectContaining({
         quality: 0.6,
+        shutterSound: false,
       }),
     );
   });

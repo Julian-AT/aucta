@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { router } from "../trpc.js";
 import { orgProcedure } from "../middleware/org-scope.js";
@@ -7,19 +6,21 @@ import { KnowledgeArticleRepository } from "@aucta/db/repositories/knowledge-art
 import { KnowledgeLinkRepository } from "@aucta/db/repositories/knowledge-link.repository";
 import { KnowledgeVerificationRepository } from "@aucta/db/repositories/knowledge-verification.repository";
 import { db } from "@aucta/db/client";
-import {
-  GeminiEmbeddingService,
-  createQdrantClient,
-  QDRANT_CONFIG,
-  EMBEDDING_CONFIG,
-  runHealthCheck,
-} from "@aucta/ai/knowledge";
-import { generateLinks } from "@aucta/ai/knowledge/compile/linker";
-import type { KnowledgeArticleDTO } from "@aucta/shared/schemas/knowledge-article.schema";
+import { KnowledgeService } from "../services/knowledge.service.js";
 
-const articleRepo = new KnowledgeArticleRepository(db);
-const linkRepo = new KnowledgeLinkRepository(db);
-const verificationRepo = new KnowledgeVerificationRepository(db);
+const knowledgeService = new KnowledgeService({
+  articleRepo: new KnowledgeArticleRepository(db),
+  linkRepo: new KnowledgeLinkRepository(db),
+  verificationRepo: new KnowledgeVerificationRepository(db),
+});
+
+const categoryEnum = z.enum([
+  "equipment",
+  "procedure",
+  "safety",
+  "regulatory",
+  "troubleshooting",
+]);
 
 export const knowledgeRouter = router({
   create: orgProcedure
@@ -28,13 +29,7 @@ export const knowledgeRouter = router({
       z.object({
         title: z.string().min(1).max(500),
         contentMd: z.string().min(1),
-        category: z.enum([
-          "equipment",
-          "procedure",
-          "safety",
-          "regulatory",
-          "troubleshooting",
-        ]),
+        category: categoryEnum,
         equipmentBrand: z.string().optional(),
         equipmentModel: z.string().optional(),
         procedureType: z.string().optional(),
@@ -42,25 +37,7 @@ export const knowledgeRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const article = await articleRepo.create({
-        orgId: ctx.orgId,
-        title: input.title,
-        contentMd: input.contentMd,
-        category: input.category,
-        equipmentBrand: input.equipmentBrand,
-        equipmentModel: input.equipmentModel,
-        procedureType: input.procedureType,
-        sourceType: "manual",
-        confidenceLevel: "technician_reviewed",
-        tags: input.tags,
-        isAiGenerated: false,
-        createdBy: ctx.userId,
-      });
-
-      await embedAndUpsert(article);
-      await generateLinks({ articleRepo, linkRepo }, article.id, ctx.orgId);
-
-      return article;
+      return knowledgeService.createArticle(ctx.orgId, ctx.userId, input);
     }),
 
   update: orgProcedure
@@ -70,15 +47,7 @@ export const knowledgeRouter = router({
         id: z.string(),
         title: z.string().min(1).max(500).optional(),
         contentMd: z.string().min(1).optional(),
-        category: z
-          .enum([
-            "equipment",
-            "procedure",
-            "safety",
-            "regulatory",
-            "troubleshooting",
-          ])
-          .optional(),
+        category: categoryEnum.optional(),
         equipmentBrand: z.string().optional(),
         equipmentModel: z.string().optional(),
         procedureType: z.string().optional(),
@@ -86,27 +55,8 @@ export const knowledgeRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const existing = await articleRepo.findById(input.id);
-      if (!existing) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Article ${input.id} not found`,
-        });
-      }
-      if (existing.orgId !== ctx.orgId) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Cross-org access denied",
-        });
-      }
-
-      const { id, ...updateData } = input;
-      const updated = await articleRepo.update(id, updateData);
-
-      await embedAndUpsert(updated);
-      await generateLinks({ articleRepo, linkRepo }, updated.id, ctx.orgId);
-
-      return updated;
+      const { id, ...data } = input;
+      return knowledgeService.updateArticle(ctx.orgId, id, data);
     }),
 
   list: orgProcedure
@@ -117,15 +67,7 @@ export const knowledgeRouter = router({
           limit: z.number().min(1).max(100).default(20),
           offset: z.number().min(0).default(0),
           equipmentBrand: z.string().optional(),
-          category: z
-            .enum([
-              "equipment",
-              "procedure",
-              "safety",
-              "regulatory",
-              "troubleshooting",
-            ])
-            .optional(),
+          category: categoryEnum.optional(),
           confidenceLevel: z
             .enum([
               "unverified",
@@ -138,53 +80,20 @@ export const knowledgeRouter = router({
         .optional(),
     )
     .query(async ({ ctx, input }) => {
-      const limit = input?.limit ?? 20;
-      const articles = await articleRepo.findByOrgId(ctx.orgId, limit);
-
-      return articles.filter((a) => {
-        if (input?.equipmentBrand && a.equipmentBrand !== input.equipmentBrand)
-          return false;
-        if (input?.category && a.category !== input.category) return false;
-        if (input?.confidenceLevel && a.confidenceLevel !== input.confidenceLevel)
-          return false;
-        return true;
-      });
+      return knowledgeService.listArticles(ctx.orgId, input);
     }),
 
   getById: orgProcedure
     .use(errorConverter)
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const article = await articleRepo.findById(input.id);
-      if (!article) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Article ${input.id} not found`,
-        });
-      }
-      if (article.orgId !== ctx.orgId) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Cross-org access denied",
-        });
-      }
-
-      return article;
+      return knowledgeService.getArticleById(ctx.orgId, input.id);
     }),
 
   healthCheck: orgProcedure
     .use(errorConverter)
     .query(async ({ ctx }) => {
-      return runHealthCheck(
-        {
-          findStaleArticles: (orgId, staleDays) =>
-            articleRepo.findStaleArticles(orgId, staleDays),
-          findCoverageGaps: (orgId) => articleRepo.findCoverageGaps(orgId),
-          findConflictingArticles: (orgId) =>
-            articleRepo.findConflictingArticles(orgId),
-        },
-        ctx.orgId,
-      );
+      return knowledgeService.healthCheck(ctx.orgId);
     }),
 
   submitReview: orgProcedure
@@ -197,124 +106,19 @@ export const knowledgeRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const article = await articleRepo.findById(input.articleId);
-      if (!article) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Article ${input.articleId} not found`,
-        });
-      }
-      if (article.orgId !== ctx.orgId) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Cross-org access denied",
-        });
-      }
-
-      const verification = await verificationRepo.create({
-        articleId: input.articleId,
-        orgId: ctx.orgId,
-        reviewerId: ctx.userId,
-        status: input.status,
-        reviewerNotes: input.reviewerNotes,
-      });
-
-      // Promote confidence level on approval (ladder: unverified -> technician_reviewed -> expert_approved)
-      // manufacturer_sourced is never auto-promoted -- only set manually
-      if (input.status === "approved") {
-        const newLevel =
-          article.confidenceLevel === "unverified"
-            ? "technician_reviewed"
-            : article.confidenceLevel === "technician_reviewed"
-              ? "expert_approved"
-              : article.confidenceLevel;
-
-        if (newLevel !== article.confidenceLevel) {
-          const updated = await articleRepo.update(article.id, {
-            confidenceLevel: newLevel,
-          });
-          await embedAndUpsert(updated);
-        }
-      }
-
-      return verification;
+      return knowledgeService.submitReview(ctx.orgId, ctx.userId, input);
     }),
 
   getPendingReviews: orgProcedure
     .use(errorConverter)
     .query(async ({ ctx }) => {
-      return verificationRepo.findPendingByOrg(ctx.orgId);
+      return knowledgeService.getPendingReviews(ctx.orgId);
     }),
 
   getReviewsByArticle: orgProcedure
     .use(errorConverter)
     .input(z.object({ articleId: z.string() }))
     .query(async ({ ctx, input }) => {
-      const article = await articleRepo.findById(input.articleId);
-      if (!article) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Article ${input.articleId} not found`,
-        });
-      }
-      if (article.orgId !== ctx.orgId) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Cross-org access denied",
-        });
-      }
-      return verificationRepo.findByArticleId(input.articleId);
+      return knowledgeService.getReviewsByArticle(ctx.orgId, input.articleId);
     }),
 });
-
-/**
- * Embed article text and upsert to Qdrant.
- * Silent failure -- article is in Postgres regardless.
- */
-async function embedAndUpsert(article: KnowledgeArticleDTO): Promise<void> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  const qdrantUrl = process.env.QDRANT_URL;
-  if (!apiKey || !qdrantUrl) return;
-
-  try {
-    const embeddingService = new GeminiEmbeddingService({ apiKey });
-    const qdrantClient = createQdrantClient({
-      url: qdrantUrl,
-      apiKey: process.env.QDRANT_API_KEY,
-    });
-
-    const embeddingText = `${article.title} ${article.summary ?? ""} ${article.contentMd}`;
-    const denseVector = await embeddingService.embedDocument(embeddingText);
-
-    await qdrantClient.upsert(QDRANT_CONFIG.COLLECTION_NAME, {
-      wait: true,
-      points: [
-        {
-          id: article.id,
-          vector: {
-            [QDRANT_CONFIG.DENSE_VECTOR_NAME]: denseVector,
-          },
-          payload: {
-            article_id: article.id,
-            org_id: article.orgId,
-            confidence_level: article.confidenceLevel,
-            equipment_brand: article.equipmentBrand ?? "",
-            equipment_model: article.equipmentModel ?? "",
-            category: article.category,
-            title: article.title,
-            summary: article.summary ?? "",
-            tags: article.tags ?? [],
-          },
-        },
-      ],
-    });
-
-    await articleRepo.updateEmbedding(
-      article.id,
-      article.id,
-      EMBEDDING_CONFIG.MODEL,
-    );
-  } catch (err) {
-    console.error(`Failed to embed article ${article.id}:`, err);
-  }
-}

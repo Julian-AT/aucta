@@ -1,5 +1,6 @@
 import { View, Text, Pressable, Modal } from "react-native";
 import { ShieldAlert } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import { ScreenContainer } from "@/components/common/ScreenContainer";
 
 interface AIDisclosureModalProps {
@@ -8,6 +9,8 @@ interface AIDisclosureModalProps {
 }
 
 export function AIDisclosureModal({ visible, onAccept }: AIDisclosureModalProps) {
+  const { t } = useTranslation();
+
   return (
     <Modal visible={visible} animationType="fade" statusBarTranslucent>
       <ScreenContainer>
@@ -15,22 +18,21 @@ export function AIDisclosureModal({ visible, onAccept }: AIDisclosureModalProps)
           <ShieldAlert color="#2563EB" size={48} />
 
           <Text className="text-heading text-text-primary text-center">
-            AI-Assisted Session
+            {t("aiDisclosure.title")}
           </Text>
 
           <Text className="text-body text-text-secondary text-center px-lg">
-            You are interacting with an AI system, not a human expert. AI
-            guidance does not replace professional training or certification.
+            {t("aiDisclosure.body")}
           </Text>
 
           <Pressable
             onPress={onAccept}
             className="min-h-[56px] w-full flex-row items-center justify-center rounded-lg bg-accent"
-            accessibilityLabel="I understand, start AI session"
+            accessibilityLabel={t("aiDisclosure.accept")}
             accessibilityRole="button"
           >
             <Text className="text-body font-semibold text-white">
-              I Understand
+              {t("aiDisclosure.accept")}
             </Text>
           </Pressable>
         </View>

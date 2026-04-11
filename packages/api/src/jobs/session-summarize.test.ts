@@ -50,7 +50,7 @@ describe("session-summarize", () => {
         startedAt: new Date("2026-04-04T10:00:00Z"),
         endedAt: new Date("2026-04-04T10:15:00Z"),
         durationMs: 900000,
-        modelVersion: "gemini-2.5-flash-live-preview",
+        modelVersion: "gemini-3.1-flash-live-preview",
         languageDetected: "en",
         tokenCountInput: 5000,
         tokenCountOutput: 2000,

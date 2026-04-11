@@ -201,8 +201,8 @@ describe("sessionRouter", () => {
 
     const result = await caller.createToken();
 
-    const toolNames = result.toolDeclarations.map(
-      (d: { name: string }) => d.name,
+    const toolNames = (result.toolDeclarations as Array<{ name: string }>).map(
+      (d) => d.name,
     );
     expect(toolNames).toContain("lookupErrorCode");
     expect(toolNames).toContain("logFinding");
@@ -432,7 +432,7 @@ describe("sessionRouter", () => {
         startedAt: new Date(),
         endedAt: null,
         durationMs: null,
-        modelVersion: "gemini-2.5-flash-live-preview",
+        modelVersion: "gemini-3.1-flash-live-preview",
         languageDetected: null,
         tokenCountInput: null,
         tokenCountOutput: null,
@@ -447,11 +447,11 @@ describe("sessionRouter", () => {
       });
 
       const caller = orgCaller();
-      await caller.createSession({ modelVersion: "gemini-2.5-flash-live-preview" });
+      await caller.createSession({ modelVersion: "gemini-3.1-flash-live-preview" });
 
       expect(mockSessionRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          modelVersion: "gemini-2.5-flash-live-preview",
+          modelVersion: "gemini-3.1-flash-live-preview",
         }),
       );
     });

@@ -28,7 +28,7 @@ describe("AudioCapture", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     onChunk = vi.fn();
-    capture = new AudioCapture({ onChunk });
+    capture = new AudioCapture({ onChunk: onChunk as unknown as (pcmBase64: string) => void });
   });
 
   afterEach(() => {

@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { SessionProvider, useSession } from "@/providers/session-provider";
 import { TRPCProviderWrapper } from "@/providers/trpc-provider";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import "@/lib/i18n";
 import "@/global.css";
 
 export default function RootLayout() {

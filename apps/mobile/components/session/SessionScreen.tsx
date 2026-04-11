@@ -121,8 +121,7 @@ export function SessionScreen() {
           showAudioIndicator={status === "active"}
           showStopButton={
             status !== "failed" &&
-            status !== "timeout" &&
-            status !== "completed"
+            status !== "timeout"
           }
           onStopPress={() => setShowEndDialog(true)}
         />

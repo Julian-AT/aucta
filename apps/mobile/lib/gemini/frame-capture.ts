@@ -37,6 +37,8 @@ export class FrameCapture {
       try {
         const photo = await this.deps.cameraRef.current.takePictureAsync({
           quality: JPEG_QUALITY,
+          /** Still captures; avoids shutter click every `CAPTURE_INTERVAL_MS` (iOS/Android where supported). */
+          shutterSound: false,
         });
         if (photo?.uri) {
           // Resize to max 768px on longest dimension (SESS-02)
